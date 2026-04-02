@@ -70,7 +70,7 @@ verify images:
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == /\//
+    - if: $CI_COMMIT_REF_NAME =~ /\//
 
 tests frontend:
   stage: test 
