@@ -11,7 +11,7 @@ build frontend:
   script:
     - | 
       if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest;
-      elif [[ $CI_COMMIT_REF_NAME == "" ]]; then REGISTRY_TAG=$DEVELOPMENT_BRANCH;
+      elif [[ $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH ]]; then REGISTRY_TAG=$DEVELOPMENT_BRANCH;
       else REGISTRY_TAG=$CI_COMMIT_REF_SLUG;
       fi
       docker buildx build -f frontend/Dockerfile -t $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG \
@@ -36,7 +36,7 @@ build backend:
   script:
     - |
       if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest;
-      elif [[ $CI_COMMIT_REF_NAME == "" ]]; then REGISTRY_TAG=$DEVELOPMENT_BRANCH;
+      elif [[ $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH ]]; then REGISTRY_TAG=$DEVELOPMENT_BRANCH;
       else REGISTRY_TAG=$CI_COMMIT_REF_SLUG;
       fi
       docker buildx build -f backend/Dockerfile -t $CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG \
