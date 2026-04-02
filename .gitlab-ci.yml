@@ -11,7 +11,7 @@ build frontend:
   script:
     - | 
       if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest;
-      elif [[ $CI_COMMIT_REF_NAME == "development" ]]; then REGISTRY_TAG=development;
+      elif [[ $CI_COMMIT_REF_NAME == "" ]]; then REGISTRY_TAG=$DEVELOPMENT_BRANCH;
       else REGISTRY_TAG=$CI_COMMIT_REF_SLUG;
       fi
       docker buildx build -f frontend/Dockerfile -t $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG \
@@ -24,8 +24,8 @@ build frontend:
       dotenv: build.env 
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == "development"
-    - if: $CI_COMMIT_REF_NAME =~ /feature/
+    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
+    - if: $CI_COMMIT_REF_NAME =~ /\//
 
 
 build backend:
@@ -36,7 +36,7 @@ build backend:
   script:
     - |
       if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest;
-      elif [[ $CI_COMMIT_REF_NAME == "development" ]]; then REGISTRY_TAG=development;
+      elif [[ $CI_COMMIT_REF_NAME == "" ]]; then REGISTRY_TAG=$DEVELOPMENT_BRANCH;
       else REGISTRY_TAG=$CI_COMMIT_REF_SLUG;
       fi
       docker buildx build -f backend/Dockerfile -t $CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG \
@@ -49,8 +49,8 @@ build backend:
       dotenv: build.env
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == "development"
-    - if: $CI_COMMIT_REF_NAME =~ /feature/
+    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
+    - if: $CI_COMMIT_REF_NAME =~ /\//
 
 tests frontend:
   stage: test 
@@ -64,7 +64,7 @@ tests frontend:
     - echo "doing alot of cool tests"
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == "development"
+    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH 
 
 tests backend:
   stage: test 
@@ -78,14 +78,14 @@ tests backend:
     - echo "doing alot of cool tests"
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == "development"
+    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
 
-deploy development:
+deploy :
   stage: deploy
   rules:
-    - if: $CI_COMMIT_REF_NAME == "development"
+    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
   script:
-    - echo "Deploying to development enviorment..."
+    - echo "Deploying to  enviorment..."
 
 deploy production:
   stage: deploy
