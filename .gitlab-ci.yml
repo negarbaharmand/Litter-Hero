@@ -15,9 +15,9 @@ build frontend:
       else REGISTRY_TAG=$CI_COMMIT_REF_SLUG;
       fi
       docker buildx build -f frontend/Dockerfile -t $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG \
-      --cache-from=$CI_REGISTRY_IMAGE:$REGISTRY_TAG --push frontend/
+      --cache-from=$CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG --push frontend/
       docker buildx build -f frontend/Dockerfile -t $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG \
-      --cache-from=test-$CI_REGISTRY_IMAGE:$REGISTRY_TAG --push frontend/
+      --cache-from=test-$CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG --push frontend/
       echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env  
   artifacts:
     reports:
@@ -40,9 +40,9 @@ build backend:
       else REGISTRY_TAG=$CI_COMMIT_REF_SLUG;
       fi
       docker buildx build -f backend/Dockerfile -t $CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG \
-      --cache-from=$CI_REGISTRY_IMAGE:$REGISTRY_TAG --push backend/
+      --cache-from=$CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG --push backend/
       docker buildx build -f backend/Dockerfile -t $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG \
-      --cache-from=test-$CI_REGISTRY_IMAGE:$REGISTRY_TAG --push backend/
+      --cache-from=test-$CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG --push backend/
       echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env 
   artifacts:
     reports:
@@ -80,7 +80,7 @@ tests backend:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
 
-deploy :
+deploy development:
   stage: deploy
   rules:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
