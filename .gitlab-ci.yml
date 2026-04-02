@@ -3,6 +3,9 @@ stages:
   - test 
   - deploy 
 
+# Builds frontend in a docker container and pushes it to gitlab registry.
+# Saves the name of the REGISTRY_TAG in build.env file
+# This stage will always run
 build frontend:
   stage: build
   image: docker:29
@@ -27,7 +30,9 @@ build frontend:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\//
 
-
+# Builds backend in a docker container and pushes it to gitlab registry.
+# Saves the name of the REGISTRY_TAG in build.env file
+# This stage will always run
 build backend:
   stage: build 
   image: docker:29 
@@ -52,6 +57,7 @@ build backend:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\//
 
+# Verifys that all the images works correctly by trying to pull all images from the registry
 verify images:
   stage: test
   image: docker:29
@@ -72,6 +78,7 @@ verify images:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\//
 
+# This dosnt do anything yet. But will add developers unit tests here.
 tests frontend:
   stage: test 
   image: $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG 
@@ -86,6 +93,7 @@ tests frontend:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH 
 
+# This dosnt do anything yet. But will add developers unit tests here.
 tests backend:
   stage: test 
   image: $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG 
@@ -100,13 +108,15 @@ tests backend:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
 
+# This dosnt do anything yet, but will eventually deploy the code in the development branch in docker swarm/kuberenetes.
 deploy development:
   stage: deploy
   rules:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
   script:
-    - echo "Deploying to  enviorment..."
+    - echo "Deploying to development enviorment..."
 
+# This dosnt do anything yet, but will eventually deploy the code in the main branch in docker swarm/kuberenetes.
 deploy production:
   stage: deploy
   rules:
