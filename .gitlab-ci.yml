@@ -7,7 +7,7 @@ build frontend:
   stage: build
   image: docker:29
   before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY_PASSWORD
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
     - | 
       if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest;
@@ -32,7 +32,7 @@ build backend:
   stage: build 
   image: docker:29 
   before_script:
-      - docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY_PASSWORD
+      - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
     - |
       if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest;
@@ -59,7 +59,7 @@ tests frontend:
     - job: build frontend
       artifacts: true
   before_script:
-      - docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY_PASSWORD
+      - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
     - echo "doing alot of cool tests"
   rules:
@@ -73,7 +73,7 @@ tests backend:
     - job: build backend 
       artifacts: true
   before_script:
-      - docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY_PASSWORD
+      - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
     - echo "doing alot of cool tests"
   rules:
