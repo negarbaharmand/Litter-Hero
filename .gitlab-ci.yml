@@ -10,10 +10,10 @@ build frontend:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
     - | 
-      if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest; \
-      elif [[ $CI_COMMIT_REF_NAME == "development" ]]; then REGISTRY_TAG=development; \
-      else REGISTRY_TAG=$CI_COMMIT_REF_NAME; \
-      fi \
+      if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest;
+      elif [[ $CI_COMMIT_REF_NAME == "development" ]]; then REGISTRY_TAG=development;
+      else REGISTRY_TAG=$CI_COMMIT_REF_NAME;
+      fi
       docker buildx build -f frontend/Dockerfile -t $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG \
       --cache-from=$CI_REGISTRY_IMAGE:$REGISTRY_TAG --push . --target=deploy 
       docker buildx build -f frontend/Dockerfile -t $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG \
@@ -35,10 +35,10 @@ build backend:
       - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
     - |
-      if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest; \
-      elif [[ $CI_COMMIT_REF_NAME == "development" ]]; then REGISTRY_TAG=development; \
-      else REGISTRY_TAG=$CI_COMMIT_REF_NAME; \
-      fi \
+      if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest;
+      elif [[ $CI_COMMIT_REF_NAME == "development" ]]; then REGISTRY_TAG=development;
+      else REGISTRY_TAG=$CI_COMMIT_REF_NAME;
+      fi
       docker buildx build -f backend/Dockerfile -t $CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG \ 
       --cache-from=$CI_REGISTRY_IMAGE:$REGISTRY_TAG --push . --target=deploy 
       docker buildx build -f backend/Dockerfile -t $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG \
