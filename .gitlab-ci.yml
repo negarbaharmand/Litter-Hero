@@ -52,6 +52,26 @@ build backend:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\//
 
+verify images:
+  stage: build 
+  image: docker:29
+  before_script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+  needs:
+    - job: build frontend
+      artifacts: true 
+    - job: build backend
+      artifacts: true 
+  script:
+    - docker pull $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG
+    - docker pull $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG
+    - docker pull $CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG
+    - docker pull $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
+    - if: $CI_COMMIT_REF_NAME == /\//
+
 tests frontend:
   stage: test 
   image: $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG 
