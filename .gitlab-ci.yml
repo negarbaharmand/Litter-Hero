@@ -9,11 +9,11 @@ build frontend:
   before_script:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
-    - if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest; \
-    elif [[ $CI_COMMIT_REF_NAME == "development" ]]; then REGISTRY_TAG=development; \
-    else REGISTRY_TAG=$CI_COMMIT_REF_NAME; \
+    - if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest;
+    elif [[ $CI_COMMIT_REF_NAME == "development" ]]; then REGISTRY_TAG=development;
+    else REGISTRY_TAG=$CI_COMMIT_REF_NAME;
     fi 
-    - docker buildx build -f frontend/Dockerfile -t $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG \ 
+    - docker buildx build -f frontend/Dockerfile -t $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG \
     --cache-from=$CI_REGISTRY_IMAGE:$REGISTRY_TAG --push . --target=deploy 
     - docker buildx build -f frontend/Dockerfile -t $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG \
     --cache-from=test-$CI_REGISTRY_IMAGE:$REGISTRY_TAG --push . --target=test 
@@ -22,9 +22,9 @@ build frontend:
     reports:
       dotenv: build.env 
   rules:
-    - if $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if $CI_COMMIT_REF_NAME == "development"
-    - if $CI_COMMIT_REF_NAME == "*feature*"
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_REF_NAME == "development"
+    - if: $CI_COMMIT_REF_NAME == "*feature*"
 
 
 build backend:
@@ -46,9 +46,9 @@ build backend:
     reports:
       dotenv: build.env
   rules:
-    - if $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if $CI_COMMIT_REF_NAME == "development"
-    - if $CI_COMMIT_REF_NAME == "*feature*"
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_REF_NAME == "development"
+    - if: $CI_COMMIT_REF_NAME == "*feature*"
 
 tests frontend:
   stage: test 
@@ -61,8 +61,8 @@ tests frontend:
   script:
     echo "doing alot of cool tests"
   rules:
-    - if $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if $CI_COMMIT_REF_NAME == "development"
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_REF_NAME == "development"
 
 tests backend:
   stage: test 
@@ -75,19 +75,19 @@ tests backend:
   script:
     echo "doing alot of cool tests"
   rules:
-    - if $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if $CI_COMMIT_REF_NAME == "development"
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_REF_NAME == "development"
 
 deploy development:
   stage: deploy
   rules:
-    - if $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_REF_NAME == "development"
   script:
     - echo "Deploying to development enviorment..."
 
 deploy production:
   stage: deploy
   rules:
-    - if $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
   script:
     - echo "Deploying to production..."
