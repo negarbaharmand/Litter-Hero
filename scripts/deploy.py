@@ -17,88 +17,99 @@ if __name__ == "__main__":
     usr = os.getenv("PORTAINER_USR")
     pwd = os.getenv("PORTAINER_PWD")
 
+    try:
+        portainer_url= "https://portainer.doe25.swarm.chas-lab.dev/api"
 
-    portainer_url= "https://portainer.doe25.swarm.chas-lab.dev/api"
+        auth_post = requests.post(f"{portainer_url}/auth", json={
+            "username": usr,
+            "password": pwd
+        })
 
-    auth_post = requests.post(f"{portainer_url}/auth", json={
-        "username": usr,
-        "password": pwd
-    })
+        print(f"Auth status: {auth_post.status_code}")
+        print(f"Auth response: {auth_post.json()}")
+        portainer_token = auth_post.json()["jwt"]
 
-    print(f"Auth status: {auth_post.status_code}")
-    print(f"Auth response: {auth_post.json()}")
-    portainer_token = auth_post.json()["jwt"]
+        stack_name = f"{CI_PROJECT_NAMESPACE_SLUG}-{CI_PROJECT_NAME}-{CI_COMMIT_REF_SLUG}"
+        print(stack_name)
 
-    stack_name = f"{CI_PROJECT_NAMESPACE_SLUG}-{CI_PROJECT_NAME}-{CI_COMMIT_REF_SLUG}"
-    #print(stack_name)
-
-    #Endpoint ID 
-    get_endpoint_id = requests.get(f"{portainer_url}/endpoints",
-                                   headers={"Authorization": f"Bearer {portainer_token}"
-                                            }).json()
-    endpoint_id = next(e["Id"] for e in get_endpoint_id if e["Name"] == "local-swarm")
-    print(f"Endpoint id is: {endpoint_id}")
+        #Endpoint ID 
+        get_endpoint_id = requests.get(f"{portainer_url}/endpoints",
+                                       headers={"Authorization": f"Bearer {portainer_token}"
+                                                }).json()
+        endpoint_id = next(e["Id"] for e in get_endpoint_id if e["Name"] == "local-swarm")
+        print(f"Endpoint id is: {endpoint_id}")
 
 
-    #Docker swarm ID 
-    get_swarm_id = requests.get(f"{portainer_url}/endpoints/{endpoint_id}/docker/swarm", 
-                                headers={"Authorization": f"Bearer {portainer_token}"
-                                         })
-    swarm_id = get_swarm_id.json()["ID"] 
-    print(f"Swarm cluster: {swarm_id}")
+        #Docker swarm ID 
+        get_swarm_id = requests.get(f"{portainer_url}/endpoints/{endpoint_id}/docker/swarm", 
+                                    headers={"Authorization": f"Bearer {portainer_token}"
+                                             })
+        swarm_id = get_swarm_id.json()["ID"] 
+        print(f"Swarm cluster: {swarm_id}")
 
-    #IMAGE TAG
-    if CI_COMMIT_REF_NAME == CI_DEFAULT_BRANCH:
-        image_tag = "latest"
-    else:
-        image_tag = CI_COMMIT_REF_NAME
-    
-    print(image_tag)
+        #IMAGE TAG
+        if CI_COMMIT_REF_NAME == CI_DEFAULT_BRANCH:
+            image_tag = "latest"
+        else:
+            image_tag = CI_COMMIT_REF_NAME
+        
+        os.environ["image_tag"] = image_tag
+        os.environ["stack_name"] = stack_name
+        print(image_tag)
 
-    # open and reads docker-compose file
-    with open("../docker-compose.yml", "r") as f:
-        compose_file = f.read()
-
-    deployable_content = envsubst(compose_file)
-
-    # open and writes to deployable-compose file 
-    with open("deployable-compose.yml", "w") as f:
-        f.write(deployable_content)
-
-    print(deployable_content)
-
-    get_stack_id = requests.get(f"{portainer_url}/stacks?endpointId={endpoint_id}",
-                            headers={"Authorization": f"Bearer {portainer_token}"
-                                     }).json()
-    match_stack_id = next((s for s in get_stack_id if s["Name"] == stack_name and s["endpointId"] == endpoint_id), None)
-    stack_id = match_stack_id["Id"] if match_stack_id else None
-
-    print(f"stack id: {stack_id}")
-
-    if not stack_id: 
-        print("Create stack")
-        with open("deployable-compose.yml", "rb") as f:
-            create_stack = requests.post(f"{portainer_url}/stacks/create/swarm/file?endpointId={endpoint_id}",
-            headers={"Authorization": f"Bearer {portainer_token}"},
-            data={
-            "Name": stack_name,
-            "SwarmID": swarm_id
-            },
-            files={"file": f}
-                      )
-        print(f"Create status: {create_stack.status_code}")
-        print(f"Create response: {create_stack.json()}")
-    else:
-        print(f"re-deploying stack with ID {stack_id}")
-        with open("deployable-compose.yml", "r") as f:
+        # open and reads docker-compose file
+        with open("../docker-compose.yml", "r") as f:
             compose_file = f.read()
-        payload = {
-            "prune": True,
-            "RepullImageAndRedeploy": True,
-            "stackFileContent": compose_file
-        }
-        deploy_stack = requests.put(f"{portainer_url}/stacks/{stack_id}?endpointId={endpoint_id}",
-                                    headers={"Authorization": f"Bearer {portainer_token}"},
-                                    json=payload)
-        print(f"Deploy status: {deploy_stack.status_code}")
-        print(f"Deploy response: {deploy_stack.json()}")
+
+        deployable_content = envsubst(compose_file)
+
+        # open and writes to deployable-compose file 
+        with open("deployable-compose.yml", "w") as f:
+            f.write(deployable_content)
+
+        print(deployable_content)
+
+        get_stack_id = requests.get(f"{portainer_url}/stacks?endpointId={endpoint_id}",
+                                headers={"Authorization": f"Bearer {portainer_token}"
+                                         }).json()
+        match_stack_id = next((s for s in get_stack_id if s["Name"] == stack_name and s["endpointId"] == endpoint_id), None)
+        stack_id = match_stack_id["Id"] if match_stack_id else None
+
+        print(f"stack id: {stack_id}")
+
+        if not stack_id: 
+            print("Create stack")
+            with open("deployable-compose.yml", "rb") as f:
+                create_stack = requests.post(f"{portainer_url}/stacks/create/swarm/file?endpointId={endpoint_id}",
+                headers={"Authorization": f"Bearer {portainer_token}"},
+                data={
+                "Name": stack_name,
+                "SwarmID": swarm_id
+                },
+                files={"file": f}
+                          )
+            print(f"Create status: {create_stack.status_code}")
+            print(f"Create response: {create_stack.json()}")
+        else:
+            print(f"re-deploying stack with ID {stack_id}")
+            with open("deployable-compose.yml", "r") as f:
+                compose_file = f.read()
+            payload = {
+                "prune": True,
+                "RepullImageAndRedeploy": True,
+                "stackFileContent": compose_file
+            }
+            deploy_stack = requests.put(f"{portainer_url}/stacks/{stack_id}?endpointId={endpoint_id}",
+                                        headers={"Authorization": f"Bearer {portainer_token}"},
+                                        json=payload)
+            print(f"Deploy status: {deploy_stack.status_code}")
+            print(f"Deploy response: {deploy_stack.json()}")
+
+        except:
+            except requests.HTTPError as e:
+            print(f"HTTP error: {e}")
+            print(f"Response: {e.response.json()}")
+            sys.exit(1)
+        except Exception as e:
+            print(f"Error: {e}")
+            sys.exit(1)
