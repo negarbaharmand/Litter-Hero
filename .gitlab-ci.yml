@@ -18,10 +18,14 @@ build frontend:
       else REGISTRY_TAG=$CI_COMMIT_REF_SLUG;
       fi
       docker buildx build -f frontend/Dockerfile -t $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG \
-      --cache-from=$CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG --provenance=false --push frontend/
+      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache \
+      --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache,mode=max \
+      --provenance=false --push frontend/
       docker buildx build -f frontend/Dockerfile -t $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG \
-      --cache-from=$CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG --provenance=false --push frontend/
-      echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env  
+      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache \
+      --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache,mode=max \
+      --provenance=false --push frontend/
+      echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env
   artifacts:
     reports:
       dotenv: build.env 
@@ -80,7 +84,6 @@ verify images:
       artifacts: true 
     - job: build backend
       artifacts: true 
-    - job: build python
   script:
     - docker pull $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG
