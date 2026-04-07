@@ -78,6 +78,20 @@ verify images:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\//
 
+build python:
+  stage: build
+  image: docker:29
+  before_script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+  script:
+    - docker buildx build -t ${CI_REGISTRY_IMAGE}/python-utils:latest --push --file python-Dockerfile .
+  rules:
+    - changes:
+      - python-Dockerfile 
+      if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
+      if: $CI_COMMIT_REF_NAME =~ /\// 
+
 # This dosnt do anything yet. But will add developers unit tests here.
 tests frontend:
   stage: test 
@@ -111,13 +125,13 @@ tests backend:
 # This dosnt do anything yet, but will eventually deploy the code in the development branch in docker swarm/kuberenetes.
 deploy development:
   stage: deploy
-  image: python:3.14-alpine
+  image: $CI_REGISTRY_IMAGE}/python-utils:latest
   environment: 
     name: review/$CI_COMMIT_REF_SLUG
     url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
 #    on_stop: stop_review
   script:
-    - python3 script/deploy.py
+    - python3 scripts/deploy.py
   rules:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\//
