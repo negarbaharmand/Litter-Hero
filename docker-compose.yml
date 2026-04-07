@@ -1,34 +1,52 @@
 services:
   frontend:
-    build: ./frontend
-    ports:
-      - 5173:5173 
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+    image: ${CI_REGISTRY_IMAGE/frontend}:${image_tag}
+    networks:
+      - traefik-public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.constraint-label=traefik-public"
+        - "traefik.swarm.network=traefik-public"
+
+        - "traefik.http.routers.${STACK_NAME}-http.rule=Host(`${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${STACK_NAME}-http.entrypoints=http"
+        - "traefik.http.routers.${STACK_NAME}-http.middlewares=https-redirect"
+
+        - "traefik.http.routers.${STACK_NAME}-https.rule=Host(`${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${STACK_NAME}-https.entrypoints=https"
+        - "traefik.http.routers.${STACK_NAME}-https.tls=true"
+        - "traefik.http.routers.${STACK_NAME}-https.tls.certresolver=le"
+
+        - "traefik.http.services.${STACK_NAME}.loadbalancer.server.port=5173"
 
   backend:
-    build: ./backend
-    ports:
-      - 3000:3000
-    env_file:
-      - .env 
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-    depends_on:
-      - db
-      
-  db:
-    image: postgres:16-alpine
-    ports:
-      - 5432:5432 
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data 
+    image: ${CI_REGISTRY_IMAGE/backend}:${image_tag}
+    networks:
+      - traefik-public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.constraint-label=traefik-public"
+        - "traefik.swarm.network=traefik-public"
 
-volumes:
-  postgres_data:
+        - "traefik.http.routers.${STACK_NAME}-http.rule=Host(`${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${STACK_NAME}-http.entrypoints=http"
+        - "traefik.http.routers.${STACK_NAME}-http.middlewares=https-redirect"
+
+        - "traefik.http.routers.${STACK_NAME}-https.rule=Host(`${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${STACK_NAME}-https.entrypoints=https"
+        - "traefik.http.routers.${STACK_NAME}-https.tls=true"
+        - "traefik.http.routers.${STACK_NAME}-https.tls.certresolver=le"
+
+        - "traefik.http.services.${STACK_NAME}.loadbalancer.server.port=3000"
+
+
+networks:
+  traefik-public:
+    external: true
+
