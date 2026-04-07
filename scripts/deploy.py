@@ -18,8 +18,8 @@ if __name__ == "__main__":
     portainer_url= "https://portainer.doe25.swarm.chas-lab.dev/api"
 
     auth_post = requests.post(f"{portainer_url}/auth", json={
-        "username": os.getenv("PORT_USR"),
-        "password": os.getenv("PORT_PWD")
+        "Username": os.getenv("PORT_USR"),
+        "Password": os.getenv("PORT_PWD")
     })
 
     portainer_token = auth_post.json()["jwt"]
@@ -30,8 +30,8 @@ if __name__ == "__main__":
     #Endpoint ID 
     get_endpoint_id = requests.get(f"{portainer_url}/endpoints",
                                    headers={"Authorization": f"Bearer {portainer_token}"
-                                            })
-    endpoint_id = get_endpoint_id.json()[0]["Id"]
+                                            }).json()
+    endpoint_id = next(e["Id"] for e in get_endpoint_id if e["Name"] == "local-swarm")
     print(f"Endpoint id is: {endpoint_id}")
 
 
@@ -62,9 +62,13 @@ if __name__ == "__main__":
 
     print(deployable_content)
 
-    stack_id = requests.get(f"{portainer_url}/stacks",
+    get_stack_id = requests.get(f"{portainer_url}/stacks?endpointId={endpoint_id}",
                             headers={"Authorization": f"Bearer {portainer_token}"
-                                     })
+                                     }).json()
+    match_stack_id = next((s for s in get_stack_id if s["Name"] == stack_name and s["endpointId"] == endpoint_id), None)
+    stack_id = match_stack_id["Id"] if match_stack_id else None
+
+    print(f"stack id: {stack_id}")
 
     if not stack_id: 
         print("Create stack")
@@ -78,4 +82,14 @@ if __name__ == "__main__":
             files={"file": f}
                       )
     else:
-        print("stack already exists")
+        print(f"re-deploying stack with ID {stack_id}")
+        with open("deployable-compose.yml", "r") as f:
+            compose_file = f.read()
+        payload = {
+            "prune": True,
+            "RepullImageAndRedeploy": True,
+            "stackFileContent": compose_file
+        }
+        deploy_stack = requests.put(f"{portainer_url}/stacks/{stack_id}?endpointId={endpoint_id}",
+                                    headers={"Authorization": f"Bearer {portainer_token}"},
+                                    json=payload)
