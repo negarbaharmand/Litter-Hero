@@ -29,7 +29,7 @@ if __name__ == "__main__":
         print(f"Auth response: {auth_post.json()}")
         portainer_token = auth_post.json()["jwt"]
 
-        stack_name = f"{CI_PROJECT_NAMESPACE_SLUG}-{CI_PROJECT_NAME}-{CI_COMMIT_REF_SLUG}"
+        stack_name = (f"{CI_PROJECT_NAMESPACE_SLUG}-{CI_PROJECT_NAME}-{CI_COMMIT_REF_SLUG}")
         print(stack_name)
 
         #Endpoint ID 
@@ -105,8 +105,7 @@ if __name__ == "__main__":
             print(f"Deploy status: {deploy_stack.status_code}")
             print(f"Deploy response: {deploy_stack.json()}")
 
-        except:
-            except requests.HTTPError as e:
+        except requests.HTTPError as e:
             print(f"HTTP error: {e}")
             print(f"Response: {e.response.json()}")
             sys.exit(1)
