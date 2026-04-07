@@ -105,10 +105,10 @@ if __name__ == "__main__":
             print(f"Deploy status: {deploy_stack.status_code}")
             print(f"Deploy response: {deploy_stack.json()}")
 
-        except requests.HTTPError as e:
-            print(f"HTTP error: {e}")
-            print(f"Response: {e.response.json()}")
-            sys.exit(1)
-        except Exception as e:
-            print(f"Error: {e}")
-            sys.exit(1)
+    except requests.HTTPError as e:
+        print(f"HTTP error: {e}")
+        print(f"Response: {e.response.json()}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
