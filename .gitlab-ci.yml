@@ -111,11 +111,15 @@ tests backend:
 # This dosnt do anything yet, but will eventually deploy the code in the development branch in docker swarm/kuberenetes.
 deploy development:
   stage: deploy
+  enviorment: 
+    name: review/$CI_COMMIT_REF_SLUG
+    url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
+    on_stop: stop_review
+  script:
+    - python3 script/deploy.py
   rules:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-  script:
-    - echo "Deploying to development enviorment..."
-
+    - if: $CI_COMMIT_REF_NAME == /\//
 # This dosnt do anything yet, but will eventually deploy the code in the main branch in docker swarm/kuberenetes.
 deploy production:
   stage: deploy
