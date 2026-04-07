@@ -18,8 +18,8 @@ if __name__ == "__main__":
     portainer_url= "https://portainer.doe25.swarm.chas-lab.dev/api"
 
     auth_post = requests.post(f"{portainer_url}/auth", json={
-        "Username": os.getenv("PORT_USR"),
-        "Password": os.getenv("PORT_PWD")
+        "Username": os.getenv("PORTAINER_USR"),
+        "Password": os.getenv("PORTAINER_PWD")
     })
 
     portainer_token = auth_post.json()["jwt"]
