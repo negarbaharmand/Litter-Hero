@@ -5,6 +5,7 @@ from requests.auth import HTTPBasicAuth
 import os
 from dotenv import load_dotenv
 from envsubst import envsubst 
+import sys
 
 load_dotenv(dotenv_path="../.env")
 
@@ -72,7 +73,7 @@ if __name__ == "__main__":
         get_stack_id = requests.get(f"{portainer_url}/stacks?endpointId={endpoint_id}",
                                 headers={"Authorization": f"Bearer {portainer_token}"
                                          }).json()
-        match_stack_id = next((s for s in get_stack_id if s["Name"] == stack_name and s["endpointId"] == endpoint_id), None)
+        match_stack_id = next((s for s in get_stack_id if s["Name"] == stack_name and s["EndpointId"] == endpoint_id), None)
         stack_id = match_stack_id["Id"] if match_stack_id else None
 
         print(f"stack id: {stack_id}")
