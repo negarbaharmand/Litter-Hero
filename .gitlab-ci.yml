@@ -114,7 +114,7 @@ deploy development:
   environment: 
     name: review/$CI_COMMIT_REF_SLUG
     url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
-    on_stop: stop_review
+#    on_stop: stop_review
   script:
     - python3 script/deploy.py
   rules:
