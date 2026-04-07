@@ -14,12 +14,15 @@ if __name__ == "__main__":
     CI_COMMIT_REF_SLUG = os.getenv("CI_COMMIT_REF_SLUG")
     CI_COMMIT_REF_NAME = os.getenv("CI_COMMIT_REF_NAME")
     CI_DEFAULT_BRANCH = os.getenv("CI_DEFAULT_BRANCH")
+    usr = os.getenv("PORTAINER_USR")
+    pwd = os.getenv("PORTAINER_PWD")
+
 
     portainer_url= "https://portainer.doe25.swarm.chas-lab.dev/api"
 
     auth_post = requests.post(f"{portainer_url}/auth", json={
-        "username": os.getenv("PORTAINER_USR"),
-        "password": os.getenv("PORTAINER_PWD")
+        "username": usr,
+        "password": pwd
     })
 
     print(f"Auth status: {auth_post.status_code}")
