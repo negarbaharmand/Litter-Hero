@@ -111,7 +111,7 @@ tests backend:
 # This dosnt do anything yet, but will eventually deploy the code in the development branch in docker swarm/kuberenetes.
 deploy development:
   stage: deploy
-  enviroment: 
+  environment: 
     name: review/$CI_COMMIT_REF_SLUG
     url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
     on_stop: stop_review
