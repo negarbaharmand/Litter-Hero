@@ -11,16 +11,16 @@ services:
         - "traefik.constraint-label=traefik-public"
         - "traefik.swarm.network=traefik-public"
 
-        - "traefik.http.routers.${stack-name}-http.rule=Host(`${stack_name}.doe25.swarm.chas-lab.dev`)"
-        - "traefik.http.routers.${stack-name}-http.entrypoints=http"
-        - "traefik.http.routers.${stack-name}-http.middlewares=https-redirect"
+        - "traefik.http.routers.${stack_name}-http.rule=Host(`${stack_name}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${stack_name}-http.entrypoints=http"
+        - "traefik.http.routers.${stack_name}-http.middlewares=https-redirect"
 
-        - "traefik.http.routers.${stack-name}-https.rule=Host(`${stack_name}.doe25.swarm.chas-lab.dev`)"
-        - "traefik.http.routers.${stack-name}-https.entrypoints=https"
-        - "traefik.http.routers.${stack-name}-https.tls=true"
-        - "traefik.http.routers.${stack-name}-https.tls.certresolver=le"
+        - "traefik.http.routers.${stack_name}-https.rule=Host(`${stack_name}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${stack_name}-https.entrypoints=https"
+        - "traefik.http.routers.${stack_name}-https.tls=true"
+        - "traefik.http.routers.${stack_name}-https.tls.certresolver=le"
 
-        - "traefik.http.services.${stack-name}.loadbalancer.server.port=5173"
+        - "traefik.http.services.${stack_name}.loadbalancer.server.port=5173"
 
   backend:
     image: ${CI_REGISTRY_IMAGE}/backend:${image_tag}
@@ -34,16 +34,16 @@ services:
         - "traefik.constraint-label=traefik-public"
         - "traefik.swarm.network=traefik-public"
 
-        - "traefik.http.routers.${stack-name}-http.rule=Host(`${stack_name}.doe25.swarm.chas-lab.dev`)"
-        - "traefik.http.routers.${stack-name}-http.entrypoints=http"
-        - "traefik.http.routers.${stack-name}-http.middlewares=https-redirect"
+        - "traefik.http.routers.${stack_name}-http.rule=Host(`${stack_name}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${stack_name}-http.entrypoints=http"
+        - "traefik.http.routers.${stack_name}-http.middlewares=https-redirect"
 
-        - "traefik.http.routers.${stack-name}-https.rule=Host(`${stack_name}.doe25.swarm.chas-lab.dev`)"
-        - "traefik.http.routers.${stack-name}-https.entrypoints=https"
-        - "traefik.http.routers.${stack-name}-https.tls=true"
-        - "traefik.http.routers.${stack-name}-https.tls.certresolver=le"
+        - "traefik.http.routers.${stack_name}-https.rule=Host(`${stack_name}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${stack_name}-https.entrypoints=https"
+        - "traefik.http.routers.${stack_name}-https.tls=true"
+        - "traefik.http.routers.${stack_name}-https.tls.certresolver=le"
 
-        - "traefik.http.services.${stack-name}.loadbalancer.server.port=3000"
+        - "traefik.http.services.${stack_name}.loadbalancer.server.port=3000"
 
 
 networks:
