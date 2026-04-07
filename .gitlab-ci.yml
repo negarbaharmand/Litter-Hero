@@ -119,7 +119,7 @@ deploy development:
     - python3 script/deploy.py
   rules:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == /\//
+    - if: $CI_COMMIT_REF_NAME =~ /\//
 # This dosnt do anything yet, but will eventually deploy the code in the main branch in docker swarm/kuberenetes.
 deploy production:
   stage: deploy
