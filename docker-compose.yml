@@ -1,6 +1,6 @@
 services:
   frontend:
-    image: ${CI_REGISTRY_IMAGE/frontend}:${image_tag}
+    image: ${CI_REGISTRY_IMAGE}/frontend:${image_tag}
     networks:
       - traefik-public
     deploy:
@@ -23,7 +23,7 @@ services:
         - "traefik.http.services.${stack-name}.loadbalancer.server.port=5173"
 
   backend:
-    image: ${CI_REGISTRY_IMAGE/backend}:${image_tag}
+    image: ${CI_REGISTRY_IMAGE}/backend:${image_tag}
     networks:
       - traefik-public
     deploy:

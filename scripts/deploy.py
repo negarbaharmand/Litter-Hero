@@ -86,6 +86,8 @@ if __name__ == "__main__":
             },
             files={"file": f}
                       )
+        print(f"Create status: {create_stack.status_code}")
+        print(f"Create response: {create_stack.json()}")
     else:
         print(f"re-deploying stack with ID {stack_id}")
         with open("deployable-compose.yml", "r") as f:
@@ -98,3 +100,5 @@ if __name__ == "__main__":
         deploy_stack = requests.put(f"{portainer_url}/stacks/{stack_id}?endpointId={endpoint_id}",
                                     headers={"Authorization": f"Bearer {portainer_token}"},
                                     json=payload)
+        print(f"Deploy status: {deploy_stack.status_code}")
+        print(f"Deploy response: {deploy_stack.json()}")
