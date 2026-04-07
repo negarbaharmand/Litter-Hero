@@ -51,7 +51,7 @@ if __name__ == "__main__":
         if CI_COMMIT_REF_NAME == CI_DEFAULT_BRANCH:
             image_tag = "latest"
         else:
-            image_tag = CI_COMMIT_REF_NAME
+            image_tag = CI_COMMIT_REF_SLUG
         
         os.environ["image_tag"] = image_tag
         os.environ["stack_name"] = stack_name
@@ -90,6 +90,7 @@ if __name__ == "__main__":
                           )
             print(f"Create status: {create_stack.status_code}")
             print(f"Create response: {create_stack.json()}")
+            create_stack.raise_for_status()
         else:
             print(f"re-deploying stack with ID {stack_id}")
             with open("deployable-compose.yml", "r") as f:
@@ -104,6 +105,7 @@ if __name__ == "__main__":
                                         json=payload)
             print(f"Deploy status: {deploy_stack.status_code}")
             print(f"Deploy response: {deploy_stack.json()}")
+            create_stack.raise_for_status()
 
     except requests.HTTPError as e:
         print(f"HTTP error: {e}")
