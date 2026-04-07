@@ -34,11 +34,11 @@ services:
         - "traefik.constraint-label=traefik-public"
         - "traefik.swarm.network=traefik-public"
 
-        - "traefik.http.routers.${stack_name}-backend-http.rule=Host(`${stack_name}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${stack_name}-backend-http.rule=Host(`api.${stack_name}.doe25.swarm.chas-lab.dev`)"
         - "traefik.http.routers.${stack_name}-backend-http.entrypoints=http"
         - "traefik.http.routers.${stack_name}-backend-http.middlewares=https-redirect"
 
-        - "traefik.http.routers.${stack_name}-backend-https.rule=Host(`${stack_name}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${stack_name}-backend-https.rule=Host(`api.${stack_name}.doe25.swarm.chas-lab.dev`)"
         - "traefik.http.routers.${stack_name}-backend-https.entrypoints=https"
         - "traefik.http.routers.${stack_name}-backend-https.tls=true"
         - "traefik.http.routers.${stack_name}-backend-https.tls.certresolver=le"

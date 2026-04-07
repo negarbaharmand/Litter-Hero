@@ -80,6 +80,7 @@ verify images:
       artifacts: true 
     - job: build backend
       artifacts: true 
+    - job: build python
   script:
     - docker pull $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG
