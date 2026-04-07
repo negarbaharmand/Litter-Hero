@@ -130,7 +130,8 @@ deploy development:
     url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
 #    on_stop: stop_review
   script:
-    - python3 scripts/deploy.py
+    - cd scripts
+    - python3 deploy.py
   rules:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\//
