@@ -106,7 +106,7 @@ if __name__ == "__main__":
                                         json=payload)
             print(f"Deploy status: {deploy_stack.status_code}")
             print(f"Deploy response: {deploy_stack.json()}")
-            create_stack.raise_for_status()
+            deploy_stack.raise_for_status()
 
     except requests.HTTPError as e:
         print(f"HTTP error: {e}")
