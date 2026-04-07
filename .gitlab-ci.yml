@@ -57,6 +57,18 @@ build backend:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\//
 
+build python:
+  stage: build
+  image: docker:29
+  before_script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+  script:
+    - docker buildx build -t ${CI_REGISTRY_IMAGE}/python-utils:latest --push --file python-Dockerfile .
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
+    - if: $CI_COMMIT_REF_NAME =~ /\// 
+
 # Verifys that all the images works correctly by trying to pull all images from the registry
 verify images:
   stage: test
@@ -73,24 +85,11 @@ verify images:
     - docker pull $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG
+    - docker pull $CI_REGISTRY_IMAGE/python-utils:latest
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\//
-
-build python:
-  stage: build
-  image: docker:29
-  before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-  script:
-    - docker buildx build -t ${CI_REGISTRY_IMAGE}/python-utils:latest --push --file python-Dockerfile .
-  rules:
-    - changes:
-      - python-Dockerfile 
-      if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-      if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-      if: $CI_COMMIT_REF_NAME =~ /\// 
 
 # This dosnt do anything yet. But will add developers unit tests here.
 tests frontend:
