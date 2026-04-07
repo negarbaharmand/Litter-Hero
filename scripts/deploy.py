@@ -18,10 +18,12 @@ if __name__ == "__main__":
     portainer_url= "https://portainer.doe25.swarm.chas-lab.dev/api"
 
     auth_post = requests.post(f"{portainer_url}/auth", json={
-        "Username": os.getenv("PORTAINER_USR"),
-        "Password": os.getenv("PORTAINER_PWD")
+        "username": os.getenv("PORTAINER_USR"),
+        "password": os.getenv("PORTAINER_PWD")
     })
 
+    print(f"Auth status: {auth_post.status_code}")
+    print(f"Auth response: {auth_post.json()}")
     portainer_token = auth_post.json()["jwt"]
 
     stack_name = f"{CI_PROJECT_NAMESPACE_SLUG}-{CI_PROJECT_NAME}-{CI_COMMIT_REF_SLUG}"
