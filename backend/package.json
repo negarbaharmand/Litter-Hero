@@ -4,7 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+<<<<<<< HEAD
     "dev": "node --loader ts-node/esm src/index.ts",
+=======
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "check": "tsc --noEmit",
+>>>>>>> 39204a3f99f010fbe916911940fa944d55fcf0c9
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,6 +19,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.2",
@@ -20,15 +28,17 @@
     "postgres": "^3.4.8"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
     "@types/pg": "^8.20.0",
     "drizzle-kit": "^0.31.10",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   },
   "overrides": {
-  "esbuild": "^0.25.0"
-}
+    "esbuild": "^0.25.0"
+  }
 }

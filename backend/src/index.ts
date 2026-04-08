@@ -1,7 +1,10 @@
+import userRoutes from './routes/userRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
 import express from 'express';
 import type { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+
 
 // Load environment variables from .env
 dotenv.config();
@@ -12,6 +15,10 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Routes
+app.use('/api/users', userRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Basic Route
 app.get('/', (req: Request, res: Response) => {
