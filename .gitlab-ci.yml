@@ -18,15 +18,14 @@ build frontend:
       elif [[ $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH ]]; then REGISTRY_TAG=$DEVELOPMENT_BRANCH;
       else REGISTRY_TAG=$CI_COMMIT_REF_SLUG;
       fi
-      docker buildx build -f frontend/Dockerfile -t $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG \
-      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache \
-      --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache,mode=max \
+      docker buildx build -f frontend/Dockerfile \
+      -t $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG \
+      -t $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG \ 
+      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache-$REGISTRY_TAG \
+      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache-latest \
+      --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache-$REGISTRY_TAG,mode=max \
       --provenance=false --push frontend/
-      docker buildx build -f frontend/Dockerfile -t $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG \
-      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache \
-      --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache,mode=max \
-      --provenance=false --push frontend/
-      echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env
+      echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env 
   artifacts:
     reports:
       dotenv: build.env 
@@ -45,14 +44,18 @@ build backend:
       - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
     - |
+      docker buildx create --use --name mybuilder --driver docker-container
       if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest;
       elif [[ $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH ]]; then REGISTRY_TAG=$DEVELOPMENT_BRANCH;
       else REGISTRY_TAG=$CI_COMMIT_REF_SLUG;
       fi
-      docker buildx build -f backend/Dockerfile -t $CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG \
-      --cache-from=$CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG --provenance=false --push backend/
-      docker buildx build -f backend/Dockerfile -t $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG \
-      --cache-from=$CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG --provenance=false --push backend/
+      docker buildx build -f backend/Dockerfile \
+      -t $CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG \
+      -t $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG \ 
+      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/backend:cache-$REGISTRY_TAG \
+      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/backend:cache-latest \
+      --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/backend:cache-$REGISTRY_TAG,mode=max \
+      --provenance=false --push backend/
       echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env 
   artifacts:
     reports:
@@ -70,9 +73,11 @@ build python:
   script:
     - docker buildx build -t ${CI_REGISTRY_IMAGE}/python-utils:latest --push --file scripts/python-Dockerfile .
   rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-    - if: $CI_COMMIT_REF_NAME =~ /\// 
+    - changes:
+        - scripts/python-Dockerfile
+      - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
+      - if: $CI_COMMIT_REF_NAME =~ /\// 
 
 # Verifys that all the images works correctly by trying to pull all images from the registry
 verify images:
@@ -85,6 +90,7 @@ verify images:
       artifacts: true 
     - job: build backend
       artifacts: true 
+    - job: build python
   script:
     - docker pull $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG
@@ -92,9 +98,13 @@ verify images:
     - docker pull $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/python-utils:latest
   rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-    - if: $CI_COMMIT_REF_NAME =~ /\//
+    - changes:
+        - frontend/Dockerfile
+        - backend/Dockerfile
+        - scripts/python-Dockerfile
+      - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
+      - if: $CI_COMMIT_REF_NAME =~ /\//
 
 # This dosnt do anything yet. But will add developers unit tests here.
 tests frontend:
@@ -126,7 +136,7 @@ tests backend:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
 
-# This dosnt do anything yet, but will eventually deploy the code in the development branch in docker swarm/kuberenetes.
+#Deploys to development or feature branch
 deploy development:
   stage: deploy
   image: ${CI_REGISTRY_IMAGE}/python-utils:latest
@@ -140,11 +150,17 @@ deploy development:
   rules:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\//
-# This dosnt do anything yet, but will eventually deploy the code in the main branch in docker swarm/kuberenetes.
+
+#Deploys to production, only runs when we push into main
 deploy production:
   stage: deploy
+  image: ${CI_REGISTRY_IMAGE}/python-utils:latest
+  environment:
+    name: production/$CI_COMMIT_REF_SLUG
+    url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
+  script:
+    - cd scripts
+    - python3 deploy.py
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-  script:
-    - echo "Deploying to production..."
 
