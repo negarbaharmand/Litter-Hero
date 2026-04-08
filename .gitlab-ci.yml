@@ -109,34 +109,34 @@ verify images:
         - scripts/python-Dockerfile
 
 # This dosnt do anything yet. But will add developers unit tests here.
-tests frontend:
-  stage: test 
-  image: $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG 
-  needs:
-    - job: build frontend
-      artifacts: true
-  before_script:
-      - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-  script:
-    - echo "doing alot of cool tests"
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH 
-
-# This dosnt do anything yet. But will add developers unit tests here.
-tests backend:
-  stage: test 
-  image: $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG 
-  needs:
-    - job: build backend 
-      artifacts: true
-  before_script:
-      - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-  script:
-    - echo "doing alot of cool tests"
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
+# tests frontend:
+#   stage: test 
+#   image: $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG 
+#   needs:
+#     - job: build frontend
+#       artifacts: true
+#   before_script:
+#       - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+#   script:
+#     - echo "doing alot of cool tests"
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+#     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH 
+#
+# # This dosnt do anything yet. But will add developers unit tests here.
+# tests backend:
+#   stage: test 
+#   image: $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG 
+#   needs:
+#     - job: build backend 
+  #     artifacts: true
+  # before_script:
+  #     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+  # script:
+  #   - echo "doing alot of cool tests"
+  # rules:
+  #   - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  #   - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
 
 #Deploys to development or feature branch
 deploy development:
@@ -165,4 +165,4 @@ deploy production:
     - python3 deploy.py
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_PROTECTED
