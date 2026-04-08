@@ -4,14 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-<<<<<<< HEAD
     "dev": "node --loader ts-node/esm src/index.ts",
-=======
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "check": "tsc --noEmit",
->>>>>>> 39204a3f99f010fbe916911940fa944d55fcf0c9
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
