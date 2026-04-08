@@ -20,12 +20,12 @@ build frontend:
       fi
       docker buildx build -f frontend/Dockerfile \
       -t $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG \
-      -t $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG \ 
+      -t $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG \
       --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache-$REGISTRY_TAG \
       --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache-latest \
       --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache-$REGISTRY_TAG,mode=max \
       --provenance=false --push frontend/
-      echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env 
+      echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env
   artifacts:
     reports:
       dotenv: build.env 
@@ -51,12 +51,12 @@ build backend:
       fi
       docker buildx build -f backend/Dockerfile \
       -t $CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG \
-      -t $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG \ 
+      -t $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG \
       --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/backend:cache-$REGISTRY_TAG \
       --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/backend:cache-latest \
       --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/backend:cache-$REGISTRY_TAG,mode=max \
       --provenance=false --push backend/
-      echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env 
+      echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env
   artifacts:
     reports:
       dotenv: build.env
