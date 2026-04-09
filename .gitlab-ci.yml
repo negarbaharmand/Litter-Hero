@@ -88,7 +88,7 @@ build database:
   before_script:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
-    - docker buildx build -t ${CI_REGISTRY_IMAGE}/database:latest --push --file backend/database-Dockerfile
+    - docker buildx build -t ${CI_REGISTRY_IMAGE}/database:latest --push --file backend/database-Dockerfile .
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
