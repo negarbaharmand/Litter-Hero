@@ -6,6 +6,4 @@ COPY drizzle*.config.ts .
 RUN npm install
 COPY . . 
 EXPOSE 3000
-CMD ["npm", "run", "dev"]
-
-
+CMD ["sh", "-c", "sleep 5 npx drizzle-kit push && npm run dev"]

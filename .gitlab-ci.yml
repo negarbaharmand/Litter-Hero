@@ -81,20 +81,7 @@ build python:
         - scripts/python-Dockerfile
         - scripts/deploy.py 
         - scripts/requirements.txt
-
-build database:
-  stage: build
-  image: docker:29 
-  before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-  script:
-    - docker buildx build -t ${CI_REGISTRY_IMAGE}/database:latest --push --file backend/database-Dockerfile .
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-    - if: $CI_COMMIT_REF_NAME =~ /\//
-
-
+        
 # Verifys that all the images works correctly by trying to pull all images from the registry
 verify images:
   stage: test
@@ -108,16 +95,12 @@ verify images:
       artifacts: true 
     - job: build python
       optional: true
-    - job: build database
-      optional: true
   script:
     - docker pull $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/python-utils:latest
-    - docker pull $CI_REGISTRY_IMAGE/database:$REGISTRY_TAG
-    - docker pull $CI_REGISTRY_IMAGE/database:test-$REGISTRY_TAG
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
