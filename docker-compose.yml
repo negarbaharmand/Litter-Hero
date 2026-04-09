@@ -57,7 +57,7 @@ services:
       replicas: 1
 
   drizzle:
-    image: $CI_REGISTRY_IMAGE/backend:$image_tag
+    image: ${CI_REGISTRY_IMAGE}/backend:$image_tag
     networks:
       - traefik-public
       - internal
