@@ -94,7 +94,7 @@ build database:
       elif [[ $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH ]]; then REGISTRY_TAG=$DEVELOPMENT_BRANCH;
       else REGISTRY_TAG=$CI_COMMIT_REF_SLUG;
       fi
-      docker buildx build -f database/Dockerfile \
+      docker buildx build \
       -t $CI_REGISTRY_IMAGE/database:$REGISTRY_TAG \
       -t $CI_REGISTRY_IMAGE/database:test-$REGISTRY_TAG \
       --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/database:cache-$REGISTRY_TAG \
