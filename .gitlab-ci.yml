@@ -82,6 +82,35 @@ build python:
         - scripts/deploy.py 
         - scripts/requirements.txt
 
+build database:
+  stage: build
+  image: postgres:18-alpine
+  before_script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+  script:
+    - | 
+      docker buildx create --use --name mybuilder --driver docker-container
+      if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest;
+      elif [[ $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH ]]; then REGISTRY_TAG=$DEVELOPMENT_BRANCH;
+      else REGISTRY_TAG=$CI_COMMIT_REF_SLUG;
+      fi
+      docker buildx build -f database/Dockerfile \
+      -t $CI_REGISTRY_IMAGE/database:$REGISTRY_TAG \
+      -t $CI_REGISTRY_IMAGE/database:test-$REGISTRY_TAG \
+      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/database:cache-$REGISTRY_TAG \
+      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/database:cache-latest \
+      --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/database:cache-$REGISTRY_TAG,mode=max \
+      --provenance=false --push database/
+      echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env
+  artifacts:
+    reports:
+      dotenv: build.env 
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
+    - if: $CI_COMMIT_REF_NAME =~ /\//
+
+
 # Verifys that all the images works correctly by trying to pull all images from the registry
 verify images:
   stage: test
@@ -95,12 +124,16 @@ verify images:
       artifacts: true 
     - job: build python
       optional: true
+    - job: build database
+      optional: true
   script:
     - docker pull $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG
     - docker pull $CI_REGISTRY_IMAGE/python-utils:latest
+    - docker pull $CI_REGISTRY_IMAGE/database:$REGISTRY_TAG
+    - docker pull $CI_REGISTRY_IMAGE/database:test-$REGISTRY_TAG
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
