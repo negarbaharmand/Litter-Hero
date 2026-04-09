@@ -1,7 +1,7 @@
 FROM postgres:18
 WORKDIR /db
 COPY drizzle* .
-COPY package*.json
+COPY package*.json .
 RUN npm install
 COPY . .
 CMD ["npx", "drizzle-kit", "studio"]
