@@ -17,7 +17,6 @@ def req_env(var_name):
 
 def main():
     #unpacking Gitlab CI varibles
-    ci_project_namespace_slug = req_env("CI_PROJECT_NAMESPACE_SLUG")
     ci_project_name= req_env("CI_PROJECT_NAME")
     ci_commit_ref_slug = req_env("CI_COMMIT_REF_SLUG")
     ci_commit_ref_name = req_env("CI_COMMIT_REF_NAME")
@@ -27,7 +26,7 @@ def main():
     portainer_url = req_env("PORTAINER_URL")
 
     #Setting image tag and stack name 
-    stack_name = (f"{ci_project_namespace_slug}-{ci_project_name}-{ci_commit_ref_slug}")
+    stack_name = (f"{ci_project_name}-{ci_commit_ref_slug}")
 
     if ci_commit_ref_name == ci_default_branch:
         image_tag = "latest"
