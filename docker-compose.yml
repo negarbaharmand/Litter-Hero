@@ -24,7 +24,7 @@ services:
     networks:
       - traefik-public
     environment:
-      - DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     deploy:
       mode: replicated
       replicas: 1
@@ -61,7 +61,7 @@ services:
     networks:
       - traefik-public
     environment:
-      - DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     depends_on:
       - db 
     deploy:
