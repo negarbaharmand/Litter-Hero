@@ -37,9 +37,9 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="login-page min-h-screen flex flex-col bg-white">
       <div className="flex-1 flex flex-col items-center justify-center px-6 pb-24">
-        <h1 className="text-xl font-semibold text-gray-900 mb-8 text-center">
+        <h1 className="text-xl font-semibold mb-8 text-center">
           {isRegistering ? 'Skapa nytt konto' : 'Logga in eller fortsätt som gäst'}
         </h1>
 
