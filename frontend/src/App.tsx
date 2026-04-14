@@ -1,41 +1,23 @@
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+// Importera fler sidor här efterhand:
+// import Home from './pages/Home'
+// import Reports from './pages/Reports'
 import './App.css'
-import { ReportList } from './components/ReportList';
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import UserProfile from './pages/UserProfile'
 
+//Här ska vi definiera våra routes, så att vi kan navigera mellan olika sidor i vår app. Just nu la jag in min route för UserProfile.
 function App() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Project: LiiterHero</h1>
-          <p>Connecting Frontend to Backend with TanStack Query</p>
-        </div>
-      </section>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/profile" element={<UserProfile />} />
 
-      {/* 2. This is where the magic happens! */}
-      <section style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <ReportList />
-      </section>
+        {/* Lägg till fler routes här: */}
+        {/* <Route path="/" element={<Home />} /> */}
+        {/* <Route path="/reports" element={<Reports />} /> */}
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <h2>Project Stats</h2>
-          <p>Your database connection is live.</p>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      </Routes>
+    </BrowserRouter>
   )
 }
 
