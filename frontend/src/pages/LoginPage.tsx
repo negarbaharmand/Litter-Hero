@@ -1,23 +1,22 @@
 import { useState } from 'react'
+import { useForm } from '@tanstack/react-form'
 
 export function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false)
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    // TODO: connect to POST /api/users/login
-    console.log('Login:', { email, password })
-  }
-
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault()
-    // TODO: connect to POST /api/users/register
-    console.log('Register:', { name, email, password })
-  }
+  const form = useForm({
+    defaultValues: { name: '', email: '', password: '' },
+    onSubmit: async ({ value }) => {
+      if (isRegistering) {
+        // TODO: connect to POST /api/users/register
+        console.log('Register:', value)
+      } else {
+        // TODO: connect to POST /api/users/login
+        console.log('Login:', { email: value.email, password: value.password })
+      }
+    },
+  })
 
   const handleGoogleSignIn = () => {
     // TODO: implement Google OAuth
@@ -31,69 +30,83 @@ export function LoginPage() {
 
   const toggleMode = () => {
     setIsRegistering(!isRegistering)
-    setName('')
-    setEmail('')
-    setPassword('')
+    form.reset()
   }
 
   return (
-    <div className="login-page min-h-screen flex flex-col bg-white">
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-24">
-        <h1 className="text-xl font-semibold mb-8 text-center">
-          {isRegistering ? 'Skapa nytt konto' : 'Logga in eller fortsätt som gäst'}
+    <div className="login-page login-page__container">
+      <div className="login-page__content">
+        <h1 className="login-page__heading">
+          {isRegistering ? 'Skapa nytt konto' : 'Logga in'}
         </h1>
 
         <form
-          onSubmit={isRegistering ? handleRegister : handleLogin}
-          className="w-full max-w-sm flex flex-col gap-4"
+          onSubmit={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            form.handleSubmit()
+          }}
+          className="login-page__form"
         >
           {isRegistering && (
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="name" className="login-page__label">
                 Namn
               </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Ditt namn"
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
+              <form.Field name="name">
+                {(field) => (
+                  <input
+                    id="name"
+                    type="text"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="Ditt namn"
+                    className="login-page__input"
+                  />
+                )}
+              </form.Field>
             </div>
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="login-page__label">
               Mail
             </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="din@email.se"
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
+            <form.Field name="email">
+              {(field) => (
+                <input
+                  id="email"
+                  type="email"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="din@email.se"
+                  className="login-page__input"
+                />
+              )}
+            </form.Field>
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="password" className="login-page__label">
               Lösenord
             </label>
-            <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-12"
-              />
+            <div className="login-page__password-wrapper">
+              <form.Field name="password">
+                {(field) => (
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="••••••••"
+                    className="login-page__input login-page__input--with-toggle"
+                  />
+                )}
+              </form.Field>
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="login-page__password-toggle"
                 aria-label={showPassword ? 'Dölj lösenord' : 'Visa lösenord'}
               >
                 {showPassword ? (
@@ -112,20 +125,14 @@ export function LoginPage() {
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="w-full py-3 rounded-xl bg-green-500 text-white font-semibold hover:bg-green-600 transition-colors mt-2"
-          >
+          <button type="submit" className="login-page__submit">
             {isRegistering ? 'Skapa konto' : 'Logga in'}
           </button>
         </form>
 
         {!isRegistering && (
           <>
-            <button
-              onClick={handleGoogleSignIn}
-              className="w-full max-w-sm mt-3 py-3 rounded-xl border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-            >
+            <button onClick={handleGoogleSignIn} className="login-page__google-btn">
               <svg width="20" height="20" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -135,39 +142,30 @@ export function LoginPage() {
               Logga in med Google
             </button>
 
-            <div className="w-full max-w-sm mt-6 flex flex-col gap-3">
-              <button
-                onClick={toggleMode}
-                className="w-full py-3 rounded-xl border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-              >
+            <div className="login-page__secondary-actions">
+              <button onClick={toggleMode} className="login-page__secondary-btn">
                 Skapa nytt konto
               </button>
-              <button
-                onClick={handleGuestContinue}
-                className="w-full py-3 rounded-xl border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-              >
+              <button onClick={handleGuestContinue} className="login-page__secondary-btn">
                 Fortsätt som gäst
               </button>
             </div>
 
-            <p className="mt-4 text-xs text-gray-400 text-center max-w-sm">
+            <p className="login-page__guest-note">
               Som gäst kan du fortfarande rapportera skräp men du kan inte samla poäng.
             </p>
           </>
         )}
 
         {isRegistering && (
-          <button
-            onClick={toggleMode}
-            className="mt-6 text-sm text-green-600 hover:text-green-700 font-medium"
-          >
+          <button onClick={toggleMode} className="login-page__toggle-link">
             Har du redan ett konto? Logga in
           </button>
         )}
       </div>
 
       {/* TODO: Replace with shared Navbar component */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around items-center py-3" />
+      <nav className="login-page__nav" />
     </div>
   )
 }
