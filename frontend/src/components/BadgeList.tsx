@@ -8,7 +8,7 @@ interface BadgeListProps {
 const BadgeList = ({ badges }: BadgeListProps) => {
   return (
     <div className="mx-4 mt-6">
-      <h2 className="text-white font-semibold mb-3">🏆Utmärkelser🏆</h2>
+      <h2 className="text-white font-semibold mb-3">🏆Awards🏆</h2>
       <div className="grid grid-cols-3 gap-3">
         {badges.map((badge) => (
           <Badge key={badge} label={badge} />

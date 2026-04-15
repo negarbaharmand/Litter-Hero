@@ -7,11 +7,11 @@ interface PointsCardProps {
 const PointsCard = ({ totalPoints, weeklyPoints }: PointsCardProps) => {
   return (
     <div className="bg-surface rounded-2xl p-6 mx-4 text-center">
-      <span className="text-muted text-sm">Totala poäng</span>
+      <span className="text-muted text-sm">Total points</span>
       <p className="text-white text-5xl font-bold my-2">{totalPoints}</p>
       <div className="flex items-center justify-center gap-1 text-primary text-sm">
         <span>↗</span>
-        <span>+{weeklyPoints} denna vecka</span>
+        <span>+{weeklyPoints} This week</span>
       </div>
     </div>
   )

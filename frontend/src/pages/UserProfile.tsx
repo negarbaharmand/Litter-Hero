@@ -8,10 +8,10 @@ import SettingsButton from '../components/SettingsButton'
 const UserProfile = () => {
   return (
     <div className="bg-background min-h-screen">
-      <ProfileHeader username="Användare123" level={12} />
+      <ProfileHeader username="User123" level={12} />
       <PointsCard totalPoints={500} weeklyPoints={180} />
-      <BadgeList badges={["🔥3 dagars streak", "Annan utmärkelse", "Annan utmärkelse"]} />
-      <SettingsButton onClick={() => console.log('Inställningar klickad')} />
+      <BadgeList badges={["🔥3 day streak", "Another award", "Another award"]} />
+      <SettingsButton onClick={() => console.log('Settings clicked')} />
     </div>
   )
 }
