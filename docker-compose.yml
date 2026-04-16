@@ -53,8 +53,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB} 
     networks:
       - internal 
-    volumes:
-      - ./backend/drizzle:/docker-entrypoint-initdb.d
     deploy:
       mode: replicated
       replicas: 1
