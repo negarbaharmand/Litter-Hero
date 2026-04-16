@@ -37,7 +37,7 @@ export function LoginPage() {
     <div className="login-page login-page__container">
       <div className="login-page__content">
         <h1 className="login-page__heading">
-          {isRegistering ? 'Skapa nytt konto' : 'Logga in'}
+          {isRegistering ? 'Create new account' : 'Login'}
         </h1>
 
         <form
@@ -51,7 +51,7 @@ export function LoginPage() {
           {isRegistering && (
             <div>
               <label htmlFor="name" className="login-page__label">
-                Namn
+                Name
               </label>
               <form.Field name="name">
                 {(field) => (
@@ -60,7 +60,7 @@ export function LoginPage() {
                     type="text"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="Ditt namn"
+                    placeholder="Your name"
                     className="login-page__input"
                   />
                 )}
@@ -70,7 +70,7 @@ export function LoginPage() {
 
           <div>
             <label htmlFor="email" className="login-page__label">
-              Mail
+              Email
             </label>
             <form.Field name="email">
               {(field) => (
@@ -79,7 +79,7 @@ export function LoginPage() {
                   type="email"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="din@email.se"
+                  placeholder="your@email.com"
                   className="login-page__input"
                 />
               )}
@@ -88,7 +88,7 @@ export function LoginPage() {
 
           <div>
             <label htmlFor="password" className="login-page__label">
-              Lösenord
+              Password
             </label>
             <div className="login-page__password-wrapper">
               <form.Field name="password">
@@ -107,7 +107,7 @@ export function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="login-page__password-toggle"
-                aria-label={showPassword ? 'Dölj lösenord' : 'Visa lösenord'}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -126,7 +126,7 @@ export function LoginPage() {
           </div>
 
           <button type="submit" className="login-page__submit">
-            {isRegistering ? 'Skapa konto' : 'Logga in'}
+            {isRegistering ? 'Create new account' : 'Login'}
           </button>
         </form>
 
@@ -139,27 +139,27 @@ export function LoginPage() {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A11.96 11.96 0 0 0 1 12c0 1.94.46 3.77 1.18 5.43l3.66-2.84z" fill="#FBBC05" />
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
-              Logga in med Google
+              Login in with Google
             </button>
 
             <div className="login-page__secondary-actions">
               <button onClick={toggleMode} className="login-page__secondary-btn">
-                Skapa nytt konto
+                Create new account
               </button>
               <button onClick={handleGuestContinue} className="login-page__secondary-btn">
-                Fortsätt som gäst
+                Continue as guest
               </button>
             </div>
 
             <p className="login-page__guest-note">
-              Som gäst kan du fortfarande rapportera skräp men du kan inte samla poäng.
+              As a guest you can still report trash but you can't collect points.
             </p>
           </>
         )}
 
         {isRegistering && (
           <button onClick={toggleMode} className="login-page__toggle-link">
-            Har du redan ett konto? Logga in
+            Already have an account? Login
           </button>
         )}
       </div>
