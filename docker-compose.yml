@@ -62,7 +62,7 @@ services:
       - traefik-public
       - internal
     environment:
-      DATABASE_URL = ${DATABASE_URL}
+      - DATABASE_URL = ${DATABASE_URL}
     depends_on:
       - db 
     ports:
