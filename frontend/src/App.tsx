@@ -1,8 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { HomePage } from './pages/HomePage.tsx'
-import { NotFoundPage } from './pages/NotFoundPage.tsx'
-import { NavBar } from './components/NavBar.tsx'
-import { ReportsPage } from './pages/Reports.tsx'
+import { HomePage } from './pages/HomePage'
+import { NotFoundPage } from './pages/NotFoundPage'
+import { NavBar } from './components/NavBar'
+import { ReportsPage } from './pages/Reports'
+import UserProfile from './pages/UserProfile'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
         <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/profile" element={<UserProfile />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
