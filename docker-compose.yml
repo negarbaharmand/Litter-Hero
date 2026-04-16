@@ -64,7 +64,7 @@ services:
       - internal
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PWD}
     depends_on:
       - db
     deploy:
