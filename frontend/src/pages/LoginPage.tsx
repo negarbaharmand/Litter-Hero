@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
+import { NavBar } from '../components/NavBar'
 
 export function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false)
@@ -164,8 +165,7 @@ export function LoginPage() {
         )}
       </div>
 
-      {/* TODO: Replace with shared Navbar component */}
-      <nav className="login-page__nav" />
+      <NavBar />
     </div>
   )
 }
