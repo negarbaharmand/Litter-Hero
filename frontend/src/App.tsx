@@ -16,7 +16,6 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
         <Route path="/reports" element={<ReportsPage />} />
-        <Route path="/leaderboard" element={<NotFoundPage />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
