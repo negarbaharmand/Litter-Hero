@@ -33,7 +33,8 @@ function MapPage() {
   ];
 
   return (
-    <main className="relative h-[calc(100svh-74px)] w-full overflow-hidden">
+    <main className="relative h-[calc(100svh-74px)] w-full overflow-hidden md:mt-[74px]">
+      {/* map area: 74px offset — nere (mobil) / uppe (desktop), samma höjd som NavBar */}
       <div className="absolute inset-0 z-[1]">
         <MapContainer
           center={[57.7089, 11.9746]}

@@ -15,7 +15,11 @@ export function NavBar() {
   const iconClass = "h-5 w-5";
 
   return (
-    <header className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-md">
+    <>
+      {/* Navigation: nere på mobil/platta (default), längst upp på desktop (md+) */}
+    <header
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-md md:bottom-auto md:top-0 md:border-b md:border-t-0"
+    >
       <nav className="mx-auto grid h-[74px] max-w-4xl grid-cols-5 items-center px-3">
         <NavLink
           to="/"
@@ -43,10 +47,11 @@ export function NavBar() {
           <span>Reports</span>
         </NavLink>
 
+        {/* Kamera-knapp: "pop" bara på mobil; platt top bar på desktop */}
         <NavLink
           to="/reports"
           aria-label="Camera"
-          className="mx-auto grid h-14 w-14 -translate-y-3 place-items-center rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-600/30 ring-1 ring-black/5"
+          className="mx-auto grid h-14 w-14 -translate-y-3 place-items-center rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-600/30 ring-1 ring-black/5 md:translate-y-0"
         >
           <img
             src={cameraIcon}
@@ -87,5 +92,6 @@ export function NavBar() {
         </NavLink>
       </nav>
     </header>
+    </>
   );
 }

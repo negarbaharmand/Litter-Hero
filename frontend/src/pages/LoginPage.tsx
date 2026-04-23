@@ -22,7 +22,8 @@ export function LoginPage() {
   })
 
   return (
-    <div className="login-page login-page__container">
+    <div className="login-page login-page__container md:pt-[74px]">
+      {/* md: topp-nav — login får samma topp-marginal som andra sidor */}
       <div className="login-page__content">
         <form.Subscribe selector={(state) => state.values.isRegistering}>
           {(isRegistering) => (

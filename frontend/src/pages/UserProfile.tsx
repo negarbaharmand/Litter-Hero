@@ -7,7 +7,8 @@ import SettingsButton from '../components/SettingsButton'
 
 const UserProfile = () => {
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-background min-h-screen md:pt-[74px]">
+      {/* md: topp-nav — profil får padding så header inte döljs */}
       <ProfileHeader username="User123" level={12} />
       <PointsCard totalPoints={500} weeklyPoints={180} />
       <BadgeList badges={[ //Example badges(hardcoded), we will replace this with real data later
