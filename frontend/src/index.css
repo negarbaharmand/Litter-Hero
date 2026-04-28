@@ -1,3 +1,4 @@
+
 @import "tailwindcss";
 
 @theme {
@@ -8,6 +9,56 @@
   --color-danger: #ef4444;
 }
 
+.login-page__container {
+  @apply min-h-screen flex flex-col bg-white;
+}
+.login-page__content {
+  @apply flex-1 flex flex-col items-center justify-center px-6 pb-24;
+}
+.login-page__heading {
+  @apply text-xl font-semibold mb-8 text-center;
+  color: #111827;
+  letter-spacing: normal;
+}
+.login-page__form {
+  @apply w-full max-w-sm flex flex-col gap-4;
+}
+.login-page__label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+.login-page__input {
+  @apply w-full px-4 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent;
+}
+.login-page__input--with-toggle {
+  @apply pr-12;
+}
+.login-page__password-wrapper {
+  @apply relative;
+}
+.login-page__password-toggle {
+  @apply absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600;
+}
+.login-page__submit {
+  @apply w-full py-3 rounded-xl bg-green-500 text-white font-semibold hover:bg-green-600 transition-colors mt-2;
+}
+.login-page__google-btn {
+  @apply w-full max-w-sm mt-3 py-3 rounded-xl border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2;
+}
+.login-page__secondary-actions {
+  @apply w-full max-w-sm mt-6 flex flex-col gap-3;
+}
+.login-page__secondary-btn {
+  @apply w-full py-3 rounded-xl border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-50 transition-colors;
+}
+.login-page__guest-note {
+  @apply mt-4 text-xs text-gray-400 text-center max-w-sm;
+}
+.login-page__toggle-link {
+  @apply mt-6 text-sm text-green-600 hover:text-green-700 font-medium;
+}
+.login-page__nav {
+  @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around items-center py-3;
+}
 
 :root {
   --text: #6b6375;
@@ -120,5 +171,3 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
-
-

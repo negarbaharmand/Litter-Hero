@@ -15,3 +15,7 @@ export const fetchUsers = async () => {
   const response = await fetch(`${API_BASE_URL}/api/users`);
   return response.json();
 };
+export const fetchLeaderboard = async (_timePeriod: 'allTime' | 'monthly' | 'weekly') => {
+
+  throw new Error('Backend endpoint not yet implemented');
+};
