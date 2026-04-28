@@ -1,5 +1,7 @@
 # Grupp 2
 
+# How to start spin up Frontend, Backend, database + drizzle for local development
+- docker compose -f docker-compose.local.yml up -d --build && docker compose logs -f
 
 ## Notes från Alexander
 Följande filer behövs för att sätta upp utvecklarnas miljö, ta inte bort dom.
