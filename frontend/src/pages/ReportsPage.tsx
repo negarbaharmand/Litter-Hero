@@ -1,119 +1,89 @@
-import { useId, useMemo, useState } from "react";
-import "../App.css";
-
-type ReportCategory = "Plast" | "Glas" | "Metall" | "Papper" | "Övrigt";
-type ReportAmount = "Small" | "Medium" | "Large";
-
-// Placeholder page file (ej inkopplad just nu) – Map är enda funktionella sidan
 export function ReportsPage() {
-  const fileInputId = useId();
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [locationText, setLocationText] = useState("");
-  const [category, setCategory] = useState<ReportCategory>("Plast");
-  const [amount, setAmount] = useState<ReportAmount>("Small");
-
-  const categories: ReportCategory[] = useMemo(
-    () => ["Plast", "Glas", "Metall", "Papper", "Övrigt"],
-    [],
-  );
-
-  function onPickImage(file: File | null) {
-    if (!file) return;
-    // Create preview URL (förhandsvisning), backend upload later
-    const next = URL.createObjectURL(file);
-    setImageUrl(next);
-  }
+  const imageUrl: string | null = null;
 
   return (
-    <div style={{ padding: 16 }}>
-      <h2 style={{ margin: 0 }}>Reports</h2>
-      <p style={{ opacity: 0.75, marginTop: 6 }}>
-        Placeholder-fil för Reports-flödet. Inte inkopplad i navigationen just nu.
-      </p>
+    <>
+      <div className="hidden min-h-screen bg-white lg:block" />
 
-      <div style={{ marginTop: 14 }}>
-        <input
-          id={fileInputId}
-          type="file"
-          accept="image/*"
-          onChange={(e) => onPickImage(e.target.files?.[0] ?? null)}
-        />
-        {imageUrl && (
-          <div style={{ marginTop: 10 }}>
-            <img
-              src={imageUrl}
-              alt="Preview"
-              style={{ width: "100%", maxWidth: 420, borderRadius: 12 }}
-            />
+      <div className="min-h-screen bg-background lg:hidden">
+        <section className="relative left-1/2 h-[32dvh] w-screen max-w-[100vw] -translate-x-1/2 overflow-hidden bg-[#252e25]">
+          <button
+            type="button"
+            className="absolute left-3 top-3 z-10 text-emerald-300"
+            aria-label="Back"
+            onClick={() => history.back()}
+          >
+            <svg
+              width="26"
+              height="26"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M11.03 3.22a1 1 0 0 1 0 1.41L5.66 10H21a1 1 0 1 1 0 2H5.66l5.37 5.37a1 1 0 1 1-1.41 1.41l-7.1-7.1a1 1 0 0 1 0-1.41l7.1-7.1a1 1 0 0 1 1.41 0Z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+
+          {imageUrl ? (
+            <img src={imageUrl} alt="Report" className="h-full w-full object-cover" />
+          ) : (
+            <div className="grid h-full w-full place-items-center">
+              <div className="translate-y-10 text-base font-medium text-slate-200">
+                Report Photo
+              </div>
+            </div>
+          )}
+        </section>
+
+        <section className="relative min-h-[calc(100dvh-32dvh)] px-4 pb-28 pt-4">
+          <div className="absolute left-0 right-0 top-4 mx-auto flex max-w-[240px] items-center justify-between px-4">
+            <div className="text-yellow-400">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 2.2l2.92 6.26 6.88.62-5.2 4.5 1.56 6.72L12 16.9 5.84 20.3l1.56-6.72-5.2-4.5 6.88-.62L12 2.2Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+
+            <div className="text-2xl font-normal text-emerald-300">
+              102pts
+            </div>
           </div>
-        )}
-      </div>
 
-      <div style={{ marginTop: 14 }}>
-        <label>
-          Plats:
-          <input
-            value={locationText}
-            onChange={(e) => setLocationText(e.target.value)}
-            placeholder="Skriv adress / platsnamn"
-            style={{ display: "block", width: "100%", maxWidth: 420, marginTop: 6 }}
-          />
-        </label>
-      </div>
+          <div className="absolute left-0 right-0 top-16 px-4">
+            <div className="flex h-16 w-full items-center gap-3 rounded-xl border border-slate-700 bg-[#252e25] px-3">
+              <div
+                className="grid h-12 w-12 shrink-0 place-items-center rounded-full ring-1 ring-slate-600"
+                style={{ backgroundColor: "#82ed9a" }}
+              >
+                <span className="text-sm font-semibold text-emerald-800">U21</span>
+              </div>
 
-      <div style={{ marginTop: 14 }}>
-        <div>Kategori:</div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 6 }}>
-          {categories.map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setCategory(c)}
-              style={{
-                padding: "8px 10px",
-                borderRadius: 999,
-                border: "1px solid rgba(164,164,164,0.55)",
-                background: c === category ? "rgba(160,223,16,0.26)" : "rgba(247,255,228,0.9)",
-                cursor: "pointer",
-                fontWeight: 700,
-              }}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-      </div>
+              <div className="flex flex-1 flex-col items-center leading-tight">
+                <div className="text-sm font-medium text-emerald-300">User21</div>
+                <div className="ml-3 text-xs text-slate-300">11d ago</div>
+              </div>
+            </div>
+          </div>
 
-      <div style={{ marginTop: 14 }}>
-        <div>Mängd:</div>
-        <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
-          {(["Small", "Medium", "Large"] as const).map((a) => (
-            <button
-              key={a}
-              type="button"
-              onClick={() => setAmount(a)}
-              style={{
-                padding: "8px 10px",
-                borderRadius: 12,
-                border: "1px solid rgba(164,164,164,0.55)",
-                background: a === amount ? "rgba(67,202,142,0.22)" : "rgba(247,255,228,0.9)",
-                cursor: "pointer",
-                fontWeight: 700,
-              }}
-            >
-              {a}
-            </button>
-          ))}
-        </div>
+          <div className="absolute left-0 right-0 top-36 px-4">
+            <div className="flex items-center text-sm text-slate-300">
+              <span>Location:</span>
+              <span className="ml-12">Type:</span>
+            </div>
+          </div>
+        </section>
       </div>
-
-      <div style={{ marginTop: 16, opacity: 0.8 }}>
-        <div>Selected:</div>
-        <div>
-          {category} / {amount} / {locationText || "(ingen plats)"}
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
-
