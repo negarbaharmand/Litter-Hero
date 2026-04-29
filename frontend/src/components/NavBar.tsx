@@ -6,6 +6,7 @@ import ranksIcon from "../assets/ranks-svgrepo-com.svg";
 import profileIcon from "../assets/profile-2-svgrepo-com.svg";
 
 export function NavBar() {
+  // Global nav: bottom on mobile + tablet, top on desktop (nav ner på mobil/surfplatta, upp på desktop)
   const itemBase =
     "grid justify-items-center gap-1 rounded-xl px-2 py-2 text-xs font-semibold text-slate-700 transition";
 
@@ -14,12 +15,11 @@ export function NavBar() {
 
   const iconClass = "h-5 w-5";
 
+  const headerClass =
+    "fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-md lg:bottom-auto lg:top-0 lg:border-b lg:border-t-0";
+
   return (
-    <>
-      {/* Navigation: nere på mobil/platta (default), längst upp på desktop (md+) */}
-    <header
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-md md:bottom-auto md:top-0 md:border-b md:border-t-0"
-    >
+    <header className={headerClass}>
       <nav className="mx-auto grid h-[74px] max-w-4xl grid-cols-5 items-center px-3">
         <NavLink
           to="/"
@@ -47,11 +47,10 @@ export function NavBar() {
           <span>Reports</span>
         </NavLink>
 
-        {/* Kamera-knapp: "pop" bara på mobil; platt top bar på desktop */}
         <NavLink
           to="/reports"
           aria-label="Camera"
-          className="mx-auto grid h-14 w-14 -translate-y-3 place-items-center rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-600/30 ring-1 ring-black/5 md:translate-y-0"
+          className="mx-auto grid h-14 w-14 -translate-y-3 place-items-center rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-600/30 ring-1 ring-black/5 lg:translate-y-0"
         >
           <img
             src={cameraIcon}
@@ -92,6 +91,5 @@ export function NavBar() {
         </NavLink>
       </nav>
     </header>
-    </>
   );
 }

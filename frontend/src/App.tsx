@@ -12,7 +12,9 @@ function App() {
   return (
     <>
       <NavBar />
-      <Routes>
+      {/* Fill remaining height under fixed NavBar (fyller höjd i flex-layout) */}
+      <div className="flex min-h-0 flex-1 flex-col">
+        <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
         <Route path="/reports" element={<ReportsPage />} />
@@ -20,7 +22,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+        </Routes>
+      </div>
     </>
   )
 }

@@ -32,9 +32,9 @@ function MapPage() {
     },
   ];
 
+  // Full-bleed map: break out of #root max width. Use dvh for stable mobile/desktop height (Leaflet needs real px height)
   return (
-    <main className="relative h-[calc(100svh-74px)] w-full overflow-hidden md:mt-[74px]">
-      {/* map area: 74px offset — nere (mobil) / uppe (desktop), samma höjd som NavBar */}
+    <main className="relative left-1/2 h-[calc(100dvh-74px)] min-h-[calc(100dvh-74px)] w-screen max-w-[100vw] -translate-x-1/2 overflow-hidden bg-slate-950">
       <div className="absolute inset-0 z-[1]">
         <MapContainer
           center={[57.7089, 11.9746]}
@@ -98,5 +98,10 @@ function MapPage() {
 }
 
 export function HomePage() {
-  return <MapPage />;
+  // Keep home route full height in the flex layout (håll kartan synlig)
+  return (
+    <div className="flex w-full min-h-0 flex-1 flex-col">
+      <MapPage />
+    </div>
+  );
 }

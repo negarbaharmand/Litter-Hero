@@ -13,7 +13,8 @@
   @apply min-h-screen flex flex-col bg-white;
 }
 .login-page__content {
-  @apply flex-1 flex flex-col items-center justify-center px-6 pb-24;
+  /* Room for fixed NavBar: bottom (pb) on phone, top (lg:pt) on desktop — (plats för fixerad nav) */
+  @apply flex-1 flex flex-col items-center justify-center px-6 pb-24 lg:pb-10 lg:pt-[74px];
 }
 .login-page__heading {
   @apply text-xl font-semibold mb-8 text-center;
