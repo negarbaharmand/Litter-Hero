@@ -4,7 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { HomePage } from './pages/HomePage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { NavBar } from './components/NavBar'
-import { ReportsPage } from './pages/Reports'
+import { ReportsPage } from './pages/ReportPage'
 import UserProfile from './pages/UserProfile'
 import { LoginPage } from './pages/LoginPage'
 

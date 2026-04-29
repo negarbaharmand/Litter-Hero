@@ -1,13 +1,5 @@
-
 import { useQuery } from '@tanstack/react-query'
-import { fetchReports } from '../api'
-
-type Report = {
-  id: number;
-  location: string;
-  description: string | null;
-  size: string | null;
-};
+import { fetchReports, type Report } from '../api'
 
 export function ReportList() {
   const { data, isLoading, isError, error } = useQuery<Report[]>({
@@ -29,7 +21,7 @@ export function ReportList() {
     <div className="p-6 sm:p-8">
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-2xl font-semibold tracking-tight">Reports from the Database</h2>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-600">
+        <span className="rounded-full bg-slate-100 px-3 py-1 text-green-500">
           {data?.length ?? 0} reports
         </span>
       </div>
