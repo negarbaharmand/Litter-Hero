@@ -4,6 +4,7 @@ stages:
   - scan
   - deploy
   - cleanup
+
 #Pipeline rule that can be reused
 #This rule makes starts the job in main, development and every other branch with / in it
 .always-rule: &always-rule
@@ -100,6 +101,11 @@ deploy production:
     TRIVY_CACHE_DIR: .trivycache/
     TRIVY_USERNAME: $CI_REGISTRY_USER
     TRIVY_PASSWORD: $CI_REGISTRY_PASSWORD
+  artifacts:
+    paths:
+      - trivy-report.html
+    expire_in: 1 week
+    when: always
 
 scan python:
   <<: *scan-image
