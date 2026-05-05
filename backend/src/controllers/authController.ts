@@ -11,6 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
+  username: z.string().min(3).max(50, 'Username must be between 3 and 50 characters').optional(),
   name: z.string().max(100).optional(),
 });
 
@@ -26,7 +27,7 @@ export const register = async (req: Request, res: Response) => {
   }
 
   try {
-    const { email, password, name } = parsed.data;
+    const { email, password, name, username } = parsed.data;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -34,6 +35,7 @@ export const register = async (req: Request, res: Response) => {
       email,
       password: hashedPassword,
       name: name ?? null,
+      username: username ?? null,
     }).returning();
 
     if (!newUser) {
