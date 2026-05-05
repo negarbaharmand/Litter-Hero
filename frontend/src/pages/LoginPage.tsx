@@ -11,6 +11,7 @@ export function LoginPage() {
 
   const form = useForm({
     defaultValues: {
+      username: '',
       name: '',
       email: '',
       password: '',
@@ -76,6 +77,30 @@ export function LoginPage() {
               )
             }
           </form.Subscribe>
+
+          
+          <form.Subscribe selector={(state) => state.values.isRegistering}>
+            {(isRegistering) =>
+            isRegistering && (
+              <div>
+                <label htmlFor="username" className="login-page__label">Username</label>
+                <form.Field name="username">
+                  {(field) => (
+                    <input
+                      id="username"
+                      type="text"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="Your username"
+                      className="login-page__input"
+                    />
+                  )}
+                </form.Field>
+              </div>
+          )
+        }
+
+</form.Subscribe>
 
           <div>
             <label htmlFor="email" className="login-page__label">Email</label>
@@ -171,7 +196,7 @@ export function LoginPage() {
 
               <div className="login-page__secondary-actions">
                 <button
-                  onClick={() => { form.setFieldValue('isRegistering', true); form.reset({ isRegistering: true, showPassword: false, name: '', email: '', password: '' }) }}
+                  onClick={() => { form.setFieldValue('isRegistering', true); form.reset({ isRegistering: true, showPassword: false, username: '', name: '', email: '', password: '' }) }}
                   className="login-page__secondary-btn"
                 >
                   Create new account
@@ -187,7 +212,7 @@ export function LoginPage() {
             </>
           ) : (
             <button
-              onClick={() => form.reset({ isRegistering: false, showPassword: false, name: '', email: '', password: '' })}
+              onClick={() => form.reset({ isRegistering: false, showPassword: false, username: '',  name: '', email: '', password: '' })}
               className="login-page__toggle-link"
             >
               Already have an account? Login

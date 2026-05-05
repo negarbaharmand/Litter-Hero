@@ -1,5 +1,5 @@
 {
-  "id": "3429c795-1a48-4ec8-a724-ba4f2cf8ee46",
+  "id": "33c6abca-17c3-4669-b59f-598a761a69bd",
   "prevId": "64324927-f956-4df9-b47a-6c167be92230",
   "version": "7",
   "dialect": "postgresql",
@@ -58,12 +58,8 @@
           "name": "reports_user_id_users_id_fk",
           "tableFrom": "reports",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -83,6 +79,12 @@
           "type": "serial",
           "primaryKey": true,
           "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
         },
         "email": {
           "name": "email",
@@ -128,12 +130,15 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "users_username_unique": {
+          "name": "users_username_unique",
+          "nullsNotDistinct": false,
+          "columns": ["username"]
+        },
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},

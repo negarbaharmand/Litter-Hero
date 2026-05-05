@@ -22,9 +22,12 @@ export type CreateReportPayload = {
 
 export type User = {
   id: number;
+  username: string | null;
   name: string;
   email: string;
   points: number;
+  role: string;
+  createdAt: string;
 };
 
 // 2. Export functions that use that URL
@@ -41,7 +44,7 @@ export const fetchUsers = async (): Promise<User[]> => {
   return response.json();
 };
 
-export const fetchLeaderboard = async (_timePeriod: 'allTime' | 'monthly' | 'weekly'): Promise<any> => {
+export const fetchLeaderboard = async (_timePeriod: 'allTime' | 'monthly' | 'weekly'): Promise<void> => {
   throw new Error('Backend endpoint not yet implemented');
 };
 
