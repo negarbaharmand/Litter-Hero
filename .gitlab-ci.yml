@@ -107,6 +107,7 @@ deploy production:
     TRIVY_USERNAME: $CI_REGISTRY_USER
     TRIVY_PASSWORD: $CI_REGISTRY_PASSWORD
   script:
+    - 'echo "ci_user=${CI_REGISTRY_USER:-EMPTY} ci_pwd_len=${#CI_REGISTRY_PASSWORD}"'
     - 'echo "user=${TRIVY_USERNAME:-EMPTY} pwd_len=${#TRIVY_PASSWORD} registry=$CI_REGISTRY"'
     - trivy image
       --severity HIGH,CRITICAL
