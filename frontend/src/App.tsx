@@ -7,6 +7,7 @@ import { NavBar } from './components/NavBar'
 import { ReportsPage } from './pages/ReportPage'
 import UserProfile from './pages/UserProfile'
 import { LoginPage } from './pages/LoginPage'
+import { AddPicturePage } from './pages/AddPicturePage'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
         <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/add-picture" element={<AddPicturePage />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
