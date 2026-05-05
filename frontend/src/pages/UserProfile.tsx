@@ -16,13 +16,8 @@ const UserProfile = () => {
   }
 
   return (
-<<<<<<< HEAD
     <div className="bg-background min-h-screen pb-24">
-      <ProfileHeader username="User123" level={12} />
-=======
-    <div className="bg-background min-h-screen">
       <ProfileHeader username={null} level={12} />
->>>>>>> 2c1e6c7 (Add username column to users table)
       <PointsCard totalPoints={500} weeklyPoints={180} />
       <BadgeList badges={[ //Example badges(hardcoded), we will replace this with real data later
         { id: 1, label: "🔥3 day streak" },
