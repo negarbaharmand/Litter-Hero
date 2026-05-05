@@ -107,13 +107,14 @@ deploy production:
     TRIVY_USERNAME: $CI_REGISTRY_USER
     TRIVY_PASSWORD: $CI_REGISTRY_PASSWORD
   script:
+    - 'echo "user=${TRIVY_USERNAME:-EMPTY} pwd_len=${#TRIVY_PASSWORD} registry=$CI_REGISTRY"'
     - trivy image
       --severity HIGH,CRITICAL
       --ignore-unfixed
       --exit-code 0
       --no-progress
       --format template
-      --template "@contrib/html.tpl"
+      --template "@/contrib/html.tpl"
       --output trivy-report-$COMPONENT.html
       $IMAGE
   artifacts:
