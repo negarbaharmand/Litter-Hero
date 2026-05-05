@@ -12,6 +12,11 @@ stages:
   - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
   - if: $CI_COMMIT_REF_NAME =~ /\//
 
+.integration-rule: &integration-rule
+  - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
+  - if: $CI_MERGE_REQUEST_TARGET_BRANCH_PROTECTED == "true"
+
 #Docker anchor template that can be reused for building frontend and backend
 .docker-build: &docker-build
   stage: build
@@ -101,38 +106,48 @@ deploy production:
     TRIVY_CACHE_DIR: .trivycache/
     TRIVY_USERNAME: $CI_REGISTRY_USER
     TRIVY_PASSWORD: $CI_REGISTRY_PASSWORD
+  script:
+    - trivy image
+      --severity HIGH,CRITICAL
+      --ignore-unfixed
+      --exit-code 0
+      --no-progress
+      --format template
+      --template "@contrib/html.tpl"
+      --output trivy-report-$COMPONENT.html
+      $IMAGE
   artifacts:
     paths:
-      - trivy-report.html
+      - trivy-report-$COMPONENT.html
     expire_in: 1 week
     when: always
 
 scan python:
   <<: *scan-image
-  rules: *always-rule
+  rules: *integration-rule
   needs:
     - job: build python
-  script:
-    - trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 --no-progress
-      $CI_REGISTRY_IMAGE/python-utils:latest
+  variables:
+    COMPONENT: python
+    IMAGE: $CI_REGISTRY_IMAGE/python-utils:latest
 
 scan frontend:
   <<: *scan-image
-  rules: *always-rule
+  rules: *integration-rule
   needs:
     - job: build frontend
-  script:
-    - trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 --no-progress
-      $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_SLUG
+  variables:
+    COMPONENT: frontend
+    IMAGE: $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_SLUG
 
 scan backend:
   <<: *scan-image
-  rules: *always-rule
+  rules: *integration-rule
   needs:
     - job: build backend
-  script:
-    - trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 --no-progress
-      $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG
+  variables:
+    COMPONENT: backend
+    IMAGE: $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG
 
 #Removes the environment manually when MR is done
 stop_review:
