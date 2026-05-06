@@ -1,17 +1,22 @@
+import { useNavigate } from "react-router-dom";
+
 export function ReportsPage() {
+  const navigate = useNavigate();
   const imageUrl: string | null = null;
+  const userCode = "U21";
+  const username = "User21";
+  const timeAgo = "11d ago";
+  const pointsText = "102pts";
 
   return (
     <>
-      <div className="hidden min-h-screen bg-white lg:block" />
-
-      <div className="min-h-screen bg-background lg:hidden">
+      <div className="min-h-screen bg-background">
         <section className="relative left-1/2 h-[32dvh] w-screen max-w-[100vw] -translate-x-1/2 overflow-hidden bg-[#252e25]">
           <button
             type="button"
             className="absolute left-3 top-3 z-10 text-emerald-300"
             aria-label="Back"
-            onClick={() => history.back()}
+            onClick={() => navigate(-1)}
           >
             <svg
               width="26"
@@ -55,23 +60,20 @@ export function ReportsPage() {
               </svg>
             </div>
 
-            <div className="text-2xl font-normal text-emerald-300">
-              102pts
-            </div>
+            <div className="text-2xl font-normal text-emerald-300">{pointsText}</div>
           </div>
 
           <div className="absolute left-0 right-0 top-16 px-4">
             <div className="flex h-16 w-full items-center gap-3 rounded-xl border border-slate-700 bg-[#252e25] px-3">
               <div
-                className="grid h-12 w-12 shrink-0 place-items-center rounded-full ring-1 ring-slate-600"
-                style={{ backgroundColor: "#82ed9a" }}
+                className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-emerald-300 ring-1 ring-slate-600"
               >
-                <span className="text-sm font-semibold text-emerald-800">U21</span>
+                <span className="text-sm font-semibold text-emerald-800">{userCode}</span>
               </div>
 
               <div className="flex flex-1 flex-col items-center leading-tight">
-                <div className="text-sm font-medium text-emerald-300">User21</div>
-                <div className="ml-3 text-xs text-slate-300">11d ago</div>
+                <div className="text-sm font-medium text-emerald-300">{username}</div>
+                <div className="ml-3 text-xs text-slate-300">{timeAgo}</div>
               </div>
             </div>
           </div>

@@ -72,8 +72,7 @@ export function NavBar() {
                     {({ isActive }) => (
                         <>
                             <span
-                                className="grid h-11 w-11 place-items-center rounded-full"
-                                style={{ backgroundColor: "#82ed9a" }}
+                                className="grid h-11 w-11 place-items-center rounded-full bg-emerald-300"
                                 aria-hidden="true"
                             >
                                 <img
