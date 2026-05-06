@@ -77,11 +77,7 @@ build python:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\// 
-      changes:
-        - scripts/python-Dockerfile
-        - scripts/deploy.py 
-        - scripts/requirements.txt
-
+        
 # Verifys that all the images works correctly by trying to pull all images from the registry
 verify images:
   stage: test

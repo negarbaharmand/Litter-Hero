@@ -22,6 +22,8 @@ export function HomePage() {
 		document.documentElement.dataset.theme = next;
 	}
 
+
+
 	return (
 		<main className="fixed inset-0 h-[100dvh] w-[100vw] bg-transparent">
 			<div className="absolute inset-0">
