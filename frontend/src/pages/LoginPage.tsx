@@ -23,7 +23,7 @@ export function LoginPage() {
       setIsLoading(true)
       try {
         const result = value.isRegistering
-          ? await registerUser(value.email, value.password, value.name || undefined)
+          ? await registerUser(value.email, value.password, value.username || undefined, value.name || undefined)
           : await loginUser(value.email, value.password)
 
         localStorage.setItem('token', result.token)
