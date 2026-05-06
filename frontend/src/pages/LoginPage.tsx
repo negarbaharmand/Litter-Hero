@@ -1,6 +1,14 @@
+import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
+import { useNavigate } from 'react-router-dom'
+import { NavBar } from '../components/NavBar'
+import { loginUser, registerUser } from '../api'
 
 export function LoginPage() {
+  const navigate = useNavigate()
+  const [apiError, setApiError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
   const form = useForm({
     defaultValues: {
       username: '',
@@ -11,12 +19,20 @@ export function LoginPage() {
       showPassword: false,
     },
     onSubmit: async ({ value }) => {
-      if (value.isRegistering) {
-        // TODO: connect to POST /api/users/register
-        console.log('Register:', value)
-      } else {
-        // TODO: connect to POST /api/users/login
-        console.log('Login:', { email: value.email, password: value.password })
+      setApiError(null)
+      setIsLoading(true)
+      try {
+        const result = value.isRegistering
+          ? await registerUser(value.email, value.password, value.username || undefined, value.name || undefined)
+          : await loginUser(value.email, value.password)
+
+        localStorage.setItem('token', result.token)
+        localStorage.setItem('user', JSON.stringify(result.user))
+        navigate('/')
+      } catch (err) {
+        setApiError(err instanceof Error ? err.message : 'Something went wrong')
+      } finally {
+        setIsLoading(false)
       }
     },
   })
@@ -62,29 +78,29 @@ export function LoginPage() {
             }
           </form.Subscribe>
 
-          
+
           <form.Subscribe selector={(state) => state.values.isRegistering}>
             {(isRegistering) =>
-            isRegistering && (
-              <div>
-                <label htmlFor="username" className="login-page__label">Username</label>
-                <form.Field name="username">
-                  {(field) => (
-                    <input
-                      id="username"
-                      type="text"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder="Your username"
-                      className="login-page__input"
-                    />
-                  )}
-                </form.Field>
-              </div>
-          )
-        }
+              isRegistering && (
+                <div>
+                  <label htmlFor="username" className="login-page__label">Username</label>
+                  <form.Field name="username">
+                    {(field) => (
+                      <input
+                        id="username"
+                        type="text"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        placeholder="Your username"
+                        className="login-page__input"
+                      />
+                    )}
+                  </form.Field>
+                </div>
+              )
+            }
 
-</form.Subscribe>
+          </form.Subscribe>
 
           <div>
             <label htmlFor="email" className="login-page__label">Email</label>
@@ -145,10 +161,23 @@ export function LoginPage() {
             </div>
           </div>
 
-          <button type="submit" className="login-page__submit">
-            <form.Subscribe selector={(state) => state.values.isRegistering}>
-              {(isRegistering) => (isRegistering ? 'Create new account' : 'Login')}
-            </form.Subscribe>
+          {apiError && (
+            <p className="text-sm text-red-500 text-center -mt-1">{apiError}</p>
+          )}
+
+          <button type="submit" disabled={isLoading} className="login-page__submit">
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24">
+                  <path d="M21 12a9 9 0 1 1-6.22-8.56" />
+                </svg>
+                Please wait…
+              </span>
+            ) : (
+              <form.Subscribe selector={(state) => state.values.isRegistering}>
+                {(isRegistering) => (isRegistering ? 'Create new account' : 'Login')}
+              </form.Subscribe>
+            )}
           </button>
         </form>
 
@@ -183,7 +212,7 @@ export function LoginPage() {
             </>
           ) : (
             <button
-              onClick={() => form.reset({ isRegistering: false, showPassword: false, username: '',  name: '', email: '', password: '' })}
+              onClick={() => form.reset({ isRegistering: false, showPassword: false, username: '', name: '', email: '', password: '' })}
               className="login-page__toggle-link"
             >
               Already have an account? Login
@@ -196,10 +225,10 @@ export function LoginPage() {
   )
 
   function handleGoogleSignIn() {
-    console.log('Google sign-in clicked')
+    setApiError('Google sign-in is not yet available.')
   }
 
   function handleGuestContinue() {
-    console.log('Continue as guest')
+    navigate('/')
   }
 }

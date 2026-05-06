@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CameraCapture } from '../components/CameraCapture.tsx'
+import { CameraCapture } from '../components/CameraCapture'
 import { createReport } from '../api'
 
 const CATEGORIES = ['Mixed', 'Plastic', 'Cardboard', 'Metal', 'Glass', 'Organic']

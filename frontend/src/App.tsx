@@ -12,18 +12,16 @@ function App() {
   return (
     <>
       <NavBar />
-      <div className="flex min-h-0 flex-1 flex-col">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/home" element={<Navigate to="/" replace />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/add-picture" element={<AddPicturePage />} />
-          <Route path="/profile" element={<UserProfile />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/leaderboard" element={<LeaderboardPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/home" element={<Navigate to="/" replace />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/add-picture" element={<AddPicturePage />} />
+        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/leaderboard" element={<LeaderboardPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
     </>
   )
 }
