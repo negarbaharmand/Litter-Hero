@@ -13,7 +13,8 @@
   @apply min-h-screen flex flex-col bg-white;
 }
 .login-page__content {
-  @apply flex-1 flex flex-col items-center justify-center px-6 pb-24;
+  /* Room for fixed NavBar: bottom (pb) on phone, top (lg:pt) on desktop — (plats för fixerad nav) */
+  @apply flex-1 flex flex-col items-center justify-center px-6 pb-24 lg:pb-10 lg:pt-[74px];
 }
 .login-page__heading {
   @apply text-xl font-semibold mb-8 text-center;
@@ -90,6 +91,23 @@
   @media (max-width: 1024px) {
     font-size: 16px;
   }
+}
+
+/* Manual theme switch (manuell theme toggle) */
+html[data-theme="light"] {
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --text: #9ca3af;
+  --text-h: #f3f4f6;
+  --bg: #16171d;
+  --border: #2e303a;
+  --code-bg: #1f2028;
+  --accent: #c084fc;
+  --accent-bg: rgba(192, 132, 252, 0.15);
+  --accent-border: rgba(192, 132, 252, 0.5);
+  --social-bg: rgba(47, 48, 58, 0.5);
 }
 
 @media (prefers-color-scheme: dark) {

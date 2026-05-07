@@ -8,6 +8,20 @@
       "when": 1775750182117,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777235611837,
+      "tag": "0001_cheerful_jane_foster",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777971624472,
+      "tag": "0002_add_username",
+      "breakpoints": true
     }
   ]
 }

@@ -17,10 +17,12 @@ export default function ReportMap({
   reports,
   position,
   setPosition,
+  theme = 'light',
 }: {
   reports?: any[];
   position: [number, number];
   setPosition: (pos: [number, number]) => void;
+  theme?: 'light' | 'dark';
 }) {
 
   function LocationMarker() {
@@ -32,25 +34,31 @@ export default function ReportMap({
 
     return position === null ? null : (
       <Marker position={position}>
-        {/* Optional: Add a popup to the "New" pin too */}
         <MarkerPopup lat={position[0]} lng={position[1]} title="Din valda plats" description="Här hittade jag skräp!" />
       </Marker>
     );
   }
 
   return (
-    <div className="h-96 w-full rounded-xl overflow-hidden shadow-inner">
+    <div className="relative h-full w-full overflow-hidden">
       <MapContainer 
         center={position} 
         zoom={13} 
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution={
+            theme === 'dark'
+              ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+              : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          }
+          url={
+            theme === 'dark'
+              ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+              : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          }
         />
 
-        {/* 3. Map through existing reports from the database */}
         {reports?.map((report) => (
           <Marker key={report.id} position={[report.lat, report.lng]}>
             <MarkerPopup 
@@ -64,8 +72,8 @@ export default function ReportMap({
 
         <LocationMarker />
       </MapContainer>
-      <div className="mt-2 text-sm text-red-500 bg-gray-100 p-2 rounded">
-        Choosen coordinates: {position[0].toFixed(5)}, {position[1].toFixed(5)}
+      <div className="pointer-events-none absolute bottom-3 left-3 rounded-lg bg-white/90 px-3 py-2 text-xs text-slate-700 shadow">
+        Chosen coordinates: {position[0].toFixed(5)}, {position[1].toFixed(5)}
       </div>
     </div>
   );

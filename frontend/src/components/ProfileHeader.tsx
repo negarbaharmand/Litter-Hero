@@ -1,7 +1,7 @@
 //Det här en komponent för att visa användarens profilheader, som inkluderar avatar, namn och level
 
 interface ProfileHeaderProps {
-  username: string
+  username: string | null // Användarens namn, kan vara null
   level: number
   avatarUrl?: string
 }
@@ -23,7 +23,9 @@ const ProfileHeader = ({ username, level, avatarUrl }: ProfileHeaderProps) => {
 
       {/* Namn och level */}
       <div className="flex flex-col gap-1">
-        <span className="text-white font-semibold text-lg">{username}</span>
+        <span className="text-white font-semibold text-lg">
+          {username ?? 'User'}
+        </span>
         <span className="text-primary text-sm border border-primary rounded-full px-3 py-0.5 w-fit">
           Level {level}
         </span>

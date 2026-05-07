@@ -16,7 +16,8 @@ export function Leaderboard() {
   // hantera loading state
   if (isLoading) {
     return (
-      <div className="leaderboard-container text-slate-100 p-6">
+      <div className="leaderboard-container min-h-screen text-slate-100 p-6 pb-24 lg:pb-6 lg:pt-[74px]">
+        {/* padding for fixed NavBar (plats för nav) */}
         <h2>🏆 Leaderboard</h2>
         <div className="loading-message text-emerald-400">Loading leaderboard data... ⏳</div>
       </div>
@@ -26,7 +27,7 @@ export function Leaderboard() {
   // hantera error state
   if (isError) {
     return (
-      <div className="leaderboard-container p-6">
+      <div className="leaderboard-container min-h-screen p-6 pb-24 lg:pb-6 lg:pt-[74px]">
         <h2 className="text-slate-100">🏆 Leaderboard</h2>
         <div className="error-message text-red-400">
           Error loading leaderboard: {(error as Error).message} ❌
@@ -36,7 +37,7 @@ export function Leaderboard() {
   }
 
   return (
-    <div className="leaderboard-container text-slate-100 p-6">
+    <div className="leaderboard-container min-h-screen text-slate-100 p-6 pb-24 lg:pb-6 lg:pt-[74px]">
       <h2>🏆 Leaderboard</h2>
       
       {/* tids filter knappar */}
