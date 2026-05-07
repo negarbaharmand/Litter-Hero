@@ -47,12 +47,12 @@ services:
 
   db:
     image: postgis/postgis:18-3.6-alpine
-    environment: 
+    environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_USER: ${POSTGRES_USER} 
-      POSTGRES_DB: ${POSTGRES_DB} 
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
     networks:
-      - internal 
+      - internal
     deploy:
       mode: replicated
       replicas: 1
@@ -81,32 +81,7 @@ services:
         - "traefik.http.routers.${stack_name}-pgadmin-https.entrypoints=https"
         - "traefik.http.routers.${stack_name}-pgadmin-https.tls=true"
         - "traefik.http.routers.${stack_name}-pgadmin-https.tls.certresolver=le"
-        - "traefik.http.services.${stack_name}-pgadmin.loadbalancer.server.port=80"    
-  # drizzle:
-  #   image: ${CI_REGISTRY_IMAGE}/backend:$image_tag
-  #   networks:
-  #     - traefik-public
-  #     - internal
-  #   command: ["sh", "-c", "sleep 5 && npm run db:migrate && npm run db:studio -- --host 0.0.0.0"]
-  #   environment:
-  #     - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-  #   depends_on:
-  #     - db 
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 1
-  #     labels:
-  #       - "traefik.enable=true"
-  #       - "traefik.constraint-label=traefik-public"
-  #       - "traefik.swarm.network=traefik-public"
-  #       - "traefik.http.routers.${stack_name}-db-http.rule=Host(`db.${stack_name}.doe25.swarm.chas-lab.dev`)"
-  #       - "traefik.http.routers.${stack_name}-db-http.entrypoints=http"
-  #       - "traefik.http.routers.${stack_name}-db-http.middlewares=https-redirect"
-  #       - "traefik.http.routers.${stack_name}-db-https.rule=Host(`db.${stack_name}.doe25.swarm.chas-lab.dev`)"
-  #       - "traefik.http.routers.${stack_name}-db-https.entrypoints=https"
-  #       - "traefik.http.routers.${stack_name}-db-https.tls=true"
-  #       - "traefik.http.routers.${stack_name}-db-https.tls.certresolver=le"
-  #       - "traefik.http.services.${stack_name}-db.loadbalancer.server.port=4983"
+        - "traefik.http.services.${stack_name}-pgadmin.loadbalancer.server.port=80"
 networks:
   traefik-public:
     external: true
