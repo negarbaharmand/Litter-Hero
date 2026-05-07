@@ -1,3 +1,4 @@
+#Only used in docker-compose.local.yml
 FROM node:20-alpine AS dev
 WORKDIR /app 
 COPY package.json . 
@@ -6,6 +7,7 @@ COPY . .
 EXPOSE 5173
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 
+#Will use everything below for CI/CD pipeline
 FROM node:20-alpine AS builder
 WORKDIR /app 
 COPY package*.json . 
