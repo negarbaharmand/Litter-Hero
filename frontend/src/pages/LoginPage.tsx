@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { useNavigate } from 'react-router-dom'
-import { NavBar } from '../components/NavBar'
+// import { NavBar } from '../components/NavBar'  -- Commented out cuz its not used and docker dosnt like that.
 import { loginUser, registerUser } from '../api'
 
 export function LoginPage() {

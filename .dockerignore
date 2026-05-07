@@ -13,5 +13,6 @@ node_modules
 #Enviorment varibles
 .env*
 
-
-package-lock.json
+.vscode
+*client/dist
+*dist
