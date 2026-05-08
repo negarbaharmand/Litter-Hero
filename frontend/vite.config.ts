@@ -7,9 +7,6 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     // LAN access so phone can open the dev server (mobil test)
-    host: true,
     allowedHosts: true,
-    port: 5173,
-    strictPort: true,
   },
 });

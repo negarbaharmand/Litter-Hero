@@ -42,7 +42,7 @@ export function NavBar() {
                 </NavLink>
 
                 <NavLink
-                    to="/reports-page"
+                    to="/reports"
                     className={({ isActive }) =>
                         `${itemBase} ${isActive ? "text-emerald-300" : "text-slate-300 hover:text-slate-200"}`
                     }
@@ -63,7 +63,7 @@ export function NavBar() {
                 </NavLink>
 
                 <NavLink
-                    to="/reports"
+                    to="/add-picture"
                     aria-label="Camera"
                     className={({ isActive }) =>
                         `${itemBase} ${isActive ? "text-emerald-300" : "text-slate-300 hover:text-slate-200"}`
@@ -84,7 +84,7 @@ export function NavBar() {
                                     }}
                                 />
                             </span>
-                            <span className={labelClass}>Camera</span>
+                            <span className={labelClass}>Add Report</span>
                         </>
                     )}
                 </NavLink>

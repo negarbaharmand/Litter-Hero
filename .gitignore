@@ -154,3 +154,6 @@ Thumbs.db
 Desktop.ini
 backend/dist/
 frontend/dist/
+
+.vscode/
+.vscode

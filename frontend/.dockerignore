@@ -12,3 +12,7 @@ node_modules
 
 #Enviorment varibles
 .env*
+
+.vscode
+*client/dist
+*dist

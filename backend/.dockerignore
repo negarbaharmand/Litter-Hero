@@ -1,0 +1,17 @@
+#README and other markdown files
+*.md 
+
+#Exclude node modules
+node_modules
+
+#Versioncontrol
+.git 
+
+#Logs 
+*.log
+
+#Enviorment varibles
+.env*
+
+.vscode
+
