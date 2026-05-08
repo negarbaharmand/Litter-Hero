@@ -73,16 +73,27 @@ export function LoginPage() {
               isRegistering && (
                 <div>
                   <label htmlFor="name" className="login-page__label">Name</label>
-                  <form.Field name="name">
+                  <form.Field
+                    name="name"
+                    validators={{
+                      onBlur: ({ value }) => (!value ? 'Name is required' : undefined),
+                    }}
+                  >
                     {(field) => (
-                      <input
-                        id="name"
-                        type="text"
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="Your name"
-                        className="login-page__input"
-                      />
+                      <>
+                        <input
+                          id="name"
+                          type="text"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          onBlur={field.handleBlur}
+                          placeholder="Your name"
+                          className="login-page__input"
+                        />
+                        {field.state.meta.errors[0] && (
+                          <p className="login-page__field-error">{field.state.meta.errors[0]}</p>
+                        )}
+                      </>
                     )}
                   </form.Field>
                 </div>
@@ -96,16 +107,30 @@ export function LoginPage() {
               isRegistering && (
                 <div>
                   <label htmlFor="username" className="login-page__label">Username</label>
-                  <form.Field name="username">
+                  <form.Field
+                    name="username"
+                    validators={{
+                      onBlur: ({ value }) =>
+                        !value ? 'Username is required'
+                        : value.length < 3 ? 'Username must be at least 3 characters'
+                        : undefined,
+                    }}
+                  >
                     {(field) => (
-                      <input
-                        id="username"
-                        type="text"
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="Your username"
-                        className="login-page__input"
-                      />
+                      <>
+                        <input
+                          id="username"
+                          type="text"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          onBlur={field.handleBlur}
+                          placeholder="Your username"
+                          className="login-page__input"
+                        />
+                        {field.state.meta.errors[0] && (
+                          <p className="login-page__field-error">{field.state.meta.errors[0]}</p>
+                        )}
+                      </>
                     )}
                   </form.Field>
                 </div>
@@ -116,16 +141,30 @@ export function LoginPage() {
 
           <div>
             <label htmlFor="email" className="login-page__label">Email</label>
-            <form.Field name="email">
+            <form.Field
+              name="email"
+              validators={{
+                onBlur: ({ value }) =>
+                  !value ? 'Email is required'
+                  : !/.+@.+\..+/.test(value) ? 'Please enter a valid email'
+                  : undefined,
+              }}
+            >
               {(field) => (
-                <input
-                  id="email"
-                  type="email"
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="your@email.com"
-                  className="login-page__input"
-                />
+                <>
+                  <input
+                    id="email"
+                    type="email"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                    placeholder="your@email.com"
+                    className="login-page__input"
+                  />
+                  {field.state.meta.errors[0] && (
+                    <p className="login-page__field-error">{field.state.meta.errors[0]}</p>
+                  )}
+                </>
               )}
             </form.Field>
           </div>
@@ -136,16 +175,33 @@ export function LoginPage() {
               <form.Subscribe selector={(state) => state.values.showPassword}>
                 {(showPassword) => (
                   <>
-                    <form.Field name="password">
+                    <form.Field
+                      name="password"
+                      validators={{
+                        onBlur: ({ value }) => {
+                          if (!value) return 'Password is required'
+                          if (form.getFieldValue('isRegistering') && value.length < 8) {
+                            return 'Password must be at least 8 characters'
+                          }
+                          return undefined
+                        },
+                      }}
+                    >
                       {(field) => (
-                        <input
-                          id="password"
-                          type={showPassword ? 'text' : 'password'}
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="••••••••"
-                          className="login-page__input login-page__input--with-toggle"
-                        />
+                        <>
+                          <input
+                            id="password"
+                            type={showPassword ? 'text' : 'password'}
+                            value={field.state.value}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            onBlur={field.handleBlur}
+                            placeholder="••••••••"
+                            className="login-page__input login-page__input--with-toggle"
+                          />
+                          {field.state.meta.errors[0] && (
+                            <p className="login-page__field-error">{field.state.meta.errors[0]}</p>
+                          )}
+                        </>
                       )}
                     </form.Field>
                     <button
