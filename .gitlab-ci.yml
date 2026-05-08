@@ -5,6 +5,14 @@ stages:
   - deploy
   - cleanup
 
+#Workflow rules so we dont get double pipelines when MR is open
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
 #Pipeline rule that can be reused
 #This rule makes starts the job in main, development and every other branch with / in it
 .always-rule: &always-rule
