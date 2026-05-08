@@ -1,5 +1,5 @@
 #This section is only used for local docker
-FROM node:20-alpine AS dev
+FROM node:22-alpine AS dev
 WORKDIR /app 
 COPY package*.json .
 COPY tsconfig*.json .
@@ -9,7 +9,7 @@ COPY . .
 CMD ["npm", "run", "dev"]
 
 #Everything below here is used for our Gitlab CI + prod
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app 
 RUN apk add --no-cache python3 make g++
 COPY package*.json .
@@ -18,7 +18,7 @@ COPY tsconfig*.json .
 COPY src ./src 
 RUN npm run build 
 
-FROM node:20-alpine AS prod 
+FROM node:22-alpine AS prod 
 WORKDIR /app 
 COPY package*.json .
 RUN npm ci --omit=dev
