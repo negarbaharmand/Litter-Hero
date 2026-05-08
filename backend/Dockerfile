@@ -1,3 +1,4 @@
+#This section is only used for local docker
 FROM node:20-alpine AS dev
 WORKDIR /app 
 COPY package*.json .
@@ -7,7 +8,7 @@ RUN npm install
 COPY . . 
 CMD ["npm", "run", "dev"]
 
-
+#Everything below here is used for our Gitlab CI + prod
 FROM node:20-alpine AS builder
 WORKDIR /app 
 RUN apk add --no-cache python3 make g++
