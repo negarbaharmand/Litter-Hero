@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
-// import { NavBar } from '../components/NavBar'  -- Commented out cuz its not used and docker dosnt like that.
 import { loginUser, registerUser, googleSignIn } from '../api'
 
 export function LoginPage() {
