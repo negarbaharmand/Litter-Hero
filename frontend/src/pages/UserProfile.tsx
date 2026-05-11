@@ -45,8 +45,8 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="bg-background min-h-screen pb-24">
-      <ProfileHeader username={user?.username} level={12} />
+    <div className="min-h-screen pb-24" style={{ backgroundColor: '#EEFCF3' }}>
+      <ProfileHeader username={user?.username} level={12} createdAt={user?.createdAt} />
       <PointsCard totalPoints={user?.points ?? 0} weeklyPoints={user?.weeklyPoints ?? 0} />
       <BadgeList badges={[
         { id: 0, label: "🔥3 day streak"}, //TODO: implement streak logic
