@@ -9,6 +9,68 @@ const options = {
     openapi: "3.0.0",
     info: { title: "Håll Sverige Rent API", version: "1.0.0" },
     servers: [{ url: "http://localhost:3000" }],
+    tags: [
+      { name: "Auth", description: "Register and login (JWT)" },
+      { name: "Users", description: "User lookup" },
+      { name: "Reports", description: "Litter reports" },
+      { name: "Health", description: "Service checks" },
+    ],
+    components: {
+      schemas: {
+        ErrorMessage: {
+          type: "object",
+          properties: {
+            error: { type: "string", description: "Human-readable error" },
+          },
+          required: ["error"],
+        },
+        UserPublic: {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            username: { type: "string", nullable: true },
+            email: { type: "string", format: "email" },
+            name: { type: "string", nullable: true },
+            role: { type: "string", nullable: true },
+            points: { type: "integer", nullable: true },
+            createdAt: { type: "string", format: "date-time", nullable: true },
+          },
+          required: ["id", "email"],
+        },
+        AuthResponse: {
+          type: "object",
+          properties: {
+            token: {
+              type: "string",
+              description: "JWT valid for 7 days",
+            },
+            user: { $ref: "#/components/schemas/UserPublic" },
+          },
+          required: ["token", "user"],
+        },
+        Report: {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            userId: { type: "integer" },
+            imageUrl: { type: "string", nullable: true },
+            location: { type: "string" },
+            description: { type: "string", nullable: true },
+            size: { type: "string", nullable: true },
+            createdAt: { type: "string", format: "date-time", nullable: true },
+          },
+          required: ["id", "userId", "location"],
+        },
+        ConfigTestResponse: {
+          type: "object",
+          properties: {
+            port: { type: "integer" },
+            db_connected: { type: "boolean" },
+          },
+          required: ["port", "db_connected"],
+        },
+      },
+    },
   },
   apis: [
     path.resolve(here, "../routes/*.ts"),

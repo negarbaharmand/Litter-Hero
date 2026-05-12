@@ -14,10 +14,11 @@ export function NavBar() {
 
     return (
         <header
-            className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-800 bg-background pb-[env(safe-area-inset-bottom)] md:sticky md:top-0 md:bottom-auto md:border-t-0 md:border-b md:pb-0 md:bg-background/95 md:backdrop-blur-md"
+            className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-800 pb-[env(safe-area-inset-bottom)] md:sticky md:top-0 md:bottom-auto md:border-t-0 md:border-b md:pb-0 md:backdrop-blur-md"
+            style={{ background: 'linear-gradient(180deg, #1A5C35 53.37%, #37C270 100%)' }}
         >
             {/* One straight row everywhere (en rak rad överallt) */}
-            <nav className="mx-auto flex max-w-4xl items-center justify-around px-2 py-3 md:px-6 md:py-4">
+            <nav className="mx-auto flex max-w-2xl items-center justify-between px-4 py-1 md:px-3 md:py-0">
 
                 <NavLink
                     to="/"

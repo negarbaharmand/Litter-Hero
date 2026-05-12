@@ -1,15 +1,13 @@
+import 'dotenv/config';
+
 import userRoutes from './routes/userRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import express from 'express';
 import type { Request, Response } from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger.js';
-
-// Load environment variables from .env
-dotenv.config();
 
 if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required');
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required');

@@ -5,8 +5,8 @@ interface BadgeProps {
 
 const Badge = ({ label }: BadgeProps) => {
   return (
-    <div className="bg-surface rounded-xl p-4 flex items-center justify-center text-center">
-      <span className="text-white text-sm">{label}</span>
+    <div style={{ backgroundColor: '#ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }} className="rounded-xl p-4 flex items-center justify-center text-center">
+      <span className="text-sm" style={{ color: '#111827', fontFamily: "'Noto Sans', sans-serif" }}>{label}</span>
     </div>
   )
 }

@@ -11,6 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
+
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
@@ -33,6 +34,11 @@ export const register = async (req: Request, res: Response) => {
     return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' });
   }
 
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    return res.status(500).json({ error: 'Server misconfiguration: JWT_SECRET is missing' });
+  }
+
   try {
     const { email, password, name, username } = parsed.data;
 
@@ -51,7 +57,7 @@ export const register = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       { userId: newUser.id, email: newUser.email },
-      JWT_SECRET,
+      jwtSecret,
       { expiresIn: '7d' }
     );
 
@@ -64,10 +70,19 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
+export const logout = (_req: Request, res: Response) => {
+  return res.status(200).json({ message: 'Logged out successfully' });
+};
+
 export const login = async (req: Request, res: Response) => {
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' });
+  }
+
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    return res.status(500).json({ error: 'Server misconfiguration: JWT_SECRET is missing' });
   }
 
   try {
@@ -86,7 +101,7 @@ export const login = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       { userId: foundUser.id, email: foundUser.email },
-      JWT_SECRET,
+      jwtSecret,
       { expiresIn: '7d' }
     );
 
