@@ -14,7 +14,7 @@
 }
 .login-page__content {
   /* Room for fixed NavBar: bottom (pb) on phone, top (lg:pt) on desktop — (plats för fixerad nav) */
-  @apply flex-1 flex flex-col items-center justify-center px-6 pb-24 lg:pb-10 lg:pt-[74px];
+  @apply flex-1 flex flex-col items-center justify-center px-6 pb-24 lg:pb-10 lg:pt-18.5;
 }
 .login-page__heading {
   @apply text-xl font-semibold mb-8 text-center;
@@ -166,9 +166,9 @@ h2 {
   font-size: 24px;
   line-height: 118%;
   letter-spacing: -0.24px;
-  margin: 0 0 8px;
+  margin: 20px 8px;
   @media (max-width: 1024px) {
-    font-size: 20px;
+    font-size: 40px;
   }
 }
 p {

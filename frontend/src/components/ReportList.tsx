@@ -26,22 +26,21 @@ export function ReportList() {
   }
 
   return (
-    <div className="p-6 sm:p-8">
+    <div className="p-1">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Reports from the Database</h2>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-600">
+        <span className="rounded-full bg-emerald-300 px-3 py-1 text-sm text-white">
           {data?.length ?? 0} reports
         </span>
       </div>
 
       <div className="mt-6 grid gap-4">
         {data?.map((report) => (
-          <div key={report.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm transition hover:shadow-md">
-            <p className="font-medium text-slate-900">
+          <div key={report.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md">
+              <p className="mt-2 font-semibold" style={{ color: '#224A32', fontSize: '21px' }}>
+                {report.description ?? 'No description'}
+              </p>
+            <p className="font-medium text-slate-900 mt-3">
               <span className="text-slate-500">Location:</span> {report.location}
-            </p>
-            <p className="mt-2 text-slate-700">
-              <span className="font-medium text-slate-500">Description:</span> {report.description ?? 'No description'}
             </p>
             <p className="mt-3 text-sm italic text-slate-500">Size: {report.size ?? 'Unknown'}</p>
           </div>
