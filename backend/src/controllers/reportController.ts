@@ -16,7 +16,7 @@ export const getAllReports = async (req: Request, res: Response) => {
 // POST a new report
 export const createReport = async (req: Request, res: Response) => {
     try {
-        const { userId, imageUrl, location, description, size } = req.body;
+        const { userId, imageUrl, location, description, size, latitude, longitude } = req.body;
 
         if (!userId || !location) {
             return res.status(400).json({ error: 'userId and location are required' });
@@ -27,7 +27,9 @@ export const createReport = async (req: Request, res: Response) => {
             imageUrl,
             location,
             description,
-            size
+            size,
+            latitude: latitude ? Number(latitude) : null,
+            longitude: longitude ? Number(longitude) : null,
         }).returning();
 
         await db.update(users).set({
