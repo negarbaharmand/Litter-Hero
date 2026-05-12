@@ -1,0 +1,14 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: gitlab-registry
+  namespace: doe25-alexander-piensoho
+spec:
+  encryptedData:
+    .dockerconfigjson: AgBEXTUXtZyAT1prUvvbqF7X3MMwOvv/u0v1BI3e7VW1dRfQ6DZZnUVOQ8UVAKH5f8a8tmexXWugDEMYRPWYPEWSKBDJFIYt+totyBX5BShTyxjc32T+vcGX5bzFrB5KiAxavjIj11+nhZ+ktUjB11DcomLZg0uD1detujCsJLd4lAr9eZnUAsXZliiqg7HZV52WKGMMjCqsQ5fT/EEp18/5yxPj/VTdueXTRTTrNpgth9tDLF1mfRHXdkmuv9VEMWxisTQU1S0C3jcURLt7aCvoko3XeEmj1WSAcZSKOykRdxhizZJ91Je7+trqIElCGDN9dZ4seq4k6UUswgIgqcKs/6NN6sim5ut1+ZMHzkpdCG2Ocx19eOAkLExik3Ng/nxAmFXl6PnH8xlGnyts66/dXpTmWf6K+70vm3psVk1NSwsPLKmaTNw+280QNzharFFjDo0TKRXPfBk2Y53v9UakHqwhAhj5RE4+qRA0FdhEleBbPIszZptBkxNxXFVFEhWiNzanBxO0GXPjmpW1wjZvHpH8r0lea1pzXsTtJqsQ82FED9aI7YlN2mL7iYIGDF38HkS1XkVUjhSuIViGh0D/QcHKoq1UCSHqlxLqLVO3wI3zxId2t9AfYxBvaj8riERdA6Z4AQg6G93L8wu4dFg5jzzhwR7x9V/PkhTyeMWmIAbZHxyLzO+eA0PvpUFpO+1B7kBDT0mPPQTLkuZ0VZg/m3OVEBwOPkxLUIyJJjOQtYRvek0Wf53RAgOHJecpRD10kIL97ZskZvJMg+Fgpn1Wjc8RKMtT2T9yrAbfQzsSInarsnAmMa4EGx3eECiOzIgtjsoR1Zsx89FzwiFmSFuu9tsOv+yOGyrXiM/A/6HAQA903d/aLiLdnmGV+X5lVOTUHgSa+X1f6f+lJMl0svIUAaWU3UvDS9ELRnnABDcElhwvcAr8
+  template:
+    metadata:
+      name: gitlab-registry
+      namespace: doe25-alexander-piensoho
+    type: kubernetes.io/dockerconfigjson
