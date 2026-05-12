@@ -7,7 +7,7 @@ import BadgeList from '../components/BadgeList'
 import SettingsButton from '../components/SettingsButton'
 import { logoutUser } from '../api'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL
+const API_BASE_URL = ""
 
 const UserProfile = () => {
   const navigate = useNavigate()
