@@ -59,6 +59,16 @@ router.get('/', getAllReports);
  *                 type: string
  *                 description: e.g. small, medium, large
  *                 nullable: true
+ *               latitude:
+ *                 type: number
+ *                 format: float
+ *                 nullable: true
+ *                 description: Latitude coordinate
+ *               longitude:
+ *                 type: number
+ *                 format: float
+ *                 nullable: true
+ *                 description: Longitude coordinate
  *     responses:
  *       201:
  *         description: Report created successfully
