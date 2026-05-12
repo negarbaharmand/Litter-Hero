@@ -137,6 +137,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
       [foundUser] = await db.insert(users).values({
         email: payload.email,
         name: payload.name ?? null,
+        username: payload.email.split('@')[0],
         password: null,
       }).returning();
     }
