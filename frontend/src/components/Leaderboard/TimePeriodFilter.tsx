@@ -13,14 +13,15 @@ export function TimePeriodFilter({ selectedPeriod, onPeriodChange }: TimePeriodF
   ];
 
   return (
-    <div className="time-period-filter flex gap-3 mb-6 flex-wrap">
+    <div className="time-period-filter mb-6 flex flex-wrap items-center gap-3">
+      <span className="text-sm font-medium text-[#1d4e2f]">Filter by period:</span>
       {periods.map((period) => (
         <button
           key={period.value}
-          className={`px-4 py-2 rounded-lg font-medium transition ${
+          className={`px-4 py-2 rounded-lg font-medium text-white transition-colors ${
             selectedPeriod === period.value
-              ? 'bg-emerald-600 text-white'
-              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+              ? 'bg-[#25653c] hover:bg-[#25653c] active:bg-[#25653c]'
+              : 'bg-[#3ea865] hover:bg-[#328650] active:bg-[#25653c]'
           }`}
           onClick={() => onPeriodChange(period.value)}
         >
