@@ -1,6 +1,6 @@
 
 // 1. Grab the URL once at the top of the file
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = "";
 
 // Type definitions
 export type Report = {
