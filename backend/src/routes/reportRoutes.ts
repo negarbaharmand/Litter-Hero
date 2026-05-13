@@ -9,6 +9,7 @@ const router = Router();
  *   get:
  *     tags: [Reports]
  *     summary: Get all reports
+ *     security: []
  *     responses:
  *       200:
  *         description: List of all reports
@@ -34,6 +35,7 @@ router.get('/', getAllReports);
  *     tags: [Reports]
  *     summary: Create a new litter report
  *     description: Creates a report and adds 10 points to the given user.
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:

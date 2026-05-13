@@ -1,13 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createReport, type CreateReportPayload } from '../../api';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ReportForm({ lat, lng }: { lat: number; lng: number }) {
   const queryClient = useQueryClient();
+  const { refreshUser } = useAuth();
 
   const mutation = useMutation({
     mutationFn: createReport,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reports'] });
+      refreshUser();
       alert("Reported successfully!");
     },
     onError: (error: Error) => {

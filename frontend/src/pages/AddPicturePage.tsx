@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CameraCapture } from '../components/CameraCapture'
 import { createReport } from '../api'
+import { useAuth } from '../context/AuthContext'
 
 const CATEGORIES = ['Mixed', 'Plastic', 'Cardboard', 'Metal', 'Glass', 'Organic']
 const SIZES = ['Small', 'Medium', 'Large'] as const
@@ -25,6 +26,7 @@ async function reverseGeocode(lat: number, lon: number): Promise<string> {
 
 export function AddPicturePage() {
 	const navigate = useNavigate()
+	const { refreshUser } = useAuth()
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	const [showCamera, setShowCamera] = useState(false)
@@ -105,13 +107,14 @@ export function AddPicturePage() {
 
 		setIsSubmitting(true)
 		try {
-			await createReport({
-				userId: user.id,
-				location: location.trim(),
-				description: fullDescription,
-				size: size.toLowerCase(),
-			})
-			navigate('/reports')
+		await createReport({
+			userId: user.id,
+			location: location.trim(),
+			description: fullDescription,
+			size: size.toLowerCase(),
+		})
+		refreshUser()
+		navigate('/reports')
 		} catch {
 			setSubmitError('Failed to submit report. Please try again.')
 		} finally {

@@ -10,6 +10,7 @@ const router = Router();
  *     tags: [Auth]
  *     summary: Register a new user
  *     description: Creates a user and returns a JWT plus the public user object (password is never returned).
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -63,6 +64,7 @@ router.post('/register', register);
  *     tags: [Auth]
  *     summary: Log in with email and password
  *     description: Returns a JWT and the public user object on success.
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -111,8 +113,7 @@ router.post('/login', login);
  *     tags: [Auth]
  *     summary: Log out the current user
  *     description: Stateless logout acknowledgment. The client must discard the JWT on its side. Returns a success message.
- *     security:
- *       - bearerAuth: []
+ *     security: []
  *     responses:
  *       200:
  *         description: Logged out successfully
