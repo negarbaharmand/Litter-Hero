@@ -1,6 +1,12 @@
 
 // 1. Grab the URL once at the top of the file
-const API_BASE_URL = "";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+function authHeaders(): HeadersInit {
+  const token = localStorage.getItem('token');
+  if (!token) return {};
+  return { Authorization: `Bearer ${token}` };
+}
 
 // Type definitions
 export type Report = {
@@ -41,15 +47,49 @@ export const fetchReports = async (): Promise<Report[]> => {
   return response.json();
 };
 
-export const fetchUsers = async (): Promise<User[]> => {
-  const response = await fetch(`${API_BASE_URL}/api/users`);
-  return response.json();
+export type PaginatedUsers = {
+  users: User[];
+  page: number;
+  limit: number;
+  total: number;
+};
+
+/** Admin only — requires a valid JWT with role `admin`. */
+export const fetchUsers = async (
+  page = 1,
+  limit = 20
+): Promise<PaginatedUsers> => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/users?page=${page}&limit=${limit}`,
+    { headers: { ...authHeaders() } }
+  );
+  const data = (await response.json()) as PaginatedUsers | { error?: string };
+  if (!response.ok) {
+    throw new Error(
+      typeof data === 'object' && data && 'error' in data && typeof data.error === 'string'
+        ? data.error
+        : 'Failed to fetch users'
+    );
+  }
+  return data as PaginatedUsers;
 };
 
 export const fetchLeaderboard = async (timePeriod: 'allTime' | 'monthly' | 'weekly'): Promise<LeaderboardData> => {
-  const response = await fetch(`${API_BASE_URL}/api/users/leaderboard`);
+  const response = await fetch(`${API_BASE_URL}/api/users/leaderboard`, {
+    headers: { ...authHeaders() },
+  });
   if (!response.ok) {
-    throw new Error('Failed to fetch leaderboard');
+    const errBody = await response.json().catch(() => ({}));
+    const message =
+      response.status === 401
+        ? 'Log in to view the leaderboard'
+        : typeof errBody === 'object' &&
+            errBody &&
+            'error' in errBody &&
+            typeof (errBody as { error: unknown }).error === 'string'
+          ? (errBody as { error: string }).error
+          : 'Failed to fetch leaderboard';
+    throw new Error(message);
   }
   
   const users = await response.json();
@@ -83,6 +123,13 @@ export type AuthUser = {
   role: string | null
   points: number | null
   createdAt: string
+}
+
+/** Full profile returned by GET /api/users/me */
+export type MeUser = AuthUser & {
+  username: string | null
+  weeklyPoints: number
+  badges: string[]
 }
 
 export type AuthResponse = {

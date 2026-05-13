@@ -10,6 +10,7 @@
  *     tags: [Health]
  *     summary: API root
  *     description: Plain-text heartbeat message.
+ *     security: []
  *     responses:
  *       200:
  *         description: OK
@@ -27,6 +28,7 @@
  *     tags: [Health]
  *     summary: Config sanity check
  *     description: Returns whether DATABASE_URL is set (boolean only, not the secret).
+ *     security: []
  *     responses:
  *       200:
  *         description: Current port and DB env flag

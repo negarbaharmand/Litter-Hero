@@ -3,9 +3,11 @@ import { useForm } from '@tanstack/react-form'
 import { useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { loginUser, registerUser, googleSignIn } from '../api'
+import { useAuth } from '../context/AuthContext'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const { setUser } = useAuth()
   const [apiError, setApiError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const googleWrapperRef = useRef<HTMLDivElement>(null)
@@ -37,8 +39,7 @@ export function LoginPage() {
           ? await registerUser(value.email, value.password, value.username || undefined, value.name || undefined)
           : await loginUser(value.email, value.password)
 
-        localStorage.setItem('token', result.token)
-        localStorage.setItem('user', JSON.stringify(result.user))
+        setUser(result.user, result.token)
         navigate('/')
       } catch (err) {
         setApiError(err instanceof Error ? err.message : 'Something went wrong')
