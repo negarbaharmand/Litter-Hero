@@ -20,19 +20,23 @@ spec:
       labels:
         app: backend
     spec:
+      imagePullSecrets:
+        - name: gitlab-registry
       containers:
         - name: backend
-          image: hashicorp/http-echo:latest
-          args: ["-listen=:3000", "-text=backend ok"]
+          image: registry.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2/backend:development
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 3000
-          # envFrom:
-          #   - configMapRef:
-          #       name: backend-config
-          #   - secretRef:
-          #       name: backend-secrets
+          env:
+            - name: DB_HOST
+              value: litter-hero-db
+            - name: DB_PORT
+              value: "5432"
+          envFrom:
+            - secretRef:
+                name: backend-secrets
           resources:
             requests:
               cpu: 50m

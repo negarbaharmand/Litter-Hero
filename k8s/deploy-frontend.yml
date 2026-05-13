@@ -15,20 +15,22 @@ spec:
       labels:
         app: frontend
     spec:
+      imagePullSecrets:
+        - name: gitlab-registry
       containers:
         - name: frontend
-          image: nginx:alpine
+          image: registry.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2/frontend:development
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
           resources:
             requests:
               cpu: 10m
               memory: 32Mi
             limits:
-              cpu: 100m
-              memory: 64Mi
+              cpu: 200m
+              memory: 128Mi
           readinessProbe:
             httpGet:
               path: /
@@ -46,6 +48,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: frontend
+  namespace: doe25-alexander-piensoho
   labels:
     app: frontend
 spec:
