@@ -29,14 +29,11 @@ spec:
           ports:
             - name: http
               containerPort: 3000
-          env:
-            - name: DB_HOST
-              value: litter-hero-db
-            - name: DB_PORT
-              value: "5432"
           envFrom:
             - secretRef:
                 name: backend-secrets
+            - configMapRef:
+                name: backend-config
           resources:
             requests:
               cpu: 50m

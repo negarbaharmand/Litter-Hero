@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: backend-migrate
+  namespace: doe25-alexander-piensoho
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: gitlab-registry
+      containers:
+        - name: migrate
+          image: registry.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2/backend:development
+          command: ["npm", "run", "db:migrate"]
+          envFrom:
+            - secretRef:
+                name: backend-secrets
+            - configMapRef:
+                name: backend-config
