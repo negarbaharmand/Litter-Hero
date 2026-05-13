@@ -1,48 +1,30 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
 import ProfileHeader from '../components/ProfileHeader'
 import PointsCard from '../components/PointsCard'
 import BadgeList from '../components/BadgeList'
 import SettingsButton from '../components/SettingsButton'
 import { logoutUser } from '../api'
-
-const API_BASE_URL = import.meta.env.VITE_API_URL
+import { useAuth } from '../context/AuthContext'
 
 const UserProfile = () => {
   const navigate = useNavigate()
+  const { authState, clearAuth } = useAuth()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
-  const { data: user, isLoading, isError } = useQuery({
-    queryKey: ['user-me'],
-    queryFn: async () => {
-      const token = localStorage.getItem('token') // Get token
-      const response = await fetch(`${API_BASE_URL}/api/users/me`, {
-        headers: {
-          Authorization: `Bearer ${token}` // Send with token in auth header
-        }
-      })
-      if (!response.ok) throw new Error('Failed to fetch user')
-      return response.json()
-    }
-  })
+  const user = authState.status === 'authenticated' ? authState.user : null
 
   async function handleLogout() {
     setIsLoggingOut(true)
     try {
       await logoutUser()
     } finally {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
+      clearAuth()
       navigate('/login')
     }
   }
 
-  if (isLoading) return <div className="bg-background min-h-screen p-4 text-white">loading...</div>
-  if (isError) {
-    navigate('/login')
-    return null
-  }
+  if (!user) return null
 
   return (
     <div className="min-h-screen pb-24" style={{ backgroundColor: '#EEFCF3' }}>

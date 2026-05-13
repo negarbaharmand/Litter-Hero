@@ -11,5 +11,8 @@ export default defineConfig({
     allowedHosts: true,
     port: 5173,
     strictPort: true,
+    proxy: {
+      "/api": "http://backend:3000",
+    },
   },
 });

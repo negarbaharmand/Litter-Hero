@@ -1,51 +1,44 @@
 // The Route file just maps the URL to the function in the controller.
 
 import { Router } from 'express';
-import { getUser, getMe, getLeaderboard } from '../controllers/userController.js';
-import { authMiddleware } from '../middleware/authMiddleware.js';
-
+import { authenticate } from '../middleware/authenticate.js';
+import { requireRole } from '../middleware/requireRole.js';
+import {
+  getLeaderboard,
+  getMe,
+  getUserById,
+  listUsers,
+} from '../controllers/userController.js';
 
 const router = Router();
 
+router.use(authenticate);
+
 /**
  * @swagger
- * /api/users:
+ * /api/users/leaderboard:
  *   get:
  *     tags: [Users]
- *     summary: Get a user by id, userId, or email
- *     description: Returns the user without the password hash. Provide exactly one lookup — `id`, `userId`, or `email`.
+ *     summary: Get the leaderboard
  *     parameters:
  *       - in: query
- *         name: id
+ *         name: limit
  *         schema:
  *           type: integer
- *         description: User ID (same as userId)
- *       - in: query
- *         name: userId
- *         schema:
- *           type: integer
- *         description: Alternative query name for user ID
- *       - in: query
- *         name: email
- *         schema:
- *           type: string
- *           format: email
- *         description: User email
+ *           enum: [10, 20]
+ *         required: false
+ *         description: Number of users to return (defaults to 10)
  *     responses:
  *       200:
- *         description: User found
+ *         description: Leaderboard found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/UserPublic'
- *       400:
- *         description: Missing query — provide id, userId, or email
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorMessage'
- *       404:
- *         description: User not found
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/UserPublic'
+ *       401:
+ *         description: Missing or invalid JWT
  *         content:
  *           application/json:
  *             schema:
@@ -57,19 +50,17 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/ErrorMessage'
  */
-router.get('/', getUser);
-
+router.get('/leaderboard', getLeaderboard);
 
 /**
  * @swagger
  * /api/users/me:
  *   get:
- *     summary: Get the currently authenticated user's profile
- *     security:
- *       - bearerAuth: []
+ *     tags: [Users]
+ *     summary: Get the authenticated user's profile
  *     responses:
  *       200:
- *         description: User profile returned successfully
+ *         description: Current user (password never included)
  *         content:
  *           application/json:
  *             schema:
@@ -86,34 +77,119 @@ router.get('/', getUser);
  *                   items:
  *                     type: string
  *       401:
- *         description: Unauthorized - no or invalid token
+ *         description: Missing or invalid JWT
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
  *       404:
  *         description: User not found
- *       500:
- *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
  */
-router.get('/me', authMiddleware, getMe);
+router.get('/me', getMe);
 
 /**
  * @swagger
- * /api/users/leaderboard:
+ * /api/users:
  *   get:
- *     summary: Get the leaderboard
+ *     tags: [Users]
+ *     summary: List all users (paginated, admin only)
  *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Page number (default 1)
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *           enum: [10, 20]
- *         required: false
- *         description: Number of users to return (defaults to 10)
+ *           minimum: 1
+ *           maximum: 100
+ *         description: Page size (default 20, max 100)
  *     responses:
  *       200:
- *         description: Leaderboard found
+ *         description: Paginated user list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UsersPaginatedResponse'
+ *       401:
+ *         description: Missing or invalid JWT
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       403:
+ *         description: Not an admin
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
  */
-router.get('/leaderboard', getLeaderboard);
+router.get('/', requireRole('admin'), listUsers);
 
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get a single user by id
+ *     description: Allowed for the same user or an admin.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: User found (password never included)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserPublic'
+ *       400:
+ *         description: Invalid id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       401:
+ *         description: Missing or invalid JWT
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       403:
+ *         description: Cannot access another user's profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ */
+router.get('/:id', getUserById);
 
 export default router;
