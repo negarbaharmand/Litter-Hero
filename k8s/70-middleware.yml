@@ -1,0 +1,8 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: cc-basic-auth
+  namespace: doe25-alexander-piensoho
+spec:
+  basicAuth:
+    secret: cc-basic-auth
