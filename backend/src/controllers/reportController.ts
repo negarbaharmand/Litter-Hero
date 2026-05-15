@@ -28,8 +28,8 @@ export const createReport = async (req: Request, res: Response) => {
             location,
             description,
             size,
-            latitude: latitude ? Number(latitude) : null,
-            longitude: longitude ? Number(longitude) : null,
+            latitude: latitude !== undefined && latitude !== null ? Number(latitude) : null,
+            longitude: longitude !== undefined && longitude !== null ? Number(longitude) : null,
         }).returning();
 
         await db.update(users).set({
