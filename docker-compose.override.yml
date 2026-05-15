@@ -1,0 +1,39 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      target: prod
+    image: local/frontend:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - internal
+      - traefik-public
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      target: prod
+    image: local/backend:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - internal
+    # This ensures backend has the env vars it needs
+    env_file:
+      - .env
+
+  pgadmin:
+    ports:
+      - "5050:80"
+    networks:
+      - internal
+
+networks:
+  traefik-public:
+    driver: bridge
+    external: false
+  internal:
+    driver: bridge
