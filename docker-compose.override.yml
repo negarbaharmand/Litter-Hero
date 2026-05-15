@@ -3,6 +3,9 @@ services:
     build:
       context: ./frontend
       target: prod
+      args:
+        - VITE_API_URL=http://localhost:3000
+        - VITE_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     image: local/frontend:latest
     ports:
       - "8080:8080"
@@ -21,7 +24,6 @@ services:
       - "3000:3000"
     networks:
       - internal
-    # This ensures backend has the env vars it needs
     env_file:
       - .env
 
@@ -30,6 +32,21 @@ services:
       - "5050:80"
     networks:
       - internal
+
+  drizzle:
+    build:
+      context: ./backend
+      target: dev
+    container_name: drizzle
+    command: ["sh", "-c", "npm run db:studio -- --host 0.0.0.0"]
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    ports:
+      - "4983:4983"
+    networks:
+      - internal
+    depends_on:
+      - db
 
 networks:
   traefik-public:
