@@ -168,6 +168,19 @@ export const registerUser = async (
   return data
 }
 
+export const googleSignIn = async (idToken: string): Promise<AuthResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/google`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idToken }),
+  })
+  const data = await response.json()
+  if (!response.ok) {
+    throw new Error(data.error ?? 'Google sign-in failed')
+  }
+  return data
+}
+
 export const logoutUser = async (): Promise<void> => {
   const token = localStorage.getItem('token')
   await fetch(`${API_BASE_URL}/api/auth/logout`, {

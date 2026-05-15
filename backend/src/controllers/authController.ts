@@ -2,9 +2,15 @@ import type { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
+import { OAuth2Client } from 'google-auth-library';
 import { db } from '../db/index.js';
 import { users } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
+
+const JWT_SECRET = process.env.JWT_SECRET!;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
+const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+
 
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -16,6 +22,10 @@ const registerSchema = z.object({
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),
+});
+
+const googleSchema = z.object({
+  idToken: z.string().min(1, 'idToken is required'),
 });
 
 export const register = async (req: Request, res: Response) => {
@@ -80,7 +90,7 @@ export const login = async (req: Request, res: Response) => {
 
     const [foundUser] = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
-    if (!foundUser) {
+    if (!foundUser || !foundUser.password) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
@@ -101,5 +111,52 @@ export const login = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error logging in user:', error);
     return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const googleSignIn = async (req: Request, res: Response) => {
+  const parsed = googleSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' });
+  }
+
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: parsed.data.idToken,
+      audience: GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+
+    if (!payload?.email || !payload.email_verified) {
+      return res.status(401).json({ error: 'Invalid Google token' });
+    }
+
+    let [foundUser] = await db.select().from(users).where(eq(users.email, payload.email)).limit(1);
+
+    if (!foundUser) {
+      [foundUser] = await db.insert(users).values({
+        email: payload.email,
+        name: payload.name ?? null,
+        username: payload.email.split('@')[0],
+        password: null,
+      }).returning();
+    }
+
+    if (!foundUser) {
+      return res.status(500).json({ error: 'Could not create user' });
+    }
+
+    const token = jwt.sign(
+      { userId: foundUser.id, email: foundUser.email },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    const { password: _, ...user } = foundUser;
+
+    return res.status(200).json({ token, user });
+  } catch (error) {
+    console.error('Error with Google sign-in:', error);
+    return res.status(401).json({ error: 'Invalid Google token' });
   }
 };

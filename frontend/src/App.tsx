@@ -1,5 +1,5 @@
 import LeaderboardPage from './pages/LeaderboardPage';
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { HomePage } from './pages/HomePage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { NavBar } from './components/NavBar'
@@ -10,9 +10,10 @@ import { AddPicturePage } from './pages/AddPicturePage'
 import PrivateRoute from './components/PrivateRoute'
 
 function App() {
+  const location = useLocation()
   return (
     <>
-      <NavBar />
+      {location.pathname !== '/login' && <NavBar />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<Navigate to="/" replace />} />

@@ -42,8 +42,11 @@
 .login-page__submit {
   @apply w-full py-3 rounded-xl bg-green-500 text-white font-semibold hover:bg-green-600 transition-colors mt-2;
 }
-.login-page__google-btn {
-  @apply w-full max-w-sm mt-3 py-3 rounded-xl border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2;
+.login-page__google-btn-wrapper {
+  @apply w-full max-w-sm mt-3 flex justify-center;
+}
+.login-page__field-error {
+  @apply mt-1 text-xs text-red-500;
 }
 .login-page__secondary-actions {
   @apply w-full max-w-sm mt-6 flex flex-col gap-3;
