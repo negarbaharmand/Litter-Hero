@@ -16,10 +16,11 @@ export const getAllReports = async (req: Request, res: Response) => {
 // POST a new report
 export const createReport = async (req: Request, res: Response) => {
     try {
-        const { userId, imageUrl, location, description, size } = req.body;
+        const userId = req.user!.id;
+        const { imageUrl, location, description, size } = req.body;
 
-        if (!userId || !location) {
-            return res.status(400).json({ error: 'userId and location are required' });
+        if (!location) {
+            return res.status(400).json({ error: 'location is required' });
         }
 
         const [newReport] = await db.insert(reports).values({

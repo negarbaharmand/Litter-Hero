@@ -20,7 +20,6 @@ export default function ReportForm({ lat, lng }: { lat: number; lng: number }) {
 
   const handleSubmit = () => {
     const payload: CreateReportPayload = {
-      userId: 1,
       location: `${lat},${lng}`,
       description: "Sample trash report",
       size: "medium"

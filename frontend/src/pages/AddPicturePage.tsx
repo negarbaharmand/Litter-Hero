@@ -108,7 +108,6 @@ export function AddPicturePage() {
 		setIsSubmitting(true)
 		try {
 		await createReport({
-			userId: user.id,
 			location: location.trim(),
 			description: fullDescription,
 			size: size.toLowerCase(),

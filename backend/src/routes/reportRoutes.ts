@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { getAllReports, createReport } from '../controllers/reportController.js';
+import { authenticate } from '../middleware/authenticate.js';
 
 const router = Router();
 
@@ -34,19 +35,15 @@ router.get('/', getAllReports);
  *   post:
  *     tags: [Reports]
  *     summary: Create a new litter report
- *     description: Creates a report and adds 10 points to the given user.
- *     security: []
+ *     description: Creates a report attributed to the authenticated user and adds 10 points to them.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required: [userId, location]
+ *             required: [location]
  *             properties:
- *               userId:
- *                 type: integer
- *                 description: Author user id
  *               location:
  *                 type: string
  *               imageUrl:
@@ -67,7 +64,13 @@ router.get('/', getAllReports);
  *             schema:
  *               $ref: '#/components/schemas/Report'
  *       400:
- *         description: userId and location are required
+ *         description: location is required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       401:
+ *         description: Missing or invalid JWT
  *         content:
  *           application/json:
  *             schema:
@@ -79,6 +82,6 @@ router.get('/', getAllReports);
  *             schema:
  *               $ref: '#/components/schemas/ErrorMessage'
  */
-router.post('/', createReport);
+router.post('/', authenticate, createReport);
 
 export default router;

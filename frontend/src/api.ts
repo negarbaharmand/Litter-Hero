@@ -20,7 +20,6 @@ export type Report = {
 };
 
 export type CreateReportPayload = {
-  userId: number;
   location: string;
   description: string;
   size: string;
@@ -199,6 +198,7 @@ export const createReport = async (newReport: CreateReportPayload): Promise<Repo
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      ...authHeaders(),
     },
     body: JSON.stringify(newReport),
   });
