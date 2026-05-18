@@ -30,7 +30,7 @@ spec:
               containerPort: 3000
           envFrom:
             - secretRef:
-                name: backend-secrets
+                name: backend-secret
             - configMapRef:
                 name: backend-config
           resources:

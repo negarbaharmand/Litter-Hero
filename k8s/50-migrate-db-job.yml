@@ -16,6 +16,6 @@ spec:
           command: ["npm", "run", "db:migrate"]
           envFrom:
             - secretRef:
-                name: backend-secrets
+                name: backend-secret
             - configMapRef:
                 name: backend-config
