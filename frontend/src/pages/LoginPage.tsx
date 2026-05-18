@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from '@tanstack/react-form'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { loginUser, registerUser, googleSignIn } from '../api'
 import { useAuth } from '../context/AuthContext'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const startInRegister = (location.state as { register?: boolean } | null)?.register === true
   const { setUser } = useAuth()
   const [apiError, setApiError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -28,7 +30,7 @@ export function LoginPage() {
       name: '',
       email: '',
       password: '',
-      isRegistering: false,
+      isRegistering: startInRegister,
       showPassword: false,
     },
     onSubmit: async ({ value }) => {
