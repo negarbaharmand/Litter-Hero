@@ -8,6 +8,7 @@ stages:
 variables:
   FRONTEND_HOST: "https://$CI_COMMIT_REF_SLUG-litter-hero.cc.k3s.chas-lab.dev"
   BACKEND_HOST: "https://$CI_COMMTIT_REF_SLUG-api-litter-hero.cc.k3s.chas-lab.dev"
+  NAMESPACE: "doe25-group-2"
 
 #Workflow rules so we dont get double pipelines when MR is open
 workflow:

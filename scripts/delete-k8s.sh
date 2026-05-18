@@ -6,24 +6,24 @@ echo "$KUBECONFIG_B64" | base64 -d >/kubeconfig
 
 export KUBECONFIG=/kubeconfig
 
-kubectl delete -f k8s/10-configmap-backend.yml
+kubectl delete -n "${NAMESPACE}" -f k8s/10-configmap-backend.yml
 
-kubectl delete -f k8s/20-sealed-backend-secret.yml \
+kubectl delete -n "${NAMESPACE}" -f k8s/20-sealed-backend-secret.yml \
   -f k8s/21-sealed-database-secret.yml \
   -f k8s/22-sealed-gitlab-registry.yml \
   -f k8s/23-middleware-secret.yml
 
-kubectl delete -f k8s/30-deploy-database.yml
+kubectl delete -n "${NAMESPACE}" -f k8s/30-deploy-database.yml
 kubectl rollout status statefulset database
 
-envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_REF_SLUG}' <k8s/40-deploy-backend.yml | kubectl delete -f -
+envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_REF_SLUG}' <k8s/40-deploy-backend.yml | kubectl delete -n "${NAMESPACE}" -f -
 kubectl rollout status deployment backend
 
-envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_REF_SLUG}' <k8s/50-migrate-db-job.yml | kubectl delete -f -
+envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_REF_SLUG}' <k8s/50-migrate-db-job.yml | kubectl delete -n "${NAMESPACE}" -f -
 
-envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_REF_SLUG}' <k8s/60-deploy-frontend.yml | kubectl delete -f -
+envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_REF_SLUG}' <k8s/60-deploy-frontend.yml | kubectl delete -n "${NAMESPACE}" -f -
 kubectl rollout status deployment frontend
 
-kubectl delete -f k8s/70-middleware.yml
+kubectl delete -n "${NAMESPACE}" -f k8s/70-middleware.yml
 
-envsubst '${FRONTEND_HOST} ${BACKEND_HOST}' <k8s/80-ingress.yml | kubectl delete -f -
+envsubst '${FRONTEND_HOST} ${BACKEND_HOST}' <k8s/80-ingress.yml | kubectl delete -n "${NAMESPACE}" -f -
