@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, integer, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, integer, timestamp, pgEnum, real } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const statusEnum = pgEnum('status', ['pending', 'verified', 'disputed', 'cleaned', 'rejected']);
@@ -22,6 +22,8 @@ export const reports = pgTable('reports', {
   description: varchar('description', { length: 1000 }),
   size: varchar('size', { length: 50 }), // e.g., small, medium, large
   status: statusEnum('status').default('pending').notNull(),
+  latitude: real('latitude'),
+  longitude: real('longitude'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
