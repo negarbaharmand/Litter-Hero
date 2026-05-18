@@ -11,6 +11,7 @@ import { swaggerSpec } from './config/swagger.js';
 
 if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required');
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required');
+if (!process.env.GOOGLE_CLIENT_ID) throw new Error('GOOGLE_CLIENT_ID is required');
 
 const app = express();
 const PORT = process.env.PORT || 3000;

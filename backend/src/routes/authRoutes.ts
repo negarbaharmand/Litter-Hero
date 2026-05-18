@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { register, login, logout } from '../controllers/authController.js';
+import { register, login, logout, googleSignIn } from '../controllers/authController.js';
 
 const router = Router();
 
@@ -105,6 +105,52 @@ router.post('/register', register);
  *               $ref: '#/components/schemas/ErrorMessage'
  */
 router.post('/login', login);
+
+/**
+ * @swagger
+ * /api/auth/google:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Sign in with Google
+ *     description: Verifies a Google ID token and returns a JWT plus the public user object. Creates a new user on first sign-in.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [idToken]
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *                 description: Google ID token from the frontend Google sign-in flow
+ *     responses:
+ *       200:
+ *         description: Sign-in successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       400:
+ *         description: Validation error (e.g. missing idToken)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       401:
+ *         description: Invalid Google token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       500:
+ *         description: Server error (e.g. could not create user)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ */
+router.post('/google', googleSignIn);
 
 /**
  * @swagger

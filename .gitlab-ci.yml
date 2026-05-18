@@ -46,6 +46,7 @@ build frontend:
         --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/$COMPONENT:cache-$CI_COMMIT_REF_SLUG \
         --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/$COMPONENT:cache-main \
         --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/$COMPONENT:cache-$CI_COMMIT_REF_SLUG,mode=max \
+        --build-arg VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID \
         --provenance=false --push $COMPONENT/
   after_script:
     - docker buildx rm frontend-builder-$CI_JOB_ID || true
