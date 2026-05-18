@@ -5,6 +5,10 @@ stages:
   - deploy
   - cleanup
 
+variables:
+  FRONTEND_HOST: "https://$CI_COMMIT_REF_SLUG-litter-hero.cc.k3s.chas-lab.dev"
+  BACKEND_HOST: "https://$CI_COMMTIT_REF_SLUG-api-litter-hero.cc.k3s.chas-lab.dev"
+
 #Workflow rules so we dont get double pipelines when MR is open
 workflow:
   rules:
@@ -69,23 +73,22 @@ build backend:
   after_script:
     - docker buildx rm backend-builder-$CI_JOB_ID || true
 
-build python:
+build utils:
   <<: *docker-build
   rules: *always-rule
   script:
-    - docker buildx build -t $CI_REGISTRY_IMAGE/python-utils:latest --push --file scripts/python-Dockerfile .
+    - docker buildx build -t $CI_REGISTRY_IMAGE/utils:latest --push -f scripts/Dockerfile-utils .
 
 #Deploys to development or feature branch
 deploy development:
   stage: deploy
-  image: $CI_REGISTRY_IMAGE/python-utils:latest
+  image: $CI_REGISTRY_IMAGE/utils:latest
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-    url: https://$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
+    url: $FRONTEND_HOST
     on_stop: stop_review
   script:
-    - cd scripts
-    - python3 deploy.py
+    - ./deploy-k8s.sh
   rules:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\//

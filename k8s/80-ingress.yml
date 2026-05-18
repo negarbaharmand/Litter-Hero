@@ -10,7 +10,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: test.labb.k3s.chas-lab.dev
+    - host: ${FRONTEND_HOST}
       http:
         paths:
           - path: /
@@ -20,7 +20,7 @@ spec:
                 name: frontend
                 port:
                   number: 80
-    - host: test-api.labb.k3s.chas-lab.dev
+    - host: ${BACKEND_HOST}
       http:
         paths:
           - path: /

@@ -24,7 +24,7 @@ spec:
         - name: gitlab-registry
       containers:
         - name: backend
-          image: registry.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2/backend:development
+          image: ${CI_REGISTRY_IMAGE}/backend:${CI_COMMIT_REF_SLUG}
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

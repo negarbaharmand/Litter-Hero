@@ -19,7 +19,7 @@ spec:
         - name: gitlab-registry
       containers:
         - name: frontend
-          image: registry.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2/frontend:development
+          image: ${CI_REGISTRY_IMAGE}/frontend:${CI_COMMIT_REF_SLUG}
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
