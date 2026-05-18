@@ -1,4 +1,5 @@
 import { type TimePeriod } from '../../hooks/useLeaderboard';
+import { Button } from '../ui';
 
 interface TimePeriodFilterProps {
   selectedPeriod: TimePeriod;
@@ -18,13 +19,13 @@ export function TimePeriodFilter({ selectedPeriod, onPeriodChange }: TimePeriodF
         Filter by period:
       </span>
       {periods.map((period) => (
-        <button
+        <Button
           key={period.value}
+          variant={selectedPeriod === period.value ? 'primary' : 'secondary'}
           onClick={() => onPeriodChange(period.value)}
-          className={selectedPeriod === period.value ? 'btn-primary' : 'btn-secondary'}
         >
           {period.label}
-        </button>
+        </Button>
       ))}
     </div>
   );

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLeaderboard, type TimePeriod } from '../../hooks/useLeaderboard';
 import { LeaderboardTable } from './LeaderboardTable';
 import { TimePeriodFilter } from './TimePeriodFilter';
+import { PageShell } from '../PageShell';
 
 export function Leaderboard() {
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('allTime');
@@ -10,36 +11,34 @@ export function Leaderboard() {
 
   if (isLoading) {
     return (
-      <div className="page-shell">
-        <div className="page-shell__inner">
-          <p className="text-body-lg" style={{ color: 'var(--color-green-dark)' }}>Loading leaderboard data... ⏳</p>
-        </div>
-      </div>
+      <PageShell>
+        <p className="text-body-lg" style={{ color: 'var(--color-green-dark)' }}>Loading leaderboard data... ⏳</p>
+      </PageShell>
     );
   }
 
   if (isError) {
     return (
-      <div className="page-shell">
-        <div className="page-shell__inner">
-          <p className="text-body-lg text-danger">Error loading leaderboard: {(error as Error).message} ❌</p>
-        </div>
-      </div>
+      <PageShell>
+        <p className="text-body-lg" style={{ color: 'var(--color-danger)' }}>
+          Error loading leaderboard: {(error as Error).message} ❌
+        </p>
+      </PageShell>
     );
   }
 
   return (
-    <div className="page-shell">
-      <div className="page-shell__inner">
-        <h2 style={{ marginBottom: '1rem' }}>Leaderboard</h2>
-        <TimePeriodFilter selectedPeriod={selectedPeriod} onPeriodChange={setSelectedPeriod} />
-        {data && data.entries.length > 0 ? (
-          <LeaderboardTable entries={data.entries} sortBy={sortBy} onSortChange={setSortBy} />
-        ) : (
-          <p className="text-body-lg" style={{ color: 'var(--color-green-dark)' }}>No leaderboard data available</p>
-        )}
-        <p className="text-body-sm mt-4" style={{ color: 'var(--color-text-muted)'}}>Last updated: {data?.lastUpdated}</p>
-      </div>
-    </div>
+    <PageShell>
+      <h2 style={{ marginBottom: '1rem' }}>Leaderboard</h2>
+      <TimePeriodFilter selectedPeriod={selectedPeriod} onPeriodChange={setSelectedPeriod} />
+      {data && data.entries.length > 0 ? (
+        <LeaderboardTable entries={data.entries} sortBy={sortBy} onSortChange={setSortBy} />
+      ) : (
+        <p className="text-body-lg" style={{ color: 'var(--color-green-dark)' }}>No leaderboard data available</p>
+      )}
+      <p className="text-body-sm mt-4" style={{ color: 'var(--color-text-muted)', fontSize: '13px' }}>
+        Last updated: {data?.lastUpdated}
+      </p>
+    </PageShell>
   );
 }
