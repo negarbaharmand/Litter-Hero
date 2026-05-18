@@ -135,14 +135,14 @@ deploy production:
     expire_in: 1 week
     when: always
 
-scan python:
-  <<: *scan-image
-  rules: *integration-rule
-  needs:
-    - job: build python
-  variables:
-    COMPONENT: python
-    IMAGE: $CI_REGISTRY_IMAGE/python-utils:latest
+# scan python:
+#   <<: *scan-image
+#   rules: *integration-rule
+#   needs:
+#     - job: build python
+#   variables:
+#     COMPONENT: python
+#     IMAGE: $CI_REGISTRY_IMAGE/python-utils:latest
 
 scan frontend:
   <<: *scan-image
