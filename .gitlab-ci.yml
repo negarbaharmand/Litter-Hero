@@ -88,7 +88,7 @@ deploy development:
     url: $FRONTEND_HOST
     on_stop: stop_review
   script:
-    - ./k8s/deploy-k8s.sh
+    - ./scripts/deploy-k8s.sh
   rules:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\//
