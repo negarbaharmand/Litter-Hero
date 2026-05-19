@@ -97,13 +97,12 @@ deploy development:
 #Deploys to production, only runs when we push into main
 deploy production:
   stage: deploy
-  image: $CI_REGISTRY_IMAGE/python-utils:latest
+  image: $CI_REGISTRY_IMAGE/utils:latest
   environment:
     name: production
-    url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-production.doe25.swarm.chas-lab.dev
+    url: https://$FRONTEND_HOST
   script:
-    - cd scripts
-    - python3 deploy.py
+    - ./scripts/deploy-k8s.sh
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
@@ -136,15 +135,6 @@ deploy production:
     expire_in: 1 week
     when: always
 
-# scan python:
-#   <<: *scan-image
-#   rules: *integration-rule
-#   needs:
-#     - job: build python
-#   variables:
-#     COMPONENT: python
-#     IMAGE: $CI_REGISTRY_IMAGE/python-utils:latest
-
 scan frontend:
   <<: *scan-image
   rules: *integration-rule
@@ -166,13 +156,12 @@ scan backend:
 #Removes the environment manually when MR is done
 stop_review:
   stage: cleanup
-  image: $CI_REGISTRY_IMAGE/python-utils:latest
+  image: $CI_REGISTRY_IMAGE/utils:latest
   environment:
-    name: review/$CI_COMMIT_REF_SLUG
+    name: review/$FRONTEND_HOST
     action: stop
   script:
-    - cd scripts
-    - python3 delete-stack.py
+    - ./scripts/delete-k8s.sh
   rules:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
       when: manual
