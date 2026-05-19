@@ -8,7 +8,7 @@ export KUBECONFIG=/kubeconfig
 
 kubectl apply -n "${NAMESPACE}" -f k8s/10-configmap-backend.yml
 
-kubectl apply -n "${NAMESPACE}" -f k8s/20-gitlab-secret.yml \
+kubectl apply -n "${NAMESPACE}" -f k8s/20-gitlab-secrets.yml \
   -f k8s/21-cc-secrets.yml
 
 kubectl apply -n "${NAMESPACE}" -f k8s/30-deploy-database.yml
