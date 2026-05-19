@@ -7,7 +7,7 @@ interface PointsCardProps {
 const PointsCard = ({ totalPoints, weeklyPoints }: PointsCardProps) => {
   return (
     <div className="mx-4 mt-6">
-      <h3 className="mb-3" style={{ marginBottom: '1rem' }}>Your Impact</h3>
+      <h3 className="mb-3!" > Your Impact</h3>
       <div className="card">
         <div className="flex justify-around text-center">
           {/* Reports — placeholder */}
