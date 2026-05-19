@@ -39,6 +39,8 @@ export function AddPicturePage() {
 	const [showAllCategories, setShowAllCategories] = useState(false)
 	const [size, setSize] = useState<Size>('Small')
 	const [location, setLocation] = useState('')
+	const [latitude, setLatitude] = useState<number | null>(null)
+	const [longitude, setLongitude] = useState<number | null>(null)
 	const [isEditingLocation, setIsEditingLocation] = useState(false)
 	const [isLocating, setIsLocating] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -60,8 +62,12 @@ export function AddPicturePage() {
 				try {
 					const address = await reverseGeocode(latitude, longitude)
 					setLocation(address)
+					setLatitude(latitude)
+					setLongitude(longitude)
 				} catch {
 					setLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`)
+					setLatitude(latitude)
+					setLongitude(longitude)
 				}
 				setIsLocating(false)
 			},
@@ -111,6 +117,8 @@ export function AddPicturePage() {
 				location: location.trim(),
 				description: fullDescription,
 				size: size.toLowerCase(),
+				latitude: latitude ?? undefined,
+				longitude: longitude ?? undefined,
 			})
 			refreshUser()
 			navigate('/reports')

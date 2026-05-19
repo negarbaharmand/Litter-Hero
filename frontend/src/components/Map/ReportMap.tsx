@@ -59,16 +59,18 @@ export default function ReportMap({
           }
         />
 
-        {reports?.map((report) => (
-          <Marker key={report.id} position={[report.lat, report.lng]}>
-            <MarkerPopup 
-              lat={report.lat} 
-              lng={report.lng} 
-              description={report.description}
-              size={report.size}
-            />
-          </Marker>
-        ))}
+        {reports
+          ?.filter(report => report.lat !== null && report.lat !== undefined && report.lng !== null && report.lng !== undefined)
+          .map((report) => (
+            <Marker key={report.id} position={[report.lat, report.lng]}>
+              <MarkerPopup 
+                lat={report.lat} 
+                lng={report.lng} 
+                description={report.description}
+                size={report.size}
+              />
+            </Marker>
+          ))}
 
         <LocationMarker />
       </MapContainer>

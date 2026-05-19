@@ -22,7 +22,9 @@ export default function ReportForm({ lat, lng }: { lat: number; lng: number }) {
     const payload: CreateReportPayload = {
       location: `${lat},${lng}`,
       description: "Sample trash report",
-      size: "medium"
+      size: "medium",
+      latitude: lat,
+      longitude: lng,
     };
     mutation.mutate(payload);
   };
