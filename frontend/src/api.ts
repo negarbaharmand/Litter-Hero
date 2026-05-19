@@ -1,6 +1,7 @@
 
-// 1. Grab the URL once at the top of the file
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+// In production, nginx proxies /api/* to the backend, so an empty base is correct.
+// VITE_API_URL can be set to override (e.g. http://localhost:3000 for local dev without the proxy).
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? '';
 
 function authHeaders(): HeadersInit {
   const token = localStorage.getItem('token');
