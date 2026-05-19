@@ -158,7 +158,7 @@ stop_review:
   stage: cleanup
   image: $CI_REGISTRY_IMAGE/utils:latest
   environment:
-    name: review/$FRONTEND_HOST
+    name: review/$CI_COMMIT_REF_SLUG
     action: stop
   script:
     - ./scripts/delete-k8s.sh
