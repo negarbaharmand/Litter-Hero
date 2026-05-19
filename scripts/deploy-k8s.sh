@@ -18,6 +18,7 @@ kubectl rollout status statefulset database
 envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_SHA}' <k8s/40-deploy-backend.yml | kubectl apply -n "${NAMESPACE}" -f -
 kubectl rollout status deployment backend
 
+kubectl delete job backend-migrate -n "${NAMESPACE}" --ignore-not-found
 envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_SHA}' <k8s/50-migrate-db-job.yml | kubectl apply -n "${NAMESPACE}" -f -
 
 envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_SHA}' <k8s/60-deploy-frontend.yml | kubectl apply -n "${NAMESPACE}" -f -
