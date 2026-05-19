@@ -17,7 +17,7 @@ export function Leaderboard() {
   if (isLoading) {
     return (
       <div
-        className="leaderboard-container min-h-screen bg-[#eefcf3] text-slate-100 p-6 pb-24 lg:pb-6 lg:pt-[74px]"
+        className="leaderboard-container min-h-screen bg-[#EEFCF3] pb-36"
       >
         <div className="loading-message text-emerald-400">Loading leaderboard data... ⏳</div>
       </div>
@@ -28,7 +28,7 @@ export function Leaderboard() {
   if (isError) {
     return (
       <div
-        className="leaderboard-container min-h-screen bg-[#eefcf3] p-6 pb-24 lg:pb-6 lg:pt-[74px]"
+        className="leaderboard-container min-h-screen bg-[#EEFCF3] pb-36"
       >
         <div className="error-message text-red-400">
           Error loading leaderboard: {(error as Error).message} ❌
@@ -38,21 +38,21 @@ export function Leaderboard() {
   }
 
   return (
-    <div
-      className="leaderboard-container min-h-screen bg-[#eefcf3] text-slate-100 p-6 pb-24 lg:pb-6 lg:pt-[74px]"
-    >
-      {/* tids filter knappar */}
-      <TimePeriodFilter selectedPeriod={selectedPeriod} onPeriodChange={setSelectedPeriod} />
+    <div className="leaderboard-container min-h-screen bg-[#EEFCF3] pb-36">
+      <div className="w-full max-w-4xl px-4 pt-6">
+        {/* tids filter knappar */}
+        <TimePeriodFilter selectedPeriod={selectedPeriod} onPeriodChange={setSelectedPeriod} />
 
-      {/* Main table */}
-      {data && data.entries.length > 0 ? (
-        <LeaderboardTable entries={data.entries} sortBy={sortBy} onSortChange={setSortBy} />
-      ) : (
-        <div className="empty-message text-emerald-400">No leaderboard data available</div>
-      )}
+        {/* Main table */}
+        {data && data.entries.length > 0 ? (
+          <LeaderboardTable entries={data.entries} sortBy={sortBy} onSortChange={setSortBy} />
+        ) : (
+          <div className="empty-message text-emerald-400">No leaderboard data available</div>
+        )}
 
-      {/* Footer med information om senaste uppdatering */}
-      <p className="last-updated text-emerald-400 text-sm mt-4">Last updated: {data?.lastUpdated}</p>
+        {/* Footer med information om senaste uppdatering */}
+        <p className="last-updated text-emerald-400 text-sm mt-4">Last updated: {data?.lastUpdated}</p>
+      </div>
     </div>
   );
 }
