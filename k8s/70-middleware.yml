@@ -1,7 +1,7 @@
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: cc-basic-auth
+  name: test-basic-auth
 spec:
   basicAuth:
-    secret: cc-secrets
+    secret: test-basic-auth
