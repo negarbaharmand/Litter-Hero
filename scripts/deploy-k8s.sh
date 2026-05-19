@@ -8,10 +8,8 @@ export KUBECONFIG=/kubeconfig
 
 kubectl apply -n "${NAMESPACE}" -f k8s/10-configmap-backend.yml
 
-kubectl apply -n "${NAMESPACE}" -f k8s/20-sealed-backend-secret.yml \
-  -f k8s/21-sealed-database-secret.yml \
-  -f k8s/22-sealed-gitlab-registry.yml \
-  -f k8s/23-middleware-secret.yml
+kubectl apply -n "${NAMESPACE}" -f k8s/20-gitlab-secret.yml \
+  -f k8s/21-cc-secrets.yml
 
 kubectl apply -n "${NAMESPACE}" -f k8s/30-deploy-database.yml
 kubectl rollout status statefulset database

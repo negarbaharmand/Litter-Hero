@@ -4,4 +4,4 @@ metadata:
   name: cc-basic-auth
 spec:
   basicAuth:
-    secret: cc-basic-auth
+    secret: cc-secrets
