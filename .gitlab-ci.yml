@@ -6,8 +6,8 @@ stages:
   - cleanup
 
 variables:
-  FRONTEND_HOST: "https://$CI_COMMIT_REF_SLUG-litter-hero.cc.k3s.chas-lab.dev"
-  BACKEND_HOST: "https://$CI_COMMTIT_REF_SLUG-api-litter-hero.cc.k3s.chas-lab.dev"
+  FRONTEND_HOST: "$CI_COMMIT_REF_SLUG-litter-hero.cc.k3s.chas-lab.dev"
+  BACKEND_HOST: "api-$CI_COMMIT_REF_SLUG-litter-hero.cc.k3s.chas-lab.dev"
   NAMESPACE: "doe25-group-2"
 
 #Workflow rules so we dont get double pipelines when MR is open
@@ -86,7 +86,7 @@ deploy development:
   image: $CI_REGISTRY_IMAGE/utils:latest
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-    url: $FRONTEND_HOST
+    url: https://$FRONTEND_HOST
     on_stop: stop_review
   script:
     - ./scripts/deploy-k8s.sh
