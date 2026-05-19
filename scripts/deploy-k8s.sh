@@ -27,4 +27,4 @@ kubectl apply -n "${NAMESPACE}" -f k8s/70-middleware.yml
 
 envsubst '${FRONTEND_HOST} ${BACKEND_HOST}' <k8s/80-ingress.yml | kubectl apply -n "${NAMESPACE}" -f -
 
-kubectl apply -n "${NAMESPACE}" -f k8/90-monitoring.yml
+kubectl apply -n "${NAMESPACE}" -f k8s/90-monitoring.yml
