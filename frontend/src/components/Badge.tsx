@@ -4,9 +4,12 @@ interface BadgeProps {
 }
 
 const Badge = ({ label }: BadgeProps) => {
+  const [icon, text] = label.includes('|') ? label.split('|') : ['🏅', label]
+
   return (
-    <div style={{ backgroundColor: '#ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }} className="rounded-xl p-4 flex items-center justify-center text-center">
-      <span className="text-sm" style={{ color: '#111827', fontFamily: "'Noto Sans', sans-serif" }}>{label}</span>
+    <div className="card flex flex-col items-center justify-center text-center gap-2 p-3" style={{ minHeight: '80px' }}>
+      <span className="text-2xl">{icon}</span>
+      <span className="text-body-sm font-medium text-text-primary">{text}</span>
     </div>
   )
 }

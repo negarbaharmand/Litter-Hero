@@ -1,11 +1,17 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import cameraIcon from "../assets/camera.svg";
 import mapIcon from "../assets/map.svg";
 import reportsIcon from "../assets/reports-svgrepo-com.svg";
 import ranksIcon from "../assets/ranks.svg";
 import profileIcon from "../assets/profile.svg";
+import { AuthGateModal } from "./AuthGateModal";
+import { useAuthGate } from "../hooks/useAuthGate";
+import { useAuth } from "../context/AuthContext";
 
 export function NavBar() {
+    const navigate = useNavigate();
+    const { gate, dismiss, requireAuth } = useAuthGate();
+    const { authState } = useAuth();
     const itemBase =
         "flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 transition-colors";
 
@@ -66,6 +72,10 @@ export function NavBar() {
                 <NavLink
                     to="/add-picture"
                     aria-label="Camera"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        requireAuth('Create an account to submit a report', () => navigate('/add-picture'));
+                    }}
                     className={({ isActive }) =>
                         `${itemBase} ${isActive ? "text-emerald-300" : "text-slate-300 hover:text-slate-200"}`
                     }
@@ -113,6 +123,14 @@ export function NavBar() {
 
                 <NavLink
                     to="/profile"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        if (authState.status === 'authenticated') {
+                            navigate('/profile');
+                        } else {
+                            navigate('/login');
+                        }
+                    }}
                     className={({ isActive }) =>
                         `${itemBase} ${isActive ? "text-emerald-300" : "text-slate-300 hover:text-slate-200"}`
                     }
@@ -132,6 +150,7 @@ export function NavBar() {
                     )}
                 </NavLink>
             </nav>
+            <AuthGateModal open={gate.open} message={gate.message} onDismiss={dismiss} />
         </header>
     )
 }

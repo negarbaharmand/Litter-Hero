@@ -1,12 +1,23 @@
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from '@tanstack/react-form'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { loginUser, registerUser, googleSignIn } from '../api'
 import { useAuth } from '../context/AuthContext'
 
+//divider component to separate sections of the login page, with "or" text in the middle
+const Divider = () => (
+  <div className="flex items-center gap-3">
+    <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-border)' }} />
+    <span className="text-body-sm text-text-muted">or</span>
+    <div className="flex-1 h-px" style={{ backgroundColor: 'var(--color-border)' }} />
+  </div>
+)
+
 export function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const startInRegister = (location.state as { register?: boolean } | null)?.register === true
   const { setUser } = useAuth()
   const [apiError, setApiError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -28,7 +39,7 @@ export function LoginPage() {
       name: '',
       email: '',
       password: '',
-      isRegistering: false,
+      isRegistering: startInRegister,
       showPassword: false,
     },
     onSubmit: async ({ value }) => {
@@ -50,12 +61,15 @@ export function LoginPage() {
   })
 
   return (
-    <div className="login-page login-page__container">
-      <div className="login-page__content">
+    <div className="login-page" style={{ backgroundColor: 'var(--color-page-bg)' }}>
+      <img src="/Logo.svg" alt="LitterHero logo" className="w-32 mb-6" />
+      <div className="login-page__form card">
+
+        {/* Rubrik */}
         <form.Subscribe selector={(state) => state.values.isRegistering}>
           {(isRegistering) => (
-            <h1 className="login-page__heading">
-              {isRegistering ? 'Create new account' : 'Login'}
+            <h1 className="text-center mb-2">
+              {isRegistering ? 'Create Account' : 'Login'}
             </h1>
           )}
         </form.Subscribe>
@@ -66,18 +80,17 @@ export function LoginPage() {
             e.stopPropagation()
             form.handleSubmit()
           }}
-          className="login-page__form"
+          className="flex flex-col gap-4"
         >
+          {/* Name — bara vid registrering */}
           <form.Subscribe selector={(state) => state.values.isRegistering}>
             {(isRegistering) =>
               isRegistering && (
                 <div>
-                  <label htmlFor="name" className="login-page__label">Name</label>
+                  <label htmlFor="name" className="block text-body-sm font-medium text-text-primary mb-1">Name</label>
                   <form.Field
                     name="name"
-                    validators={{
-                      onBlur: ({ value }) => (!value ? 'Name is required' : undefined),
-                    }}
+                    validators={{ onBlur: ({ value }) => (!value ? 'Name is required' : undefined) }}
                   >
                     {(field) => (
                       <>
@@ -88,10 +101,10 @@ export function LoginPage() {
                           onChange={(e) => field.handleChange(e.target.value)}
                           onBlur={field.handleBlur}
                           placeholder="Your name"
-                          className="login-page__input"
+                          className={`input ${field.state.meta.errors[0] ? 'input--error' : ''}`}
                         />
                         {field.state.meta.errors[0] && (
-                          <p className="login-page__field-error">{field.state.meta.errors[0]}</p>
+                          <p className="field-error">{field.state.meta.errors[0]}</p>
                         )}
                       </>
                     )}
@@ -101,12 +114,12 @@ export function LoginPage() {
             }
           </form.Subscribe>
 
-
+          {/* Username — bara vid registrering */}
           <form.Subscribe selector={(state) => state.values.isRegistering}>
             {(isRegistering) =>
               isRegistering && (
                 <div>
-                  <label htmlFor="username" className="login-page__label">Username</label>
+                  <label htmlFor="username" className="block text-body-sm font-medium text-text-primary mb-1">Username</label>
                   <form.Field
                     name="username"
                     validators={{
@@ -125,10 +138,10 @@ export function LoginPage() {
                           onChange={(e) => field.handleChange(e.target.value)}
                           onBlur={field.handleBlur}
                           placeholder="Your username"
-                          className="login-page__input"
+                          className={`input ${field.state.meta.errors[0] ? 'input--error' : ''}`}
                         />
                         {field.state.meta.errors[0] && (
-                          <p className="login-page__field-error">{field.state.meta.errors[0]}</p>
+                          <p className="field-error">{field.state.meta.errors[0]}</p>
                         )}
                       </>
                     )}
@@ -136,11 +149,11 @@ export function LoginPage() {
                 </div>
               )
             }
-
           </form.Subscribe>
 
+          {/* Email */}
           <div>
-            <label htmlFor="email" className="login-page__label">Email</label>
+            <label htmlFor="email" className="block text-body-sm font-medium text-text-primary mb-1">Email</label>
             <form.Field
               name="email"
               validators={{
@@ -159,19 +172,20 @@ export function LoginPage() {
                     onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
                     placeholder="your@email.com"
-                    className="login-page__input"
+                    className={`input ${field.state.meta.errors[0] ? 'input--error' : ''}`}
                   />
                   {field.state.meta.errors[0] && (
-                    <p className="login-page__field-error">{field.state.meta.errors[0]}</p>
+                    <p className="field-error">{field.state.meta.errors[0]}</p>
                   )}
                 </>
               )}
             </form.Field>
           </div>
 
+          {/* Password */}
           <div>
-            <label htmlFor="password" className="login-page__label">Password</label>
-            <div className="login-page__password-wrapper">
+            <label htmlFor="password" className="block text-body-sm font-medium text-text-primary mb-1">Password</label>
+            <div className="relative">
               <form.Subscribe selector={(state) => state.values.showPassword}>
                 {(showPassword) => (
                   <>
@@ -196,10 +210,10 @@ export function LoginPage() {
                             onChange={(e) => field.handleChange(e.target.value)}
                             onBlur={field.handleBlur}
                             placeholder="••••••••"
-                            className="login-page__input login-page__input--with-toggle"
+                            className={`input pr-12 ${field.state.meta.errors[0] ? 'input--error' : ''}`}
                           />
                           {field.state.meta.errors[0] && (
-                            <p className="login-page__field-error">{field.state.meta.errors[0]}</p>
+                            <p className="field-error">{field.state.meta.errors[0]}</p>
                           )}
                         </>
                       )}
@@ -207,7 +221,7 @@ export function LoginPage() {
                     <button
                       type="button"
                       onClick={() => form.setFieldValue('showPassword', !showPassword)}
-                      className="login-page__password-toggle"
+                      className="absolute right-3 top-4 text-grey-normal hover:text-grey-dark"
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? (
@@ -230,10 +244,11 @@ export function LoginPage() {
           </div>
 
           {apiError && (
-            <p className="text-sm text-red-500 text-center -mt-1">{apiError}</p>
+            <p className="field-error text-center">{apiError}</p>
           )}
 
-          <button type="submit" disabled={isLoading} className="login-page__submit">
+          {/* Submit */}
+          <button type="submit" disabled={isLoading} className="btn-primary w-full">
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
                 <svg className="animate-spin" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24">
@@ -243,15 +258,16 @@ export function LoginPage() {
               </span>
             ) : (
               <form.Subscribe selector={(state) => state.values.isRegistering}>
-                {(isRegistering) => (isRegistering ? 'Create new account' : 'Login')}
+                {(isRegistering) => (isRegistering ? 'Create Account' : 'Login')}
               </form.Subscribe>
             )}
           </button>
         </form>
 
+        {/* Google login — bara vid login */}
         <form.Subscribe selector={(state) => state.values.isRegistering}>
           {(isRegistering) => (
-            <div ref={googleWrapperRef} className="login-page__google-btn-wrapper" hidden={isRegistering}>
+            <div ref={googleWrapperRef} hidden={isRegistering}>
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={() => setApiError('Google sign-in failed')}
@@ -265,10 +281,12 @@ export function LoginPage() {
           )}
         </form.Subscribe>
 
+        {/* Sekundära knappar */}
         <form.Subscribe selector={(state) => state.values.isRegistering}>
           {(isRegistering) => !isRegistering ? (
             <>
-              <div className="login-page__secondary-actions">
+              <Divider />
+              <div className="flex flex-col gap-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -279,38 +297,47 @@ export function LoginPage() {
                     form.setFieldValue('showPassword', false)
                     form.setFieldValue('isRegistering', true)
                   }}
-                  className="login-page__secondary-btn"
+                  className="btn-secondary w-full"
                 >
                   Create new account
                 </button>
-                <button type="button" onClick={handleGuestContinue} className="login-page__secondary-btn">
+                <button type="button" onClick={handleGuestContinue} className="btn-secondary w-full">
                   Continue as guest
                 </button>
               </div>
-
-              <p className="login-page__guest-note">
+              <p className="text-body-sm text-text-muted text-center">
                 As a guest you can still report trash but you can't collect points.
               </p>
             </>
           ) : (
-            <button
-              type="button"
-              onClick={() => {
-                form.setFieldValue('username', '')
-                form.setFieldValue('name', '')
-                form.setFieldValue('email', '')
-                form.setFieldValue('password', '')
-                form.setFieldValue('showPassword', false)
-                form.setFieldValue('isRegistering', false)
-              }}
-              className="login-page__toggle-link"
-            >
-              Already have an account? Login
-            </button>
+            <>
+              <Divider />
+              <button
+                type="button"
+                onClick={handleGuestContinue}
+                className="btn-secondary w-full"
+              >
+                Continue as guest
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  form.setFieldValue('username', '')
+                  form.setFieldValue('name', '')
+                  form.setFieldValue('email', '')
+                  form.setFieldValue('password', '')
+                  form.setFieldValue('showPassword', false)
+                  form.setFieldValue('isRegistering', false)
+                }}
+                className="text-green-dark font-semibold text-body-sm hover:text-green-darker text-center"
+              >
+                Already have an account? Login
+              </button>
+            </>
           )}
         </form.Subscribe>
-      </div>
 
+      </div>
     </div>
   )
 

@@ -1,5 +1,4 @@
-//Det här en komponent för att visa användarens profilheader, som inkluderar avatar, namn och level
-
+//Det här en komponent för att visa användarens profilheader
 interface ProfileHeaderProps {
   username: string | null
   level: number
@@ -9,7 +8,14 @@ interface ProfileHeaderProps {
 const getInitial = (username: string) => username.charAt(0).toUpperCase()
 
 const getAvatarColor = (username: string) => {
-  const colors = ['#ef4444', '#4ade80', '#3b82f6', '#eab308', '#a855f7', '#ec4899']
+  const colors = [
+    'var(--color-green-darker)',
+    'var(--color-green-dark)',
+    '#3b82f6',
+    '#eab308',
+    '#a855f7',
+    '#ec4899'
+  ]
   const hash = username.charCodeAt(0)
   return colors[hash % colors.length]
 }
@@ -26,27 +32,30 @@ const ProfileHeader = ({ username, level, createdAt }: ProfileHeaderProps) => {
   const avatarColor = getAvatarColor(displayName)
 
   return (
-    <div className="flex flex-col items-center pt-8 pb-4" style={{ fontFamily: "'Noto Sans', sans-serif" }}>
+    <div className="flex flex-col items-center pt-8 pb-4">
       {/* Avatar */}
       <div
-        className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-3"
+        className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-3"
         style={{ backgroundColor: avatarColor }}
       >
         {initial}
       </div>
 
       {/* Namn */}
-      <span className="font-semibold text-lg" style={{ color: '#111827' }}>
+      <span className="font-semibold text-body-xl" style={{ color: 'var(--color-text-primary)' }}>
         {displayName}
       </span>
 
       {/* Member since */}
-      <span className="text-sm mt-1" style={{ color: '#6b7280' }}>
+      <span className="text-body-sm mt-1" style={{ color: 'var(--color-green-dark)' }}>
         {formatMemberSince(createdAt)}
       </span>
 
       {/* Level badge */}
-      <span className="text-sm mt-2 border rounded-full px-3 py-0.5" style={{ color: '#4ade80', borderColor: '#4ade80' }}>
+      <span
+        className="text-body-sm mt-2 border rounded-full px-3 py-0.5"
+        style={{ color: 'var(--color-green-dark)', borderColor: 'var(--color-green-dark)' }}
+      >
         Level {level}
       </span>
     </div>

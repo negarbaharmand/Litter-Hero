@@ -12,14 +12,13 @@ import {
 
 const router = Router();
 
-router.use(authenticate);
-
 /**
  * @swagger
  * /api/users/leaderboard:
  *   get:
  *     tags: [Users]
  *     summary: Get the leaderboard
+ *     security: []
  *     parameters:
  *       - in: query
  *         name: limit
@@ -37,12 +36,6 @@ router.use(authenticate);
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/UserPublic'
- *       401:
- *         description: Missing or invalid JWT
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorMessage'
  *       500:
  *         description: Internal server error
  *         content:
@@ -51,6 +44,8 @@ router.use(authenticate);
  *               $ref: '#/components/schemas/ErrorMessage'
  */
 router.get('/leaderboard', getLeaderboard);
+
+router.use(authenticate);
 
 /**
  * @swagger
