@@ -18,7 +18,7 @@ spec:
               service:
                 name: frontend
                 port:
-                  number: 80
+                  number: 8080
     - host: ${BACKEND_HOST}
       http:
         paths:
