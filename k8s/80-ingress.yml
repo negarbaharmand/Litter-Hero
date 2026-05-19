@@ -4,7 +4,6 @@ metadata:
   name: litter-hero
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.middlewares: doe25-group-2-cc-basic-auth@kubernetescrd
 spec:
   ingressClassName: traefik
