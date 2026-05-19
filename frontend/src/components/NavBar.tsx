@@ -1,23 +1,28 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import cameraIcon from "../assets/camera.svg";
 import mapIcon from "../assets/map.svg";
 import reportsIcon from "../assets/reports-svgrepo-com.svg";
 import ranksIcon from "../assets/ranks.svg";
 import profileIcon from "../assets/profile.svg";
 import logoRaw from "../assets/litter-hero-logo.svg?raw";
+import { AuthGateModal } from "./AuthGateModal";
+import { useAuthGate } from "../hooks/useAuthGate";
+import { useAuth } from "../context/AuthContext";
 
 type NavItemProps = {
     to: string;
     icon: string;
     label: string;
     end?: boolean;
+    onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 };
 
-function MobileNavItem({ to, icon, label, end }: NavItemProps) {
+function MobileNavItem({ to, icon, label, end, onClick }: NavItemProps) {
     return (
         <NavLink
             to={to}
             end={end}
+            onClick={onClick}
             className={({ isActive }) =>
                 [
                     "flex w-16 flex-col items-center justify-end gap-1 transition-colors",
@@ -47,11 +52,22 @@ function MobileNavItem({ to, icon, label, end }: NavItemProps) {
     );
 }
 
-function DesktopNavLink({ to, label, end }: { to: string; label: string; end?: boolean }) {
+function DesktopNavLink({
+    to,
+    label,
+    end,
+    onClick,
+}: {
+    to: string;
+    label: string;
+    end?: boolean;
+    onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+}) {
     return (
         <NavLink
             to={to}
             end={end}
+            onClick={onClick}
             className={({ isActive }) =>
                 [
                     "relative px-1 py-2 text-sm transition-colors",
@@ -67,6 +83,24 @@ function DesktopNavLink({ to, label, end }: { to: string; label: string; end?: b
 }
 
 export function NavBar() {
+    const navigate = useNavigate();
+    const { gate, dismiss, requireAuth } = useAuthGate();
+    const { authState } = useAuth();
+
+    const onCameraClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        requireAuth('Create an account to submit a report', () => navigate('/add-picture'));
+    };
+
+    const onProfileClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        if (authState.status === 'authenticated') {
+            navigate('/profile');
+        } else {
+            navigate('/login');
+        }
+    };
+
     return (
         <>
             {/* Mobile bottom navbar (< md) */}
@@ -82,6 +116,7 @@ export function NavBar() {
                     <NavLink
                         to="/add-picture"
                         aria-label="Add Report"
+                        onClick={onCameraClick}
                         className="flex h-18 w-18 -translate-y-[1px] items-center justify-center rounded-full bg-[var(--nav-camera-bg)] transition-colors"
                     >
                         <img
@@ -93,7 +128,7 @@ export function NavBar() {
                     </NavLink>
 
                     <MobileNavItem to="/leaderboard" icon={ranksIcon} label="Ranks" />
-                    <MobileNavItem to="/profile" icon={profileIcon} label="Profile" />
+                    <MobileNavItem to="/profile" icon={profileIcon} label="Profile" onClick={onProfileClick} />
                 </nav>
             </header>
 
@@ -111,12 +146,14 @@ export function NavBar() {
                     <div className="flex items-center gap-8">
                         <DesktopNavLink to="/" label="Map" end />
                         <DesktopNavLink to="/reports" label="Reports" />
-                        <DesktopNavLink to="/add-picture" label="Add Report" />
+                        <DesktopNavLink to="/add-picture" label="Add Report" onClick={onCameraClick} />
                         <DesktopNavLink to="/leaderboard" label="Ranks" />
-                        <DesktopNavLink to="/profile" label="Profile" />
+                        <DesktopNavLink to="/profile" label="Profile" onClick={onProfileClick} />
                     </div>
                 </nav>
             </header>
+
+            <AuthGateModal open={gate.open} message={gate.message} onDismiss={dismiss} />
         </>
     );
 }

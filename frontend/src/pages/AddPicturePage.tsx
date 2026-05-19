@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { CameraCapture } from '../components/CameraCapture'
 import { createReport } from '../api'
 import { useAuth } from '../context/AuthContext'
+import { AuthGateModal } from '../components/AuthGateModal'
+import { useAuthGate } from '../hooks/useAuthGate'
 
 const CATEGORIES = ['Mixed', 'Plastic', 'Cardboard', 'Metal', 'Glass', 'Organic']
 const SIZES = ['Small', 'Medium', 'Large'] as const
@@ -27,6 +29,7 @@ async function reverseGeocode(lat: number, lon: number): Promise<string> {
 export function AddPicturePage() {
 	const navigate = useNavigate()
 	const { refreshUser } = useAuth()
+	const { gate, dismiss, requireAuth } = useAuthGate()
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	const [showCamera, setShowCamera] = useState(false)
@@ -84,15 +87,12 @@ export function AddPicturePage() {
 		e.target.value = ''
 	}
 
-	async function handleSubmit() {
+	function handleSubmit() {
 		setSubmitError(null)
+		requireAuth('Create an account to submit a report', submitReport)
+	}
 
-		const userStr = localStorage.getItem('user')
-		const user = userStr ? JSON.parse(userStr) : null
-		if (!user?.id) {
-			setSubmitError('You must be logged in to submit a report.')
-			return
-		}
+	async function submitReport() {
 		if (!location.trim()) {
 			setSubmitError('Please provide a location.')
 			return
@@ -107,14 +107,13 @@ export function AddPicturePage() {
 
 		setIsSubmitting(true)
 		try {
-		await createReport({
-			userId: user.id,
-			location: location.trim(),
-			description: fullDescription,
-			size: size.toLowerCase(),
-		})
-		refreshUser()
-		navigate('/reports')
+			await createReport({
+				location: location.trim(),
+				description: fullDescription,
+				size: size.toLowerCase(),
+			})
+			refreshUser()
+			navigate('/reports')
 		} catch {
 			setSubmitError('Failed to submit report. Please try again.')
 		} finally {
@@ -421,6 +420,8 @@ export function AddPicturePage() {
 					)}
 				</button>
 			</div>
+
+			<AuthGateModal open={gate.open} message={gate.message} onDismiss={dismiss} />
 		</div>
 	)
 }
