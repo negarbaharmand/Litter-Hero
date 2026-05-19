@@ -8,9 +8,9 @@ export KUBECONFIG=/kubeconfig
 
 kubectl delete -n "${NAMESPACE}" -f k8s/30-deploy-database.yml
 
-envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_REF_SLUG}' <k8s/40-deploy-backend.yml | kubectl delete -n "${NAMESPACE}" -f -
+envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_SHA}' <k8s/40-deploy-backend.yml | kubectl delete -n "${NAMESPACE}" -f -
 
-envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_REF_SLUG}' <k8s/60-deploy-frontend.yml | kubectl delete -n "${NAMESPACE}" -f -
+envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_SHA}' <k8s/60-deploy-frontend.yml | kubectl delete -n "${NAMESPACE}" -f -
 
 kubectl delete -n "${NAMESPACE}" -f k8s/70-middleware.yml
 

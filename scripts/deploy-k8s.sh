@@ -15,12 +15,12 @@ kubectl apply -n "${NAMESPACE}" -f k8s/20-gitlab-secrets.yml \
 kubectl apply -n "${NAMESPACE}" -f k8s/30-deploy-database.yml
 kubectl rollout status statefulset database
 
-envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_REF_SLUG}' <k8s/40-deploy-backend.yml | kubectl apply -n "${NAMESPACE}" -f -
+envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_SHA}' <k8s/40-deploy-backend.yml | kubectl apply -n "${NAMESPACE}" -f -
 kubectl rollout status deployment backend
 
-envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_REF_SLUG}' <k8s/50-migrate-db-job.yml | kubectl apply -n "${NAMESPACE}" -f -
+envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_SHA}' <k8s/50-migrate-db-job.yml | kubectl apply -n "${NAMESPACE}" -f -
 
-envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_REF_SLUG}' <k8s/60-deploy-frontend.yml | kubectl apply -n "${NAMESPACE}" -f -
+envsubst '${CI_REGISTRY_IMAGE} ${CI_COMMIT_SHA}' <k8s/60-deploy-frontend.yml | kubectl apply -n "${NAMESPACE}" -f -
 kubectl rollout status deployment frontend
 
 kubectl apply -n "${NAMESPACE}" -f k8s/70-middleware.yml

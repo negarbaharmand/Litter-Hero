@@ -12,7 +12,7 @@ spec:
         - name: gitlab-registry
       containers:
         - name: migrate
-          image: ${CI_REGISTRY_IMAGE}/backend:${CI_COMMIT_REF_SLUG}
+          image: ${CI_REGISTRY_IMAGE}/backend:${CI_COMMIT_SHA}
           command: ["npm", "run", "db:migrate"]
           envFrom:
             - secretRef:

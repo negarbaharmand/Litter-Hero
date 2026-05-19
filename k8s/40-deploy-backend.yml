@@ -23,7 +23,7 @@ spec:
         - name: gitlab-registry
       containers:
         - name: backend
-          image: ${CI_REGISTRY_IMAGE}/backend:${CI_COMMIT_REF_SLUG}
+          image: ${CI_REGISTRY_IMAGE}/backend:${CI_COMMIT_SHA}
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
