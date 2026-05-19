@@ -9,7 +9,8 @@ export KUBECONFIG=/kubeconfig
 kubectl apply -n "${NAMESPACE}" -f k8s/10-configmap-backend.yml
 
 kubectl apply -n "${NAMESPACE}" -f k8s/20-gitlab-secrets.yml \
-  -f k8s/21-cc-secrets.yml
+  -f k8s/21-cc-secrets.yml \
+  -f k8s/22-basic-auth-secret.yml
 
 kubectl apply -n "${NAMESPACE}" -f k8s/30-deploy-database.yml
 kubectl rollout status statefulset database
