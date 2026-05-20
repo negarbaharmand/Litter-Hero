@@ -51,7 +51,7 @@ metadata:
   labels:
     grafana_dashboard: "1" # This needs to be there!
 data:
-  test-rest-api.json: |
+  litter-hero-dashboard.json: |
     {
       "title": "litter-hero",
       "uid": "litter-hero",
