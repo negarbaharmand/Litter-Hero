@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend
+  name: backend-${CI_COMMIT_REF_SLUG}
   labels:
-    app: backend
+    app: backend-${CI_COMMIT_REF_SLUG}
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: backend
+      app: backend-${CI_COMMIT_REF_SLUG}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -17,12 +17,12 @@ spec:
   template:
     metadata:
       labels:
-        app: backend
+        app: backend-${CI_COMMIT_REF_SLUG}
     spec:
       imagePullSecrets:
         - name: gitlab-registry
       containers:
-        - name: backend
+        - name: backend-${CI_COMMIT_REF_SLUG}
           image: ${CI_REGISTRY_IMAGE}/backend:${CI_COMMIT_SHA}
           imagePullPolicy: IfNotPresent
           ports:
@@ -54,13 +54,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend
+  name: backend-${CI_COMMIT_REF_SLUG}
   labels:
-    app: backend
+    app: backend-${CI_COMMIT_REF_SLUG}
 spec:
   type: ClusterIP
   selector:
-    app: backend
+    app: backend-${CI_COMMIT_REF_SLUG}
   ports:
     - name: http
       port: 3000
