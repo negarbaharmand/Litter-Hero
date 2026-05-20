@@ -10,15 +10,9 @@ export function HomePage() {
 		queryKey: ['reports'],
 		queryFn: fetchReports,
 	});
-	const mapReports = reports
-		.filter((report) => report.latitude !== null && report.longitude !== null)
-		.map(({ id, latitude, longitude, description, size }) => ({
-			id,
-			lat: latitude,
-			lng: longitude,
-			description,
-			size,
-		}));
+	const mapReports = reports.filter(
+        (report) => report.latitude !== null && report.longitude !== null
+    );
 
 	useEffect(() => {
 		const saved = localStorage.getItem('theme');
