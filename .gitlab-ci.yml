@@ -142,7 +142,7 @@ scan frontend:
     - job: build frontend
   variables:
     COMPONENT: frontend
-    IMAGE: $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_SLUG
+    IMAGE: $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA
 
 scan backend:
   <<: *scan-image
@@ -151,7 +151,7 @@ scan backend:
     - job: build backend
   variables:
     COMPONENT: backend
-    IMAGE: $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_SLUG
+    IMAGE: $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA
 
 #Removes the environment manually when MR is done
 stop_review:
