@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: backend-migrate
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: gitlab-registry
+      containers:
+        - name: migrate
+          image: ${CI_REGISTRY_IMAGE}/backend:${CI_COMMIT_SHA}
+          command: ["npm", "run", "db:migrate"]
+          envFrom:
+            - secretRef:
+                name: cc-secrets
+            - configMapRef:
+                name: backend-config

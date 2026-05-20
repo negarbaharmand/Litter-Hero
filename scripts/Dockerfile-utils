@@ -1,0 +1,5 @@
+FROM alpine:latest
+RUN apk add envsubst
+RUN apk add bash
+RUN apk add kubectl
+

@@ -157,3 +157,4 @@ frontend/dist/
 
 .vscode/
 .vscode
+pub-cert.pem
