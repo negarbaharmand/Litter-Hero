@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: litter-hero
+  name: litter-hero-${CI_COMMIT_REF_SLUG}
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.middlewares: doe25-group-2-test-basic-auth@kubernetescrd
@@ -15,7 +15,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: frontend
+                name: frontend-${CI_COMMIT_REF_SLUG}
                 port:
                   number: 8080
     - host: ${BACKEND_HOST}
@@ -25,6 +25,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: backend
+                name: backend-${CI_COMMIT_REF_SLUG}
                 port:
                   number: 3000
