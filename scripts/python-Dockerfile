@@ -1,5 +1,0 @@
-FROM python:3.14-alpine
-COPY scripts/requirements.txt .
-RUN pip install -r requirements.txt 
-COPY scripts/deploy.py .
-CMD ["python", "deploy.py"]
