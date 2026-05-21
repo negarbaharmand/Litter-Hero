@@ -165,14 +165,29 @@ export function ReportDetailPage() {
             Upload a current photo from the cleaned spot so the community can verify it.
           </p>
 
-          <div className="mt-4">
+          <div className="mt-4 rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50/50 p-4">
+            <p className="text-sm font-medium text-emerald-900">Cleanup proof photo (required)</p>
+            <p className="mt-1 text-xs text-emerald-800">Take a clear after-photo of the cleaned spot.</p>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
+              className="mt-3 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {proofFile ? 'Change photo' : 'Upload cleanup photo'}
+            </button>
+            {proofFile && (
+              <p className="mt-2 text-sm text-slate-700">
+                Selected file: <span className="font-medium">{proofFile.name}</span>
+              </p>
+            )}
             <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
               onChange={(event) => setProofFile(event.target.files?.[0] ?? null)}
               disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
-              className="block w-full text-sm text-slate-700"
+              className="sr-only"
             />
           </div>
 
