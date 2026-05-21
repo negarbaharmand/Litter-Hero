@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CameraCapture } from '../components/CameraCapture'
 import { createReport, uploadReportImage } from '../api'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../hooks/useAuth'
 import { AuthGateModal } from '../components/AuthGateModal'
 import { useAuthGate } from '../hooks/useAuthGate'
 

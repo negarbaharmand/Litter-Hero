@@ -1,31 +1,21 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import type { AuthUser, MeUser } from '../api'
+import { AuthContext, type AuthState } from './authContext'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? ''
 
-type AuthState =
-  | { status: 'loading' }
-  | { status: 'authenticated'; user: MeUser }
-  | { status: 'unauthenticated' }
-
-type AuthContextValue = {
-  authState: AuthState
-  setUser: (user: AuthUser, token: string) => void
-  clearAuth: () => void
-  refreshUser: () => void
+function getInitialAuthState(): AuthState {
+  const token = localStorage.getItem('token')
+  if (!token) return { status: 'unauthenticated' }
+  return { status: 'loading' }
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null)
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [authState, setAuthState] = useState<AuthState>({ status: 'loading' })
+  const [authState, setAuthState] = useState<AuthState>(getInitialAuthState)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    if (!token) {
-      setAuthState({ status: 'unauthenticated' })
-      return
-    }
+    if (!token) return
 
     fetch(`${API_BASE_URL}/api/users/me`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -91,10 +81,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   )
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used inside AuthProvider')
-  return ctx
 }

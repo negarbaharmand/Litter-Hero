@@ -7,7 +7,7 @@ import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import type { Report } from '../../api';
 
 
-let DefaultIcon = L.icon({
+const DefaultIcon = L.icon({
     iconUrl: icon,
     shadowUrl: iconShadow,
     iconSize: [25, 41],
