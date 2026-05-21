@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-${CI_COMMIT_REF_SLUG}
+  labels:
+    app: frontend-${CI_COMMIT_REF_SLUG}
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend-${CI_COMMIT_REF_SLUG}
+  template:
+    metadata:
+      labels:
+        app: frontend-${CI_COMMIT_REF_SLUG}
+    spec:
+      imagePullSecrets:
+        - name: gitlab-registry
+      containers:
+        - name: frontend-${CI_COMMIT_REF_SLUG}
+          image: ${CI_REGISTRY_IMAGE}/frontend:${CI_COMMIT_SHA}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: nginx-conf-${CI_COMMIT_REF_SLUG}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-${CI_COMMIT_REF_SLUG}
+  labels:
+    app: frontend-${CI_COMMIT_REF_SLUG}
+spec:
+  type: ClusterIP
+  selector:
+    app: frontend-${CI_COMMIT_REF_SLUG}
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

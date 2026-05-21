@@ -8,6 +8,41 @@
       "when": 1775750182117,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777235611837,
+      "tag": "0001_cheerful_jane_foster",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777971624472,
+      "tag": "0002_add_username",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1778263665572,
+      "tag": "0003_messy_giant_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1778840171046,
+      "tag": "0004_workable_baron_strucker",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1779183614070,
+      "tag": "0005_sweet_norman_osborn",
+      "breakpoints": true
     }
   ]
 }

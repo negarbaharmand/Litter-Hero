@@ -1,152 +1,95 @@
 stages:
   - build
-  - test 
-  - deploy 
+  - test
+  - scan
+  - deploy
   - cleanup
 
-# Builds frontend in a docker container and pushes it to gitlab registry.
-# Saves the name of the REGISTRY_TAG in build.env file
-# This stage will always run
-build frontend:
+variables:
+  FRONTEND_HOST: "$CI_COMMIT_REF_SLUG-litter-hero.cc.k3s.chas-lab.dev"
+  BACKEND_HOST: "api-$CI_COMMIT_REF_SLUG-litter-hero.cc.k3s.chas-lab.dev"
+  NAMESPACE: "doe25-group-2"
+
+#Workflow rules so we dont get double pipelines when MR is open
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+#Pipeline rule that can be reused
+#This rule makes starts the job in main, development and every other branch with / in it
+.always-rule: &always-rule
+  - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
+  - if: $CI_COMMIT_REF_NAME =~ /\//
+
+.integration-rule: &integration-rule
+  - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
+  - if: $CI_MERGE_REQUEST_TARGET_BRANCH_PROTECTED == "true"
+
+#Docker anchor template that can be reused for building frontend and backend
+.docker-build: &docker-build
   stage: build
   image: docker:29
   before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-  script:
-    - | 
-      docker buildx create --use --name mybuilder --driver docker-container
-      if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest;
-      elif [[ $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH ]]; then REGISTRY_TAG=$DEVELOPMENT_BRANCH;
-      else REGISTRY_TAG=$CI_COMMIT_REF_SLUG;
-      fi
-      docker buildx build -f frontend/Dockerfile \
-      -t $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG \
-      -t $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG \
-      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache-$REGISTRY_TAG \
-      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache-latest \
-      --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/frontend:cache-$REGISTRY_TAG,mode=max \
-      --provenance=false --push frontend/
-      echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env
-  artifacts:
-    reports:
-      dotenv: build.env 
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-    - if: $CI_COMMIT_REF_NAME =~ /\//
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
 
-# Builds backend in a docker container and pushes it to gitlab registry.
-# Saves the name of the REGISTRY_TAG in build.env file
-# This stage will always run
-build backend:
-  stage: build 
-  image: docker:29 
-  before_script:
-      - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+#Builds frontend in a docker container and pushes it to gitlab registry.
+build frontend:
+  <<: *docker-build
+  rules: *always-rule
+  variables:
+    COMPONENT: frontend
   script:
     - |
-      docker buildx create --use --name mybuilder --driver docker-container
-      if [[ $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH ]]; then REGISTRY_TAG=latest;
-      elif [[ $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH ]]; then REGISTRY_TAG=$DEVELOPMENT_BRANCH;
-      else REGISTRY_TAG=$CI_COMMIT_REF_SLUG;
-      fi
-      docker buildx build -f backend/Dockerfile \
-      -t $CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG \
-      -t $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG \
-      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/backend:cache-$REGISTRY_TAG \
-      --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/backend:cache-latest \
-      --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/backend:cache-$REGISTRY_TAG,mode=max \
-      --provenance=false --push backend/
-      echo "REGISTRY_TAG=$REGISTRY_TAG" >> build.env
-  artifacts:
-    reports:
-      dotenv: build.env
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-    - if: $CI_COMMIT_REF_NAME =~ /\//
+      docker buildx create --use --name frontend-builder-$CI_JOB_ID --driver docker-container
+      docker buildx build -f $COMPONENT/Dockerfile \
+        -t $CI_REGISTRY_IMAGE/$COMPONENT:$CI_COMMIT_SHA \
+        --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/$COMPONENT:cache-$CI_COMMIT_REF_SLUG \
+        --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/$COMPONENT:cache-main \
+        --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/$COMPONENT:cache-$CI_COMMIT_REF_SLUG,mode=max \
+        --build-arg VITE_GOOGLE_CLIENT_ID="$VITE_GOOGLE_CLIENT_ID" \
+        --provenance=false --push $COMPONENT/
+  after_script:
+    - docker buildx rm frontend-builder-$CI_JOB_ID || true
 
-build python:
-  stage: build
-  image: docker:29
-  before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+#Builds backend in a docker container and pushes it to gitlab registry.
+build backend:
+  <<: *docker-build
+  rules: *always-rule
+  variables:
+    COMPONENT: backend
   script:
-    - docker buildx build -t ${CI_REGISTRY_IMAGE}/python-utils:latest --push --file scripts/python-Dockerfile .
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-    - if: $CI_COMMIT_REF_NAME =~ /\// 
-        
-# Verifys that all the images works correctly by trying to pull all images from the registry
-verify images:
-  stage: test
-  image: docker:29
-  before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-  needs:
-    - job: build frontend
-      artifacts: true 
-    - job: build backend
-      artifacts: true 
-    - job: build python
-      optional: true
-  script:
-    - docker pull $CI_REGISTRY_IMAGE/frontend:$REGISTRY_TAG
-    - docker pull $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG
-    - docker pull $CI_REGISTRY_IMAGE/backend:$REGISTRY_TAG
-    - docker pull $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG
-    - docker pull $CI_REGISTRY_IMAGE/python-utils:latest
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-    - if: $CI_COMMIT_REF_NAME =~ /\//
-      changes:
-        - frontend/Dockerfile
-        - backend/Dockerfile
-        - scripts/python-Dockerfile
+    - |
+      docker buildx create --use --name backend-builder-$CI_JOB_ID --driver docker-container
+      docker buildx build -f $COMPONENT/Dockerfile \
+        -t $CI_REGISTRY_IMAGE/$COMPONENT:$CI_COMMIT_SHA \
+        --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/$COMPONENT:cache-$CI_COMMIT_REF_SLUG \
+        --cache-from=type=registry,ref=$CI_REGISTRY_IMAGE/$COMPONENT:cache-main \
+        --cache-to=type=registry,ref=$CI_REGISTRY_IMAGE/$COMPONENT:cache-$CI_COMMIT_REF_SLUG,mode=max \
+        --provenance=false --push $COMPONENT/
+  after_script:
+    - docker buildx rm backend-builder-$CI_JOB_ID || true
 
-# This dosnt do anything yet. But will add developers unit tests here.
-# tests frontend:
-#   stage: test 
-#   image: $CI_REGISTRY_IMAGE/frontend:test-$REGISTRY_TAG 
-#   needs:
-#     - job: build frontend
-#       artifacts: true
-#   before_script:
-#       - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-#   script:
-#     - echo "doing alot of cool tests"
-#   rules:
-#     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-#     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH 
-#
-# # This dosnt do anything yet. But will add developers unit tests here.
-# tests backend:
-#   stage: test 
-#   image: $CI_REGISTRY_IMAGE/backend:test-$REGISTRY_TAG 
-#   needs:
-#     - job: build backend 
-  #     artifacts: true
-  # before_script:
-  #     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-  # script:
-  #   - echo "doing alot of cool tests"
-  # rules:
-  #   - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-  #   - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
+build utils:
+  <<: *docker-build
+  rules: *always-rule
+  script:
+    - docker buildx build -t $CI_REGISTRY_IMAGE/utils:latest --push -f scripts/Dockerfile-utils .
 
 #Deploys to development or feature branch
 deploy development:
   stage: deploy
-  image: ${CI_REGISTRY_IMAGE}/python-utils:latest
-  environment: 
+  image: $CI_REGISTRY_IMAGE/utils:latest
+  environment:
     name: review/$CI_COMMIT_REF_SLUG
-    url: https://$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
+    url: https://$FRONTEND_HOST
     on_stop: stop_review
   script:
-    - cd scripts
-    - python3 deploy.py
+    - ./scripts/deploy-k8s.sh
   rules:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
     - if: $CI_COMMIT_REF_NAME =~ /\//
@@ -154,28 +97,73 @@ deploy development:
 #Deploys to production, only runs when we push into main
 deploy production:
   stage: deploy
-  image: ${CI_REGISTRY_IMAGE}/python-utils:latest
+  image: $CI_REGISTRY_IMAGE/utils:latest
   environment:
     name: production
-    url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-production.doe25.swarm.chas-lab.dev
+    url: https://litterhero.cc.k3s.chas-lab.dev
   script:
-    - cd scripts
-    - python3 deploy.py
+    - ./scripts/deploy-k8s.sh
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
-#Removes the environment manually when MR is done 
+.scan-image: &scan-image
+  stage: scan
+  image:
+    name: aquasec/trivy:0.70.0
+    entrypoint: [""]
+  cache:
+    paths:
+      - .trivycache/
+  variables:
+    TRIVY_CACHE_DIR: .trivycache/
+  before_script:
+    - export TRIVY_USERNAME="$CI_REGISTRY_USER"
+    - export TRIVY_PASSWORD="$CI_REGISTRY_PASSWORD"
+  script:
+    - trivy image
+      --severity HIGH,CRITICAL
+      --ignore-unfixed
+      --exit-code 0
+      --no-progress
+      --format template
+      --template "@/contrib/html.tpl"
+      --output trivy-report-$COMPONENT.html
+      $IMAGE
+  artifacts:
+    paths:
+      - trivy-report-$COMPONENT.html
+    expire_in: 1 week
+    when: always
+
+scan frontend:
+  <<: *scan-image
+  rules: *integration-rule
+  needs:
+    - job: build frontend
+  variables:
+    COMPONENT: frontend
+    IMAGE: $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA
+
+scan backend:
+  <<: *scan-image
+  rules: *integration-rule
+  needs:
+    - job: build backend
+  variables:
+    COMPONENT: backend
+    IMAGE: $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA
+
+#Removes the environment manually when MR is done
 stop_review:
   stage: cleanup
-  image: ${CI_REGISTRY_IMAGE}/python-utils:latest
+  image: $CI_REGISTRY_IMAGE/utils:latest
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-    action: stop 
+    action: stop
   script:
-    - cd scripts
-    - python3 delete-stack.py 
+    - ./scripts/delete-k8s.sh
   rules:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-      when: manual 
-    - if: $CI_COMMIT_REF_NAME =~ /\// 
+      when: manual
+    - if: $CI_COMMIT_REF_NAME =~ /\//
       when: manual

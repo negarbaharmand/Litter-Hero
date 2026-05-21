@@ -1,17 +1,19 @@
-//Det här en komponent för att visa en inställningsknapp.
+import { Button } from './ui'
+
 interface SettingsButtonProps {
   onClick: () => void
 }
 
 const SettingsButton = ({ onClick }: SettingsButtonProps) => {
   return (
-    <button
+    <Button
+      variant="secondary"
       onClick={onClick}
-      className="w-full bg-surface text-white text-left px-4 py-4 rounded-xl mx-4 mt-6"
+      className="mx-4 mt-4 text-left"
       style={{ width: 'calc(100% - 2rem)' }}
     >
       Account Settings
-    </button>
+    </Button>
   )
 }
 
