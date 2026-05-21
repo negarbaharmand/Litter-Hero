@@ -36,6 +36,13 @@
       "when": 1778840171046,
       "tag": "0004_workable_baron_strucker",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1779183614070,
+      "tag": "0005_sweet_norman_osborn",
+      "breakpoints": true
     }
   ]
 }
