@@ -7,7 +7,7 @@ import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import type { Report } from '../../api';
 
 
-let DefaultIcon = L.icon({
+const DefaultIcon = L.icon({
     iconUrl: icon,
     shadowUrl: iconShadow,
     iconSize: [25, 41],
@@ -43,9 +43,9 @@ export default function ReportMap({
 
   return (
     <div className="relative h-full w-full overflow-hidden">
-      <MapContainer 
-        center={position} 
-        zoom={13} 
+      <MapContainer
+        center={position}
+        zoom={13}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer

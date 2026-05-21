@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap');
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* ── Root & theme tokens ──────────────────────────────────────── */
 :root {
   font-family: 'Noto Sans', system-ui, sans-serif;
@@ -18,10 +20,10 @@
   --color-border:         #d2d2d2;
   --color-green-normal:   #53e086;
   --color-green-dark:     #3ea865;
-  --color-green-darker:   #1d4e2f;
   --color-danger:         #ef4444;
-  --color-nav-from:       #1a5c35;
-  --color-nav-to:         #37c270;
+  --nav-gradient:         linear-gradient(180deg, #1a5c35 53%, #37c270 100%);
+  --nav-camera-bg:        #ddffe2;
+  --nav-active:           #53e086;
 
   --radius-card: 20px;
   --radius-btn:  12px;
@@ -29,18 +31,6 @@
 }
 
 /* ── Dark mode overrides ──────────────────────────────────────── */
-html[data-theme="dark"],
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-page-bg:      #191919;
-    --color-surface:      #1f1f1f;
-    --color-text-primary: #53e086;
-    --color-text-body:    #d2d2d2;
-    --color-text-muted:   #9b9b9b;
-    --color-border:       #363636;
-  }
-}
-
 html[data-theme="dark"] {
   --color-page-bg:      #191919;
   --color-surface:      #1f1f1f;
@@ -48,6 +38,10 @@ html[data-theme="dark"] {
   --color-text-body:    #d2d2d2;
   --color-text-muted:   #9b9b9b;
   --color-border:       #363636;
+
+  --nav-gradient:       linear-gradient(180deg, #222222 0%, #9b9b9b 100%);
+  --nav-camera-bg:      #ffffff;
+  --nav-active:         #14f000;
 }
 
 /* ── Base resets ──────────────────────────────────────────────── */
@@ -59,6 +53,10 @@ body {
   margin: 0;
   background-color: var(--color-page-bg);
   color: var(--color-text-body);
+}
+
+html {
+  scrollbar-gutter: stable both-edges;
 }
 
 #root {
@@ -198,7 +196,7 @@ p {
 @media (min-width: 768px) {
   .page-shell {
     padding-bottom: 24px;
-    padding-top: calc(56px + 16px); /* top NavBar height + spacing */
+    padding-top: calc(80px + 16px); /* top NavBar height + spacing */
   }
 }
 

@@ -3,7 +3,7 @@ import { useForm } from '@tanstack/react-form'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { loginUser, registerUser, googleSignIn } from '../api'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../hooks/useAuth'
 
 //divider component to separate sections of the login page, with "or" text in the middle
 const Divider = () => (
@@ -350,8 +350,7 @@ export function LoginPage() {
     setIsLoading(true)
     try {
       const result = await googleSignIn(credentialResponse.credential)
-      localStorage.setItem('token', result.token)
-      localStorage.setItem('user', JSON.stringify(result.user))
+      setUser(result.user, result.token)
       navigate('/')
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Something went wrong')

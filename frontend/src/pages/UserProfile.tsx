@@ -7,7 +7,7 @@ import SettingsButton from '../components/SettingsButton'
 import { PageShell } from '../components/PageShell'
 import { Button } from '../components/ui'
 import { logoutUser } from '../api'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../hooks/useAuth'
 
 const UserProfile = () => {
   const navigate = useNavigate()

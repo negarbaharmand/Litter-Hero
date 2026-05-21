@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface CameraCaptureProps {
   onCapture: (imageDataUrl: string) => void
@@ -13,30 +13,43 @@ export function CameraCapture({ onCapture, onClose }: CameraCaptureProps) {
   const [cameraError, setCameraError] = useState<string | null>(null)
   const [isReady, setIsReady] = useState(false)
 
-  const startCamera = useCallback(async (mode: 'environment' | 'user') => {
-    streamRef.current?.getTracks().forEach((t) => t.stop())
-    setCameraError(null)
-    setIsReady(false)
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: mode, width: { ideal: 1920 }, height: { ideal: 1080 } },
-        audio: false,
-      })
-      streamRef.current = stream
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-      }
-    } catch {
-      setCameraError('Could not access camera. Please check your browser permissions and try again.')
-    }
-  }, [])
-
   useEffect(() => {
-    startCamera(facingMode)
+    let cancelled = false
+    streamRef.current?.getTracks().forEach((t) => t.stop())
+    streamRef.current = null
+
+    void (async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
+          audio: false,
+        })
+        if (cancelled) {
+          stream.getTracks().forEach((t) => t.stop())
+          return
+        }
+        streamRef.current = stream
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream
+        }
+      } catch {
+        if (!cancelled) {
+          setCameraError('Could not access camera. Please check your browser permissions and try again.')
+        }
+      }
+    })()
+
     return () => {
+      cancelled = true
       streamRef.current?.getTracks().forEach((t) => t.stop())
     }
-  }, [facingMode, startCamera])
+  }, [facingMode])
+
+  function handleFlipCamera() {
+    setIsReady(false)
+    setCameraError(null)
+    setFacingMode((m) => (m === 'environment' ? 'user' : 'environment'))
+  }
 
   function handleCapture() {
     const video = videoRef.current
@@ -95,7 +108,7 @@ export function CameraCapture({ onCapture, onClose }: CameraCaptureProps) {
             </button>
 
             <button
-              onClick={() => setFacingMode((m) => (m === 'environment' ? 'user' : 'environment'))}
+              onClick={handleFlipCamera}
               aria-label="Flip camera"
               className="w-10 h-10 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center"
             >

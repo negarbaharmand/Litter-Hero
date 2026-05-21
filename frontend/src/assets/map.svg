@@ -1,12 +1,12 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
-<svg width="64px" height="64px" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 
 <g id="SVGRepo_bgCarrier" stroke-width="0"/>
 
 <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
 
-<g id="SVGRepo_iconCarrier"> <path d="M4 2L0 1V14L4 15V2Z" fill="#047857"/> <path d="M16 2L12 1V14L16 15V2Z" fill="#047857"/> <path d="M10 1L6 2V15L10 14V1Z" fill="#047857"/> </g>
+<g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M8.553 3.106a1 1 0 0 1 .894 0L15 5.882l5.553-2.776A1 1 0 0 1 22 4v13.382a1 1 0 0 1-.553.894l-6 3a1 1 0 0 1-.894 0L9 18.118l-5.553 2.776A1 1 0 0 1 2 20V6.618a1 1 0 0 1 .553-.894l6-3ZM10 6.618v9.764l4 2V8.618l-4-2ZM8 6.618 4 8.618v9.764l4-2V6.618Zm8 2v9.764l4-2V6.618l-4 2Z" fill="#047857"/> </g>
 
 </svg>
