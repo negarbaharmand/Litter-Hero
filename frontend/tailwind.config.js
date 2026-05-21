@@ -5,6 +5,7 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+<<<<<<< HEAD
     extend: {
       fontFamily: {
         sans: ['"Noto Sans"', 'system-ui', 'sans-serif'],
@@ -74,3 +75,9 @@ export default {
   },
   plugins: [],
 }
+=======
+    extend: {},
+  },
+  plugins: [],
+}
+>>>>>>> origin/main

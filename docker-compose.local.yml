@@ -1,8 +1,12 @@
 services:
   frontend:
+<<<<<<< HEAD
     build:
       context: ./frontend
       target: dev
+=======
+    build: ./frontend
+>>>>>>> origin/main
     container_name: frontend
     restart: unless-stopped
     ports:
@@ -12,16 +16,23 @@ services:
       - /app/node_modules
 
   backend:
+<<<<<<< HEAD
     build:
       context: ./backend
       target: dev
+=======
+    build: ./backend
+>>>>>>> origin/main
     restart: unless-stopped
     container_name: backend
     command: ["sh", "-c", "npm run db:migrate && npm run dev"]
     environment:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+<<<<<<< HEAD
       - JWT_SECRET=${JWT_SECRET}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+=======
+>>>>>>> origin/main
     ports:
       - 3000:3000
     volumes:
@@ -48,9 +59,13 @@ services:
       retries: 10
 
   drizzle:
+<<<<<<< HEAD
     build:
       context: ./backend
       target: dev
+=======
+    build: ./backend
+>>>>>>> origin/main
     container_name: drizzle
     command: ["sh", "-c", "npm run db:studio -- --host 0.0.0.0"]
     environment:

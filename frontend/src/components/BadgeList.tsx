@@ -1,6 +1,10 @@
 //Det här en komponent för att visa en LISTA av badges, som kan användas för att visa utmärkelser eller prestationer på användarprofilen
 import Badge from './Badge'
 
+<<<<<<< HEAD
+=======
+//
+>>>>>>> origin/main
 interface BadgeItem {
   id: number
   label: string
@@ -13,7 +17,11 @@ interface BadgeListProps {
 const BadgeList = ({ badges }: BadgeListProps) => {
   return (
     <div className="mx-4 mt-6">
+<<<<<<< HEAD
       <h3 className="mb-3!" >Awards</h3>
+=======
+      <h2 className="text-white font-semibold mb-3">Awards</h2>
+>>>>>>> origin/main
       <div className="grid grid-cols-3 gap-3">
         {badges.map((badge) => (
           <Badge key={badge.id} label={badge.label} />
