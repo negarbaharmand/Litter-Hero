@@ -1,4 +1,5 @@
 import { Popup } from 'react-leaflet';
+import { Link } from 'react-router-dom';
 
 type MarkerPopupProps = {
 	lat: number;
@@ -6,6 +7,7 @@ type MarkerPopupProps = {
 	title?: string;
 	description?: string | null;
 	size?: string | null;
+	reportId?: number;
 };
 
 export default function MarkerPopup({
@@ -14,6 +16,7 @@ export default function MarkerPopup({
 	title = 'Trash report',
 	description,
 	size,
+	reportId,
 }: MarkerPopupProps) {
 	return (
 		<Popup>
@@ -26,6 +29,14 @@ export default function MarkerPopup({
 				<p className="mt-1 text-xs text-slate-500">
 					{lat.toFixed(5)}, {lng.toFixed(5)}
 				</p>
+				{typeof reportId === 'number' && (
+					<Link
+						to={`/reports/${reportId}`}
+						className="mt-3 inline-block text-xs font-semibold text-emerald-700 hover:underline"
+					>
+						Open report details
+					</Link>
+				)}
 			</div>
 		</Popup>
 	);

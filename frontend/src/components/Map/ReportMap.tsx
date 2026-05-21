@@ -72,6 +72,7 @@ export default function ReportMap({
                 title={`Rapport #${report.id}`}
                 description={report.description || 'Ingen beskrivning tillgänglig'}
                 size={report.size || 'Okänd storlek'}
+                reportId={report.id}
               />
             </Marker>
           ))}

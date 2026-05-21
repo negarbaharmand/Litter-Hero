@@ -1,5 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import { fetchReports } from '../api'
 import type { Report } from '../api'
 
@@ -29,7 +30,11 @@ export function ReportList() {
 
       <div className="mt-6 grid gap-4">
         {data?.map((report) => (
-          <div key={report.id} className="rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md overflow-hidden">
+          <Link
+            key={report.id}
+            to={`/reports/${report.id}`}
+            className="block rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md overflow-hidden"
+          >
             {report.imageUrl && (
               <img
                 src={report.imageUrl}
@@ -45,8 +50,9 @@ export function ReportList() {
                 <span className="text-slate-500">Location:</span> {report.location}
               </p>
               <p className="mt-3 text-sm italic text-slate-500">Size: {report.size ?? 'Unknown'}</p>
+              <p className="mt-3 text-sm font-medium text-emerald-700">Open details</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

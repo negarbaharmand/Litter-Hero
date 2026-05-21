@@ -19,7 +19,32 @@ export type Report = {
   description: string | null;
   size: string | null;
   imageUrl: string | null;
+  status: 'pending' | 'verified' | 'disputed' | 'cleaned' | 'rejected' | 'open' | 'cleanup_pending_vote';
+  cleanedByUserId: number | null;
+  cleanedAt: string | null;
   createdAt: string;
+};
+
+export type CleanupSubmission = {
+  id: number;
+  reportId: number;
+  userId: number;
+  imageUrl: string;
+  note: string | null;
+  status: 'pending' | 'approved' | 'rejected' | 'expired';
+  createdAt: string | null;
+  resolvedAt: string | null;
+};
+
+export type VoteSummary = {
+  totalVotes: number;
+  cleanVotes: number;
+  notCleanVotes: number;
+  myVote: 'clean' | 'not_clean' | null;
+};
+
+export type ReportDetails = Report & {
+  winningSubmission: CleanupSubmission | null;
 };
 
 export type CreateReportPayload = {
@@ -47,6 +72,15 @@ export const fetchReports = async (): Promise<Report[]> => {
   const response = await fetch(`${API_BASE_URL}/api/reports`);
   if (!response.ok) {
     throw new Error('Network response was not ok');
+  }
+  return response.json();
+};
+
+export const fetchReportById = async (reportId: number): Promise<ReportDetails> => {
+  const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}`);
+  if (!response.ok) {
+    if (response.status === 404) throw new Error('Report not found');
+    throw new Error('Failed to fetch report details');
   }
   return response.json();
 };
@@ -238,4 +272,32 @@ export const createReport = async (newReport: CreateReportPayload): Promise<Repo
   }
 
   return response.json();
+};
+
+export const createCleanupSubmission = async (
+  reportId: number,
+  payload: { imageUrl: string; note?: string }
+): Promise<CleanupSubmission & { voteSummary: VoteSummary }> => {
+  const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}/cleanup-submissions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message =
+      typeof data === 'object' &&
+      data &&
+      'error' in data &&
+      typeof (data as { error?: unknown }).error === 'string'
+        ? (data as { error: string }).error
+        : 'Failed to submit cleanup proof';
+    throw new Error(message);
+  }
+
+  return data as CleanupSubmission & { voteSummary: VoteSummary };
 };
