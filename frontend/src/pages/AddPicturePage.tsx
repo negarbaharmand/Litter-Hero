@@ -1,30 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CameraCapture } from '../components/CameraCapture'
+import { LocationPicker } from '../components/LocationPicker'
 import { createReport, uploadReportImage } from '../api'
 import { useAuth } from '../hooks/useAuth'
 import { AuthGateModal } from '../components/AuthGateModal'
 import { useAuthGate } from '../hooks/useAuthGate'
+import { reverseGeocode } from '../utils/geocoding'
 
 const CATEGORIES = ['Mixed', 'Plastic', 'Cardboard', 'Metal', 'Glass', 'Organic']
 const SIZES = ['Small', 'Medium', 'Large'] as const
 type Size = (typeof SIZES)[number]
-
-async function reverseGeocode(lat: number, lon: number): Promise<string> {
-	const res = await fetch(
-		`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-		{ headers: { 'Accept-Language': 'en' } }
-	)
-	const data = await res.json()
-	const a = data.address ?? {}
-	const street =
-		a.road && a.house_number
-			? `${a.road} ${a.house_number}`
-			: a.road ?? null
-	const city = a.city ?? a.town ?? a.village ?? a.county ?? null
-	const parts = [street, a.postcode, city].filter(Boolean)
-	return parts.length > 0 ? parts.join(', ') : `${lat.toFixed(5)}, ${lon.toFixed(5)}`
-}
 
 export function AddPicturePage() {
 	const navigate = useNavigate()
@@ -42,7 +28,6 @@ export function AddPicturePage() {
 	const [location, setLocation] = useState('')
 	const [latitude, setLatitude] = useState<number | null>(null)
 	const [longitude, setLongitude] = useState<number | null>(null)
-	const [isEditingLocation, setIsEditingLocation] = useState(false)
 	const [isLocating, setIsLocating] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [submitError, setSubmitError] = useState<string | null>(null)
@@ -349,46 +334,16 @@ export function AddPicturePage() {
 					>
 						Place
 					</label>
-
-					{isEditingLocation ? (
-						<div className="flex gap-2">
-							<input
-								type="text"
-								value={location}
-								onChange={(e) => setLocation(e.target.value)}
-								autoFocus
-								className="flex-1 bg-white rounded-xl px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 min-w-0"
-								style={{ '--tw-ring-color': '#53E086' } as React.CSSProperties}
-							/>
-							<button
-								onClick={() => setIsEditingLocation(false)}
-								className="px-4 py-2 rounded-xl text-white text-sm font-medium shrink-0"
-								style={{ backgroundColor: '#53E086' }}
-							>
-								Done
-							</button>
-						</div>
-					) : (
-						<div className="flex items-center gap-3">
-							<span className="flex-1 text-sm truncate" style={{ color: '#6b7280' }}>
-								{isLocating ? (
-									<span className="flex items-center gap-2">
-										<span className="w-3 h-3 rounded-full border-2 border-gray-300 border-t-gray-600 animate-spin inline-block" />
-										Detecting location…
-									</span>
-								) : (
-									location || 'No location set'
-								)}
-							</span>
-							<button
-								onClick={() => setIsEditingLocation(true)}
-								className="px-4 py-1.5 rounded-lg text-sm font-medium shrink-0"
-								style={{ border: '1.5px solid #53E086', color: '#53E086', backgroundColor: 'transparent' }}
-							>
-								Edit
-							</button>
-						</div>
-					)}
+					<LocationPicker
+						value={{ location, latitude, longitude }}
+						onChange={({ location, latitude, longitude }) => {
+							setLocation(location)
+							setLatitude(latitude)
+							setLongitude(longitude)
+						}}
+						isLocating={isLocating}
+						onUseCurrentLocation={detectLocation}
+					/>
 				</div>
 
 				{/* Error message */}
