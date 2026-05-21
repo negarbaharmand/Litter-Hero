@@ -1,5 +1,12 @@
 import { Router } from 'express';
-import { getAllReports, createReport } from '../controllers/reportController.js';
+import {
+  createCleanupSubmission,
+  createReport,
+  getAllReports,
+  getCleanupSubmissionById,
+  getReportById,
+  voteOnCleanupSubmission,
+} from '../controllers/reportController.js';
 import { authenticate } from '../middleware/authenticate.js';
 
 const router = Router();
@@ -28,6 +35,7 @@ const router = Router();
  *               $ref: '#/components/schemas/ErrorMessage'
  */
 router.get('/', getAllReports);
+router.get('/:id', getReportById);
 
 /**
  * @swagger
@@ -83,5 +91,8 @@ router.get('/', getAllReports);
  *               $ref: '#/components/schemas/ErrorMessage'
  */
 router.post('/', authenticate, createReport);
+router.post('/:id/cleanup-submissions', authenticate, createCleanupSubmission);
+router.get('/:id/cleanup-submissions/:submissionId', getCleanupSubmissionById);
+router.post('/:id/cleanup-submissions/:submissionId/votes', authenticate, voteOnCleanupSubmission);
 
 export default router;
