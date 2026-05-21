@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import ReportMap from '../components/Map/ReportMap';
+import { fetchReports } from '../api';
 
 export function HomePage() {
 	const [position, setPosition] = useState<[number, number]>([59.3293, 18.0686]);
 	const [theme, setTheme] = useState<'light' | 'dark'>('light');
+	const { data: reports = [] } = useQuery({
+		queryKey: ['reports'],
+		queryFn: fetchReports,
+	});
+	const mapReports = reports.filter(
+        (report) => report.latitude !== null && report.longitude !== null
+    );
 
 	useEffect(() => {
 		const saved = localStorage.getItem('theme');
@@ -25,12 +34,17 @@ export function HomePage() {
 
 
 	return (
-		<main className="fixed inset-0 h-[100dvh] w-[100vw] bg-transparent">
+		<main className="fixed inset-0 h-dvh w-screen bg-transparent">
 			<div className="absolute inset-0">
-				<ReportMap position={position} setPosition={setPosition} theme={theme} />
+				<ReportMap 
+					reports={mapReports} 
+					position={position} 
+					setPosition={setPosition} 
+					theme={theme} 
+				/>
 			</div>
 
-			<div className="fixed bottom-28 right-3 z-[2000] pointer-events-auto lg:bottom-24">
+			<div className="fixed bottom-28 right-3 z-2000 pointer-events-auto lg:bottom-24">
 				<button
 					type="button"
 					onClick={toggleTheme}

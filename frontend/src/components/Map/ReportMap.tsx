@@ -4,6 +4,8 @@ import L from 'leaflet';
 import MarkerPopup from './MarkerPopup';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import type { Report } from '../../api';
+
 
 let DefaultIcon = L.icon({
     iconUrl: icon,
@@ -19,7 +21,7 @@ export default function ReportMap({
   setPosition,
   theme = 'light',
 }: {
-  reports?: any[];
+  reports?: Report[];
   position: [number, number];
   setPosition: (pos: [number, number]) => void;
   theme?: 'light' | 'dark';
@@ -58,17 +60,21 @@ export default function ReportMap({
               : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           }
         />
-
-        {reports?.map((report) => (
-          <Marker key={report.id} position={[report.lat, report.lng]}>
-            <MarkerPopup 
-              lat={report.lat} 
-              lng={report.lng} 
-              description={report.description}
-              size={report.size}
-            />
-          </Marker>
-        ))}
+        {reports
+          ?.filter((report): report is Report & { latitude: number; longitude: number } =>
+            report.latitude !== null && report.longitude !== null
+          )
+          .map((report) => (
+            <Marker key={report.id} position={[report.latitude, report.longitude]}>
+              <MarkerPopup
+                lat={report.latitude}
+                lng={report.longitude}
+                title={`Rapport #${report.id}`}
+                description={report.description || 'Ingen beskrivning tillgänglig'}
+                size={report.size || 'Okänd storlek'}
+              />
+            </Marker>
+          ))}
 
         <LocationMarker />
       </MapContainer>
