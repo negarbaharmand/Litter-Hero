@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import ReportMap from '../components/Map/ReportMap';
 import { fetchReports } from '../api';
@@ -14,7 +14,8 @@ function getInitialTheme(): 'light' | 'dark' {
 }
 
 export function HomePage() {
-	const [position, setPosition] = useState<[number, number]>([59.3293, 18.0686]);
+	const [mapCenter, setMapCenter] = useState<[number, number]>([59.3293, 18.0686]);
+	const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
 	const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
 	const [statusFilter, setStatusFilter] = useState<ReportStatusFilter>('all');
 	const { data: reports = [] } = useQuery({
@@ -24,6 +25,21 @@ export function HomePage() {
 	const mapReports = reports.filter(
         (report) => report.latitude !== null && report.longitude !== null
     );
+
+	useEffect(() => {
+		if (!navigator.geolocation) return;
+		navigator.geolocation.getCurrentPosition(
+			({ coords }) => {
+				const nextPosition: [number, number] = [coords.latitude, coords.longitude];
+				setCurrentLocation(nextPosition);
+				setMapCenter(nextPosition);
+			},
+			() => {
+				// Keep Stockholm fallback center if geolocation is blocked/unavailable.
+			},
+			{ timeout: 10000 }
+		);
+	}, []);
 
 	function toggleTheme() {
 		const next = theme === 'dark' ? 'light' : 'dark';
@@ -39,8 +55,8 @@ export function HomePage() {
 			<div className="absolute inset-0">
 				<ReportMap 
 					reports={mapReports} 
-					position={position} 
-					setPosition={setPosition} 
+					center={mapCenter}
+					currentLocation={currentLocation}
 					theme={theme} 
 				/>
 			</div>
