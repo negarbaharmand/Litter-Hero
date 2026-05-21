@@ -48,17 +48,18 @@ export const getMe = async (req: Request, res: Response) => {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-    const [weeklyReportsCount] = await db
-      .select({ count: count() })
+    const weeklyReports = await db
+      .select({ size: reports.size })
       .from(reports)
       .where(and(
         eq(reports.userId, userId),
         gte(reports.createdAt, oneWeekAgo)
       ));
 
-    const [weeklyApprovedCleanupsCount] = await db
-      .select({ count: count() })
+    const weeklyApprovedCleanups = await db
+      .select({ size: reports.size })
       .from(cleanupSubmissions)
+      .innerJoin(reports, eq(cleanupSubmissions.reportId, reports.id))
       .where(
         and(
           eq(cleanupSubmissions.userId, userId),
@@ -88,8 +89,8 @@ export const getMe = async (req: Request, res: Response) => {
       .where(eq(cleanupSubmissionVotes.userId, userId));
 
     const weeklyPoints = calculateWeeklyPoints({
-      weeklyReportsCreated: weeklyReportsCount?.count ?? 0,
-      weeklyApprovedCleanups: weeklyApprovedCleanupsCount?.count ?? 0,
+      weeklyReportSizes: weeklyReports.map((report) => report.size),
+      weeklyApprovedCleanupSizes: weeklyApprovedCleanups.map((cleanup) => cleanup.size),
     });
 
     const { password: _, ...userWithoutPassword } = user;

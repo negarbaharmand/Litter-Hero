@@ -1,9 +1,35 @@
-export const REPORT_POINTS = 10;
-export const CLEANUP_POINTS = 20;
 export const CLEANUP_VOTE_THRESHOLD = 3;
 
 export type CleanupVote = 'clean' | 'not_clean';
 export type CleanupResolution = 'pending' | 'approved' | 'rejected';
+export type TrashSize = 'small' | 'medium' | 'large';
+
+const REPORT_POINTS_BY_SIZE: Record<TrashSize, number> = {
+  small: 10,
+  medium: 15,
+  large: 20,
+};
+
+const CLEANUP_POINTS_BY_SIZE: Record<TrashSize, number> = {
+  small: 20,
+  medium: 30,
+  large: 40,
+};
+
+function normalizeSize(size: unknown): TrashSize {
+  if (typeof size !== 'string') return 'small';
+  const normalized = size.trim().toLowerCase();
+  if (normalized === 'medium' || normalized === 'large') return normalized;
+  return 'small';
+}
+
+export function getReportPointsForSize(size: unknown): number {
+  return REPORT_POINTS_BY_SIZE[normalizeSize(size)];
+}
+
+export function getCleanupPointsForSize(size: unknown): number {
+  return CLEANUP_POINTS_BY_SIZE[normalizeSize(size)];
+}
 
 export function summarizeVotes(votes: CleanupVote[]) {
   const cleanVotes = votes.filter((vote) => vote === 'clean').length;
@@ -27,11 +53,21 @@ export function resolveCleanupFromVotes(
 }
 
 export function calculateWeeklyPoints({
-  weeklyReportsCreated,
-  weeklyApprovedCleanups,
+  weeklyReportSizes,
+  weeklyApprovedCleanupSizes,
 }: {
-  weeklyReportsCreated: number;
-  weeklyApprovedCleanups: number;
+  weeklyReportSizes: Array<string | null>;
+  weeklyApprovedCleanupSizes: Array<string | null>;
 }) {
-  return weeklyReportsCreated * REPORT_POINTS + weeklyApprovedCleanups * CLEANUP_POINTS;
+  const reportPoints = weeklyReportSizes.reduce(
+    (sum, size) => sum + getReportPointsForSize(size),
+    0
+  );
+
+  const cleanupPoints = weeklyApprovedCleanupSizes.reduce(
+    (sum, size) => sum + getCleanupPointsForSize(size),
+    0
+  );
+
+  return reportPoints + cleanupPoints;
 }

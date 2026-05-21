@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   calculateWeeklyPoints,
-  CLEANUP_POINTS,
   CLEANUP_VOTE_THRESHOLD,
-  REPORT_POINTS,
+  getCleanupPointsForSize,
+  getReportPointsForSize,
   resolveCleanupFromVotes,
   summarizeVotes,
 } from './reportWorkflow.js';
@@ -34,11 +34,25 @@ test('resolveCleanupFromVotes rejects when not_clean votes tie or win at thresho
   assert.equal(noCleanMajority, 'rejected');
 });
 
-test('calculateWeeklyPoints applies +10 for reports and +20 for approved cleanups', () => {
+test('size-based report points increase with trash size', () => {
+  assert.equal(getReportPointsForSize('small'), 10);
+  assert.equal(getReportPointsForSize('medium'), 15);
+  assert.equal(getReportPointsForSize('large'), 20);
+  assert.equal(getReportPointsForSize('unknown'), 10);
+});
+
+test('size-based cleanup points increase with trash size', () => {
+  assert.equal(getCleanupPointsForSize('small'), 20);
+  assert.equal(getCleanupPointsForSize('medium'), 30);
+  assert.equal(getCleanupPointsForSize('large'), 40);
+  assert.equal(getCleanupPointsForSize(undefined), 20);
+});
+
+test('calculateWeeklyPoints sums size-weighted report and cleanup points', () => {
   const result = calculateWeeklyPoints({
-    weeklyReportsCreated: 3,
-    weeklyApprovedCleanups: 2,
+    weeklyReportSizes: ['small', 'large', 'medium'],
+    weeklyApprovedCleanupSizes: ['small', 'large'],
   });
-  assert.equal(result, 3 * REPORT_POINTS + 2 * CLEANUP_POINTS);
-  assert.equal(result, 70);
+  assert.equal(result, 10 + 20 + 15 + 20 + 40);
+  assert.equal(result, 105);
 });

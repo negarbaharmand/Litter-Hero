@@ -3,8 +3,9 @@ import { db } from '../db/index.js';
 import { and, eq, ne, sql } from 'drizzle-orm';
 import { cleanupSubmissions, cleanupSubmissionVotes, reports, users } from '../db/schema.js';
 import {
-  CLEANUP_POINTS,
   CLEANUP_VOTE_THRESHOLD,
+  getCleanupPointsForSize,
+  getReportPointsForSize,
   resolveCleanupFromVotes,
   summarizeVotes,
 } from './reportWorkflow.js';
@@ -181,7 +182,7 @@ export const createReport = async (req: Request, res: Response) => {
     await db
       .update(users)
       .set({
-        points: sql`${users.points} + 10`,
+        points: sql`${users.points} + ${getReportPointsForSize(size)}`,
       })
       .where(eq(users.id, userId));
 
@@ -320,6 +321,7 @@ export const voteOnCleanupSubmission = async (req: Request, res: Response) => {
           reportId: cleanupSubmissions.reportId,
           reportStatus: reports.status,
           reportOwnerUserId: reports.userId,
+          reportSize: reports.size,
         })
         .from(cleanupSubmissions)
         .innerJoin(reports, eq(cleanupSubmissions.reportId, reports.id))
@@ -435,7 +437,7 @@ export const voteOnCleanupSubmission = async (req: Request, res: Response) => {
         await tx
           .update(users)
           .set({
-            points: sql`${users.points} + ${CLEANUP_POINTS}`,
+            points: sql`${users.points} + ${getCleanupPointsForSize(submissionWithReport.reportSize)}`,
           })
           .where(eq(users.id, submissionWithReport.submitterUserId));
 
