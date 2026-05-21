@@ -407,22 +407,19 @@ export function AddPicturePage() {
 				aria-hidden="true"
 			/>
 
-			{/* Floating submit button — sits above the bottom navbar */}
-			<div className="fixed bottom-3 left-0 right-0 flex justify-center z-40 pointer-events-none">
+			{/* Floating submit button — sits in the bottom navbar's center notch */}
+			<div className="fixed inset-x-0 bottom-0 z-40 h-[94px] flex items-start justify-center pointer-events-none md:hidden">
 				<button
 					onClick={handleSubmit}
 					disabled={isSubmitting}
 					aria-label="Submit report"
-					className="w-16 h-16 rounded-full flex items-center justify-center shadow-xl pointer-events-auto disabled:opacity-60 active:scale-95 transition-transform"
-					style={{ background: 'linear-gradient(135deg, #37C270, #1A5C35)' }}
+					className="h-18 w-18 -mt-[14px] -translate-y-[1px] rounded-full flex items-center justify-center bg-[var(--nav-camera-bg)] pointer-events-auto disabled:opacity-60 active:scale-95 transition-transform"
 				>
 					{isSubmitting ? (
 						<svg
-							className="animate-spin"
-							width="24"
-							height="24"
+							className="animate-spin h-7 w-7 dark:[filter:brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
 							fill="none"
-							stroke="white"
+							stroke="#1a5c35"
 							strokeWidth="2.5"
 							strokeLinecap="round"
 							viewBox="0 0 24 24"
@@ -431,10 +428,9 @@ export function AddPicturePage() {
 						</svg>
 					) : (
 						<svg
-							width="26"
-							height="26"
+							className="h-7 w-7 dark:[filter:brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
 							fill="none"
-							stroke="white"
+							stroke="#1a5c35"
 							strokeWidth="2.5"
 							strokeLinecap="round"
 							strokeLinejoin="round"

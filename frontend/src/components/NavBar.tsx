@@ -4,153 +4,156 @@ import mapIcon from "../assets/map.svg";
 import reportsIcon from "../assets/reports-svgrepo-com.svg";
 import ranksIcon from "../assets/ranks.svg";
 import profileIcon from "../assets/profile.svg";
+import logoRaw from "../assets/litter-hero-logo.svg?raw";
 import { AuthGateModal } from "./AuthGateModal";
 import { useAuthGate } from "../hooks/useAuthGate";
 import { useAuth } from "../hooks/useAuth";
+
+type NavItemProps = {
+    to: string;
+    icon: string;
+    label: string;
+    end?: boolean;
+    onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+};
+
+function MobileNavItem({ to, icon, label, end, onClick }: NavItemProps) {
+    return (
+        <NavLink
+            to={to}
+            end={end}
+            onClick={onClick}
+            className={({ isActive }) =>
+                [
+                    "flex w-16 flex-col items-center justify-end gap-1 transition-colors",
+                    isActive
+                        ? "font-semibold text-white dark:text-[var(--nav-active)]"
+                        : "font-normal text-white hover:text-white/80",
+                ].join(" ")
+            }
+        >
+            {({ isActive }) => (
+                <>
+                    <img
+                        src={icon}
+                        alt=""
+                        aria-hidden="true"
+                        className={
+                            "h-6 w-6 " +
+                            (isActive
+                                ? "[filter:brightness(0)_invert(1)_drop-shadow(0_0_0.5px_white)_drop-shadow(0_0_0.5px_white)] dark:[filter:brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)_drop-shadow(0_0_0.5px_#14F000)_drop-shadow(0_0_0.5px_#14F000)]"
+                                : "[filter:brightness(0)_invert(1)]")
+                        }
+                    />
+                    <span className="text-base leading-[1.2]">{label}</span>
+                </>
+            )}
+        </NavLink>
+    );
+}
+
+function DesktopNavLink({
+    to,
+    label,
+    end,
+    onClick,
+}: {
+    to: string;
+    label: string;
+    end?: boolean;
+    onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+}) {
+    return (
+        <NavLink
+            to={to}
+            end={end}
+            onClick={onClick}
+            className={({ isActive }) =>
+                [
+                    "relative px-1 py-2 text-sm transition-colors",
+                    isActive
+                        ? "font-semibold text-[var(--color-text-primary)] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-[var(--color-green-normal)]"
+                        : "font-normal text-[var(--color-text-body)] hover:text-[var(--color-text-primary)]",
+                ].join(" ")
+            }
+        >
+            {label}
+        </NavLink>
+    );
+}
 
 export function NavBar() {
     const navigate = useNavigate();
     const { gate, dismiss, requireAuth } = useAuthGate();
     const { authState } = useAuth();
-    const itemBase =
-        "flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 transition-colors";
 
-    const labelClass = "text-[11px] leading-none";
-    const iconClass = "h-5 w-5";
+    const onCameraClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        requireAuth('Create an account to submit a report', () => navigate('/add-picture'));
+    };
+
+    const onProfileClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        if (authState.status === 'authenticated') {
+            navigate('/profile');
+        } else {
+            navigate('/login');
+        }
+    };
 
     return (
-        <header
-            className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-800 pb-[env(safe-area-inset-bottom)] md:sticky md:top-0 md:bottom-auto md:border-t-0 md:border-b md:pb-0 md:backdrop-blur-md"
-            style={{ background: 'linear-gradient(180deg, #1A5C35 53.37%, #37C270 100%)' }}
-        >
-            {/* One straight row everywhere (en rak rad överallt) */}
-            <nav className="mx-auto flex max-w-2xl items-center justify-between px-4 py-1 md:px-3 md:py-0">
+        <>
+            {/* Mobile bottom navbar (< md) */}
+            <header className="fixed inset-x-0 bottom-0 z-30 h-[94px] pb-[env(safe-area-inset-bottom)] md:hidden">
+                <div
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-[image:var(--nav-gradient)] shadow-lg [mask-image:radial-gradient(circle_40px_at_calc(50%_-_0px)_22px,transparent_98%,black_100%)] [-webkit-mask-image:radial-gradient(circle_40px_at_calc(50%_-_0px)_22px,transparent_98%,black_100%)]"
+                />
+                <nav className="relative mx-auto flex h-full max-w-2xl items-end justify-around px-4 pb-9">
+                    <MobileNavItem to="/" icon={mapIcon} label="Map" end />
+                    <MobileNavItem to="/reports" icon={reportsIcon} label="Reports" />
 
-                <NavLink
-                    to="/"
-                    end
-                    className={({ isActive }) =>
-                        `${itemBase} ${isActive ? "text-emerald-300" : "text-slate-300 hover:text-slate-200"}`
-                    }
-                >
-                    {({ isActive }) => (
-                        <>
-                            <img
-                                src={mapIcon}
-                                alt="Map"
-                                className={iconClass}
-                                style={{
-                                    filter: isActive ? "none" : "grayscale(1) brightness(1.6)",
-                                }}
-                            />
-                            <span className={labelClass}>Map</span>
-                        </>
-                    )}
-                </NavLink>
+                    <NavLink
+                        to="/add-picture"
+                        aria-label="Add Report"
+                        onClick={onCameraClick}
+                        className="flex h-18 w-18 -translate-y-[1px] items-center justify-center rounded-full bg-[var(--nav-camera-bg)] transition-colors"
+                    >
+                        <img
+                            src={cameraIcon}
+                            alt=""
+                            aria-hidden="true"
+                            className="h-7 w-7 dark:[filter:brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
+                        />
+                    </NavLink>
 
-                <NavLink
-                    to="/reports"
-                    className={({ isActive }) =>
-                        `${itemBase} ${isActive ? "text-emerald-300" : "text-slate-300 hover:text-slate-200"}`
-                    }
-                >
-                    {({ isActive }) => (
-                        <>
-                            <img
-                                src={reportsIcon}
-                                alt="Reports"
-                                className={iconClass}
-                                style={{
-                                    filter: isActive ? "none" : "grayscale(1) brightness(1.6)",
-                                }}
-                            />
-                            <span className={labelClass}>Reports</span>
-                        </>
-                    )}
-                </NavLink>
+                    <MobileNavItem to="/leaderboard" icon={ranksIcon} label="Ranks" />
+                    <MobileNavItem to="/profile" icon={profileIcon} label="Profile" onClick={onProfileClick} />
+                </nav>
+            </header>
 
-                <NavLink
-                    to="/add-picture"
-                    aria-label="Camera"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        requireAuth('Create an account to submit a report', () => navigate('/add-picture'));
-                    }}
-                    className={({ isActive }) =>
-                        `${itemBase} ${isActive ? "text-emerald-300" : "text-slate-300 hover:text-slate-200"}`
-                    }
-                >
-                    {({ isActive }) => (
-                        <>
-                            <span
-                                className="grid h-11 w-11 place-items-center rounded-full bg-emerald-300"
-                                aria-hidden="true"
-                            >
-                                <img
-                                    src={cameraIcon}
-                                    alt=""
-                                    className="h-5 w-5"
-                                    style={{
-                                        filter: isActive ? "none" : "grayscale(1) brightness(1.6)",
-                                    }}
-                                />
-                            </span>
-                            <span className={labelClass}>Add Report</span>
-                        </>
-                    )}
-                </NavLink>
+            {/* Desktop top navbar (md+) */}
+            <header className="sticky top-0 z-30 hidden h-20 border-b border-[var(--color-border)] bg-[var(--color-surface)] md:block">
+                <nav className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
+                    <NavLink
+                        to="/"
+                        end
+                        aria-label="Litter Hero — Home"
+                        className="flex h-10 items-center text-black dark:text-white [&_svg]:h-full [&_svg]:w-auto"
+                        dangerouslySetInnerHTML={{ __html: logoRaw }}
+                    />
 
-                <NavLink
-                    to="/leaderboard"
-                    className={({ isActive }) =>
-                        `${itemBase} ${isActive ? "text-emerald-300" : "text-slate-300 hover:text-slate-200"}`
-                    }
-                >
-                    {({ isActive }) => (
-                        <>
-                            <img
-                                src={ranksIcon}
-                                alt="Ranks"
-                                className={iconClass}
-                                style={{
-                                    filter: isActive ? "none" : "grayscale(1) brightness(1.6)",
-                                }}
-                            />
-                            <span className={labelClass}>Ranks</span>
-                        </>
-                    )}
-                </NavLink>
+                    <div className="flex items-center gap-8">
+                        <DesktopNavLink to="/" label="Map" end />
+                        <DesktopNavLink to="/reports" label="Reports" />
+                        <DesktopNavLink to="/add-picture" label="Add Report" onClick={onCameraClick} />
+                        <DesktopNavLink to="/leaderboard" label="Ranks" />
+                        <DesktopNavLink to="/profile" label="Profile" onClick={onProfileClick} />
+                    </div>
+                </nav>
+            </header>
 
-                <NavLink
-                    to="/profile"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        if (authState.status === 'authenticated') {
-                            navigate('/profile');
-                        } else {
-                            navigate('/login');
-                        }
-                    }}
-                    className={({ isActive }) =>
-                        `${itemBase} ${isActive ? "text-emerald-300" : "text-slate-300 hover:text-slate-200"}`
-                    }
-                >
-                    {({ isActive }) => (
-                        <>
-                            <img
-                                src={profileIcon}
-                                alt="Profile"
-                                className={iconClass}
-                                style={{
-                                    filter: isActive ? "none" : "grayscale(1) brightness(1.6)",
-                                }}
-                            />
-                            <span className={labelClass}>Profile</span>
-                        </>
-                    )}
-                </NavLink>
-            </nav>
             <AuthGateModal open={gate.open} message={gate.message} onDismiss={dismiss} />
-        </header>
-    )
+        </>
+    );
 }

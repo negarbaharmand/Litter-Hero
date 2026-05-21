@@ -43,9 +43,9 @@ export default function ReportMap({
 
   return (
     <div className="relative h-full w-full overflow-hidden">
-      <MapContainer 
-        center={position} 
-        zoom={13} 
+      <MapContainer
+        center={position}
+        zoom={13}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
