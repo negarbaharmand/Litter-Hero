@@ -8,7 +8,6 @@
       "when": 1775750182117,
       "tag": "0000_init",
       "breakpoints": true
-<<<<<<< HEAD
     },
     {
       "idx": 1,
@@ -44,8 +43,6 @@
       "when": 1779183614070,
       "tag": "0005_sweet_norman_osborn",
       "breakpoints": true
-=======
->>>>>>> origin/main
     }
   ]
 }

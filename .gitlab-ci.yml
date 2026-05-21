@@ -1,13 +1,8 @@
 stages:
   - build
-<<<<<<< HEAD
   - test
   - scan
   - deploy
-=======
-  - test 
-  - deploy 
->>>>>>> origin/main
   - cleanup
 
 variables:
@@ -68,7 +63,6 @@ build backend:
   variables:
     COMPONENT: backend
   script:
-<<<<<<< HEAD
     - |
       docker buildx create --use --name backend-builder-$CI_JOB_ID --driver docker-container
       docker buildx build -f $COMPONENT/Dockerfile \
@@ -83,27 +77,6 @@ build backend:
 build utils:
   <<: *docker-build
   rules: *always-rule
-=======
-    - docker buildx build -t ${CI_REGISTRY_IMAGE}/python-utils:latest --push --file scripts/python-Dockerfile .
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-    - if: $CI_COMMIT_REF_NAME =~ /\// 
-        
-# Verifys that all the images works correctly by trying to pull all images from the registry
-verify images:
-  stage: test
-  image: docker:29
-  before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-  needs:
-    - job: build frontend
-      artifacts: true 
-    - job: build backend
-      artifacts: true 
-    - job: build python
-      optional: true
->>>>>>> origin/main
   script:
     - docker buildx build -t $CI_REGISTRY_IMAGE/utils:latest --push -f scripts/Dockerfile-utils .
 
@@ -113,11 +86,7 @@ deploy development:
   image: $CI_REGISTRY_IMAGE/utils:latest
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-<<<<<<< HEAD
     url: https://$FRONTEND_HOST
-=======
-    url: https://$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
->>>>>>> origin/main
     on_stop: stop_review
   script:
     - ./scripts/deploy-k8s.sh
@@ -131,17 +100,12 @@ deploy production:
   image: $CI_REGISTRY_IMAGE/utils:latest
   environment:
     name: production
-<<<<<<< HEAD
     url: https://litterhero.cc.k3s.chas-lab.dev
-=======
-    url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-production.doe25.swarm.chas-lab.dev
->>>>>>> origin/main
   script:
     - ./scripts/deploy-k8s.sh
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
-<<<<<<< HEAD
 .scan-image: &scan-image
   stage: scan
   image:
@@ -202,20 +166,4 @@ stop_review:
     - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
       when: manual
     - if: $CI_COMMIT_REF_NAME =~ /\//
-=======
-#Removes the environment manually when MR is done 
-stop_review:
-  stage: cleanup
-  image: ${CI_REGISTRY_IMAGE}/python-utils:latest
-  environment:
-    name: review/$CI_COMMIT_REF_SLUG
-    action: stop 
-  script:
-    - cd scripts
-    - python3 delete-stack.py 
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $DEVELOPMENT_BRANCH
-      when: manual 
-    - if: $CI_COMMIT_REF_NAME =~ /\// 
->>>>>>> origin/main
       when: manual

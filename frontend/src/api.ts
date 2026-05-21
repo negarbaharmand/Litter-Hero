@@ -1,5 +1,4 @@
 
-<<<<<<< HEAD
 // In production, nginx proxies /api/* to the backend, so an empty base is correct.
 // VITE_API_URL can be set to override (e.g. http://localhost:3000 for local dev without the proxy).
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? '';
@@ -45,13 +44,6 @@ export type User = {
 import type { LeaderboardData, LeaderboardEntry } from './components/Leaderboard/LeaderboardTypes';
 // 2. Export functions that use that URL
 export const fetchReports = async (): Promise<Report[]> => {
-=======
-// 1. Grab the URL once at the top of the file
-const API_BASE_URL = import.meta.env.VITE_API_URL;
-
-// 2. Export functions that use that URL
-export const fetchReports = async () => {
->>>>>>> origin/main
   const response = await fetch(`${API_BASE_URL}/api/reports`);
   if (!response.ok) {
     throw new Error('Network response was not ok');
@@ -59,7 +51,6 @@ export const fetchReports = async () => {
   return response.json();
 };
 
-<<<<<<< HEAD
 export type PaginatedUsers = {
   users: User[];
   page: number;
@@ -248,13 +239,3 @@ export const createReport = async (newReport: CreateReportPayload): Promise<Repo
 
   return response.json();
 };
-=======
-export const fetchUsers = async () => {
-  const response = await fetch(`${API_BASE_URL}/api/users`);
-  return response.json();
-};
-export const fetchLeaderboard = async (_timePeriod: 'allTime' | 'monthly' | 'weekly') => {
-
-  throw new Error('Backend endpoint not yet implemented');
-};
->>>>>>> origin/main

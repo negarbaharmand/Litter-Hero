@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 //Det här en komponent för att visa en poängkort
-=======
-//Det här en komponent för att visa en poängkort, som kan användas för att visa användarens totala poäng och veckovisa poängökning
->>>>>>> origin/main
 interface PointsCardProps {
   totalPoints: number
   weeklyPoints: number
@@ -10,7 +6,6 @@ interface PointsCardProps {
 
 const PointsCard = ({ totalPoints, weeklyPoints }: PointsCardProps) => {
   return (
-<<<<<<< HEAD
     <div className="mx-4 mt-6">
       <h3 className="mb-3!" > Your Impact</h3>
       <div className="card">
@@ -42,14 +37,6 @@ const PointsCard = ({ totalPoints, weeklyPoints }: PointsCardProps) => {
             <span className="text-body-sm text-text-muted">This week</span>
           </div>
         </div>
-=======
-    <div className="bg-surface rounded-2xl p-6 mx-4 text-center">
-      <span className="text-muted text-sm">Total points</span>
-      <p className="text-white text-5xl font-bold my-2">{totalPoints}</p>
-      <div className="flex items-center justify-center gap-1 text-primary text-sm">
-        <span>↗</span>
-        <span>+{weeklyPoints} This week</span>
->>>>>>> origin/main
       </div>
     </div>
   )

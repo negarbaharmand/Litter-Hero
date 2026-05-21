@@ -7,7 +7,6 @@ COPY drizzle*.config.ts .
 RUN npm install
 COPY . . 
 CMD ["npm", "run", "dev"]
-<<<<<<< HEAD
 
 #Everything below here is used for our Gitlab CI + prod
 FROM node:22-alpine AS builder
@@ -29,5 +28,3 @@ COPY --chown=node:node drizzle ./drizzle
 USER node
 EXPOSE 3000
 CMD ["node", "dist/index.js"]
-=======
->>>>>>> origin/main

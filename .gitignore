@@ -154,10 +154,7 @@ Thumbs.db
 Desktop.ini
 backend/dist/
 frontend/dist/
-<<<<<<< HEAD
 
 .vscode/
 .vscode
 pub-cert.pem
-=======
->>>>>>> origin/main
