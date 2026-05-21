@@ -350,8 +350,7 @@ export function LoginPage() {
     setIsLoading(true)
     try {
       const result = await googleSignIn(credentialResponse.credential)
-      localStorage.setItem('token', result.token)
-      localStorage.setItem('user', JSON.stringify(result.user))
+      setUser(result.user, result.token)
       navigate('/')
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Something went wrong')
