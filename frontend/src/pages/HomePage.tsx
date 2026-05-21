@@ -1,11 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import ReportMap from '../components/Map/ReportMap';
 import { fetchReports } from '../api';
 
+function getInitialTheme(): 'light' | 'dark' {
+	const saved = localStorage.getItem('theme');
+	const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches;
+	const next: 'light' | 'dark' =
+		saved === 'dark' || saved === 'light' ? (saved as 'light' | 'dark') : prefersDark ? 'dark' : 'light';
+	document.documentElement.dataset.theme = next;
+	return next;
+}
+
 export function HomePage() {
 	const [position, setPosition] = useState<[number, number]>([59.3293, 18.0686]);
-	const [theme, setTheme] = useState<'light' | 'dark'>('light');
+	const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
 	const { data: reports = [] } = useQuery({
 		queryKey: ['reports'],
 		queryFn: fetchReports,
@@ -13,16 +22,6 @@ export function HomePage() {
 	const mapReports = reports.filter(
         (report) => report.latitude !== null && report.longitude !== null
     );
-
-	useEffect(() => {
-		const saved = localStorage.getItem('theme');
-		const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches;
-		const next: 'light' | 'dark' =
-			saved === 'dark' || saved === 'light' ? (saved as 'light' | 'dark') : prefersDark ? 'dark' : 'light';
-
-		setTheme(next);
-		document.documentElement.dataset.theme = next;
-	}, []);
 
 	function toggleTheme() {
 		const next = theme === 'dark' ? 'light' : 'dark';

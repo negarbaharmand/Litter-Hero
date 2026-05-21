@@ -3,7 +3,7 @@ import { useForm } from '@tanstack/react-form'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { loginUser, registerUser, googleSignIn } from '../api'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../hooks/useAuth'
 
 //divider component to separate sections of the login page, with "or" text in the middle
 const Divider = () => (

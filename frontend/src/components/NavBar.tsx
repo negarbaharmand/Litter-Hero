@@ -6,7 +6,7 @@ import ranksIcon from "../assets/ranks.svg";
 import profileIcon from "../assets/profile.svg";
 import { AuthGateModal } from "./AuthGateModal";
 import { useAuthGate } from "../hooks/useAuthGate";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 export function NavBar() {
     const navigate = useNavigate();
