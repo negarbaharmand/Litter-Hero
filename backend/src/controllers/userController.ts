@@ -3,6 +3,7 @@ import { db } from '../db/index.js';
 import { cleanupSubmissions, cleanupSubmissionVotes, reports, users } from '../db/schema.js';
 import { publicUserColumns } from '../db/userPublicColumns.js';
 import { count, desc, eq, gte, and } from 'drizzle-orm';
+import { calculateWeeklyPoints } from './reportWorkflow.js';
 
 export const listUsers = async (req: Request, res: Response) => {
   try {
@@ -86,8 +87,10 @@ export const getMe = async (req: Request, res: Response) => {
       .from(cleanupSubmissionVotes)
       .where(eq(cleanupSubmissionVotes.userId, userId));
 
-    const weeklyPoints =
-      (weeklyReportsCount?.count ?? 0) * 10 + (weeklyApprovedCleanupsCount?.count ?? 0) * 20;
+    const weeklyPoints = calculateWeeklyPoints({
+      weeklyReportsCreated: weeklyReportsCount?.count ?? 0,
+      weeklyApprovedCleanups: weeklyApprovedCleanupsCount?.count ?? 0,
+    });
 
     const { password: _, ...userWithoutPassword } = user;
 

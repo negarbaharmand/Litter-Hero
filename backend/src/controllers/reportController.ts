@@ -2,9 +2,13 @@ import type { Request, Response } from 'express';
 import { db } from '../db/index.js';
 import { and, eq, ne, sql } from 'drizzle-orm';
 import { cleanupSubmissions, cleanupSubmissionVotes, reports, users } from '../db/schema.js';
+import {
+  CLEANUP_POINTS,
+  CLEANUP_VOTE_THRESHOLD,
+  resolveCleanupFromVotes,
+  summarizeVotes,
+} from './reportWorkflow.js';
 
-const CLEANUP_VOTE_THRESHOLD = 3;
-const CLEANUP_POINTS = 20;
 const REPORT_STATUSES = new Set([
   'pending',
   'verified',
@@ -362,9 +366,8 @@ export const voteOnCleanupSubmission = async (req: Request, res: Response) => {
         .from(cleanupSubmissionVotes)
         .where(eq(cleanupSubmissionVotes.submissionId, submissionId));
 
-      const cleanVotes = votes.filter((v) => v.vote === 'clean').length;
-      const notCleanVotes = votes.filter((v) => v.vote === 'not_clean').length;
-      const totalVotes = votes.length;
+      const voteSummary = summarizeVotes(votes.map((v) => v.vote));
+      const { cleanVotes, notCleanVotes, totalVotes } = voteSummary;
 
       if (totalVotes < CLEANUP_VOTE_THRESHOLD) {
         return {
@@ -379,7 +382,18 @@ export const voteOnCleanupSubmission = async (req: Request, res: Response) => {
       }
 
       const now = new Date();
-      const finalStatus = cleanVotes > notCleanVotes ? 'approved' : 'rejected';
+      const finalStatus = resolveCleanupFromVotes(votes.map((v) => v.vote));
+      if (finalStatus === 'pending') {
+        return {
+          type: 'pending',
+          voteSummary: {
+            totalVotes,
+            cleanVotes,
+            notCleanVotes,
+            myVote: vote,
+          },
+        } as const;
+      }
 
       const [resolvedSubmission] = await tx
         .update(cleanupSubmissions)
