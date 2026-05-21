@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { db } from '../db/index.js';
-import { users, reports } from '../db/schema.js';
+import { cleanupSubmissions, cleanupSubmissionVotes, reports, users } from '../db/schema.js';
 import { publicUserColumns } from '../db/userPublicColumns.js';
 import { count, desc, eq, gte, and } from 'drizzle-orm';
 
@@ -47,30 +47,67 @@ export const getMe = async (req: Request, res: Response) => {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-    const weeklyReports = await db
-      .select()
+    const [weeklyReportsCount] = await db
+      .select({ count: count() })
       .from(reports)
       .where(and(
         eq(reports.userId, userId),
         gte(reports.createdAt, oneWeekAgo)
       ));
 
-    const weeklyPoints = weeklyReports.length * 10;
+    const [weeklyApprovedCleanupsCount] = await db
+      .select({ count: count() })
+      .from(cleanupSubmissions)
+      .where(
+        and(
+          eq(cleanupSubmissions.userId, userId),
+          eq(cleanupSubmissions.status, 'approved'),
+          gte(cleanupSubmissions.resolvedAt, oneWeekAgo)
+        )
+      );
+
+    const [reportsCreatedCount] = await db
+      .select({ count: count() })
+      .from(reports)
+      .where(eq(reports.userId, userId));
+
+    const [cleanupsApprovedCount] = await db
+      .select({ count: count() })
+      .from(cleanupSubmissions)
+      .where(
+        and(
+          eq(cleanupSubmissions.userId, userId),
+          eq(cleanupSubmissions.status, 'approved')
+        )
+      );
+
+    const [verificationVotesCount] = await db
+      .select({ count: count() })
+      .from(cleanupSubmissionVotes)
+      .where(eq(cleanupSubmissionVotes.userId, userId));
+
+    const weeklyPoints =
+      (weeklyReportsCount?.count ?? 0) * 10 + (weeklyApprovedCleanupsCount?.count ?? 0) * 20;
 
     const { password: _, ...userWithoutPassword } = user;
 
     const badges: string[] = [];
-    const reportCount = (user.points ?? 0) / 10;
+    const reportCount = reportsCreatedCount?.count ?? 0;
+    const cleanupCount = cleanupsApprovedCount?.count ?? 0;
 
     if (reportCount >= 1) badges.push('First Report');
-    if (reportCount >= 5) badges.push('5 Cleanups');
-    if (reportCount >= 10) badges.push('10 Cleanups');
-    if (reportCount >= 50) badges.push('50 Cleanups');
+    if (cleanupCount >= 1) badges.push('First Cleanup');
+    if (cleanupCount >= 5) badges.push('5 Cleanups');
+    if (cleanupCount >= 10) badges.push('10 Cleanups');
+    if (cleanupCount >= 50) badges.push('50 Cleanups');
 
     return res.json({
       ...userWithoutPassword,
       weeklyPoints,
       badges,
+      reportsCreated: reportsCreatedCount?.count ?? 0,
+      cleanupsApproved: cleanupsApprovedCount?.count ?? 0,
+      verificationVotes: verificationVotesCount?.count ?? 0,
     });
   } catch (error) {
     console.error('Error fetching me:', error);
@@ -121,11 +158,42 @@ export const getLeaderboard = async (req: Request, res: Response) => {
     const rawLimit = typeof req.query.limit === 'string' ? Number(req.query.limit) : 10;
     const limit = rawLimit === 20 ? 20 : 10;
 
-    const leaderboard = await db
+    const leaderboardBase = await db
       .select(publicUserColumns)
       .from(users)
       .orderBy(desc(users.points))
       .limit(limit);
+
+    const leaderboard = await Promise.all(
+      leaderboardBase.map(async (user) => {
+        const [reportsCreatedCount] = await db
+          .select({ count: count() })
+          .from(reports)
+          .where(eq(reports.userId, user.id));
+
+        const [cleanupsApprovedCount] = await db
+          .select({ count: count() })
+          .from(cleanupSubmissions)
+          .where(
+            and(
+              eq(cleanupSubmissions.userId, user.id),
+              eq(cleanupSubmissions.status, 'approved')
+            )
+          );
+
+        const [verificationVotesCount] = await db
+          .select({ count: count() })
+          .from(cleanupSubmissionVotes)
+          .where(eq(cleanupSubmissionVotes.userId, user.id));
+
+        return {
+          ...user,
+          reportsCreated: reportsCreatedCount?.count ?? 0,
+          cleanupsApproved: cleanupsApprovedCount?.count ?? 0,
+          verificationVotes: verificationVotesCount?.count ?? 0,
+        };
+      })
+    );
 
     return res.json(leaderboard);
   } catch (error) {

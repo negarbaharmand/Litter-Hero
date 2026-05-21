@@ -68,6 +68,12 @@ export type User = {
   createdAt: string;
 };
 
+export type LeaderboardUser = User & {
+  reportsCreated: number;
+  cleanupsApproved: number;
+  verificationVotes: number;
+};
+
 import type { LeaderboardData, LeaderboardEntry } from './components/Leaderboard/LeaderboardTypes';
 // 2. Export functions that use that URL
 export const fetchReports = async (status?: ReportStatusFilter): Promise<Report[]> => {
@@ -133,18 +139,19 @@ export const fetchLeaderboard = async (timePeriod: 'allTime' | 'monthly' | 'week
     throw new Error(message);
   }
   
-  const users = await response.json();
+  const users = (await response.json()) as LeaderboardUser[];
   
   // Transform backend response to LeaderboardData format
-  const entries: LeaderboardEntry[] = users.map((user: User, index: number) => ({
+  const entries: LeaderboardEntry[] = users.map((user: LeaderboardUser, index: number) => ({
     id: user.id,
     username: user.username || `User${user.id}`,
     email: user.email,
     points: user.points,
     rank: index + 1,
     profilePictureUrl: null,
-    reportsSubmitted: 0, //placeholder, in case we want to add this to the backend later 
-    reportsResolved: 0, //same as above
+    reportsSubmitted: user.reportsCreated,
+    reportsResolved: user.cleanupsApproved,
+    verificationVotes: user.verificationVotes,
     createdAt: user.createdAt,
   }));
   
@@ -171,6 +178,9 @@ export type MeUser = AuthUser & {
   username: string | null
   weeklyPoints: number
   badges: string[]
+  reportsCreated: number
+  cleanupsApproved: number
+  verificationVotes: number
 }
 
 export type AuthResponse = {
