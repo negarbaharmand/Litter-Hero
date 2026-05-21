@@ -69,7 +69,7 @@ export default function ReportMap({
               <MarkerPopup
                 lat={report.latitude}
                 lng={report.longitude}
-                title={`Rapport #${report.id}`}
+                title="Trash report"
                 description={report.description || 'Ingen beskrivning tillgänglig'}
                 size={report.size || 'Okänd storlek'}
                 reportId={report.id}
