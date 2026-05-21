@@ -47,6 +47,8 @@ export type ReportDetails = Report & {
   winningSubmission: CleanupSubmission | null;
 };
 
+export type ReportStatusFilter = 'pending' | 'verified' | 'disputed' | 'cleaned' | 'rejected' | 'open' | 'cleanup_pending_vote';
+
 export type CreateReportPayload = {
   location: string;
   description: string;
@@ -68,8 +70,9 @@ export type User = {
 
 import type { LeaderboardData, LeaderboardEntry } from './components/Leaderboard/LeaderboardTypes';
 // 2. Export functions that use that URL
-export const fetchReports = async (): Promise<Report[]> => {
-  const response = await fetch(`${API_BASE_URL}/api/reports`);
+export const fetchReports = async (status?: ReportStatusFilter): Promise<Report[]> => {
+  const query = status ? `?status=${encodeURIComponent(status)}` : '';
+  const response = await fetch(`${API_BASE_URL}/api/reports${query}`);
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }

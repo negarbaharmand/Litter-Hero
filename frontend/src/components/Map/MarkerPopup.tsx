@@ -1,5 +1,7 @@
 import { Popup } from 'react-leaflet';
 import { Link } from 'react-router-dom';
+import type { Report } from '../../api';
+import { getStatusPresentation } from '../../utils/reportStatus';
 
 type MarkerPopupProps = {
 	lat: number;
@@ -8,6 +10,7 @@ type MarkerPopupProps = {
 	description?: string | null;
 	size?: string | null;
 	reportId?: number;
+	status?: Report['status'];
 };
 
 export default function MarkerPopup({
@@ -17,11 +20,19 @@ export default function MarkerPopup({
 	description,
 	size,
 	reportId,
+	status,
 }: MarkerPopupProps) {
 	return (
 		<Popup>
 			<div className="min-w-44 text-sm text-slate-800">
 				<p className="font-semibold">{title}</p>
+				{status && (
+					<span
+						className={`mt-2 inline-block rounded-full px-2 py-1 text-[11px] font-semibold ${getStatusPresentation(status).className}`}
+					>
+						{getStatusPresentation(status).label}
+					</span>
+				)}
 				<p className="mt-1 text-slate-600">
 					{description && description.trim().length > 0 ? description : 'No description'}
 				</p>
