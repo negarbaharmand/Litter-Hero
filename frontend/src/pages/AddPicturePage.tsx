@@ -43,6 +43,7 @@ export function AddPicturePage() {
 	const [isLocating, setIsLocating] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [submitError, setSubmitError] = useState<string | null>(null)
+	const [submitSuccess, setSubmitSuccess] = useState(false)
 	const [showSizeInfo, setShowSizeInfo] = useState(false)
 
 	useEffect(() => {
@@ -93,8 +94,16 @@ export function AddPicturePage() {
 	}
 
 	async function submitReport() {
-		if (!location.trim()) {
-			setSubmitError('Please provide a location.')
+		if (!capturedImage) {
+			setSubmitError('Please add a photo before submitting.')
+			return
+		}
+		if (
+			!location.trim() ||
+			location === 'Could not detect location' ||
+			location === 'Geolocation not supported'
+		) {
+			setSubmitError('Please provide a valid location.')
 			return
 		}
 
@@ -113,7 +122,7 @@ export function AddPicturePage() {
 				size: size.toLowerCase(),
 			})
 			refreshUser()
-			navigate('/reports')
+			setSubmitSuccess(true)
 		} catch {
 			setSubmitError('Failed to submit report. Please try again.')
 		} finally {
@@ -136,6 +145,40 @@ export function AddPicturePage() {
 
 	return (
 		<div className="min-h-screen pb-36" style={{ backgroundColor: '#EEFCF3' }}>
+
+			{/* Success modal */}
+			{submitSuccess && (
+				<div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
+					<div className="card mx-4 text-center p-8 relative">
+						{/* Kryss */}
+						<button
+							onClick={() => navigate('/reports')}
+							className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center"
+							style={{ backgroundColor: 'var(--color-page-bg)' }}
+							aria-label="Close"
+						>
+							<svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+								<path d="M11 3L3 11M3 3l8 8" />
+							</svg>
+						</button>
+
+						<p className="text-4xl mb-4!">✅</p>
+						<h3 style={{ color: 'var(--color-green-dark)', marginBottom: '0.5rem' }}>
+							Report submitted!
+						</h3>
+						<p className="text-body-sm mb-6!" style={{ color: 'var(--color-text-muted)' }}>
+							+10 points earned 🎉
+						</p>
+						<button
+							onClick={() => navigate('/reports')}
+							className="btn-primary w-full"
+						>
+							View reports
+						</button>
+					</div>
+				</div>
+			)}
+
 			<div className="max-w-lg mx-auto px-4 pt-6">
 
 				{/* Page title */}
@@ -171,7 +214,6 @@ export function AddPicturePage() {
 								Take photo or upload image
 							</p>
 							<div className="flex items-center gap-4">
-								{/* Camera button — filled green circle, 48×48 */}
 								<button
 									onClick={() => setShowCamera(true)}
 									aria-label="Open camera"
@@ -184,7 +226,6 @@ export function AddPicturePage() {
 									</svg>
 								</button>
 
-								{/* Upload from gallery button — outline style, 32×32 */}
 								<button
 									onClick={() => fileInputRef.current?.click()}
 									aria-label="Upload from gallery"
@@ -248,7 +289,6 @@ export function AddPicturePage() {
 							</button>
 						))}
 
-						{/* Show more / less toggle */}
 						<button
 							onClick={() => setShowAllCategories((v) => !v)}
 							aria-label={showAllCategories ? 'Show fewer categories' : 'Show more categories'}
@@ -382,7 +422,7 @@ export function AddPicturePage() {
 				aria-hidden="true"
 			/>
 
-			{/* Floating submit button — sits above the bottom navbar */}
+			{/* Floating submit button */}
 			<div className="fixed bottom-3 left-0 right-0 flex justify-center z-40 pointer-events-none">
 				<button
 					onClick={handleSubmit}
