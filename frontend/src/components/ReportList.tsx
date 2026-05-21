@@ -8,6 +8,8 @@ import { getStatusPresentation, STATUS_FILTER_OPTIONS, type ReportStatusFilter }
 
 export function ReportList() {
   const [statusFilter, setStatusFilter] = useState<ReportStatusFilter>('all')
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null)
+  const [previewImageAlt, setPreviewImageAlt] = useState<string>('Report image')
   const { data, isLoading, isError, error } = useQuery<Report[]>({
     queryKey: ['reports', statusFilter],
     queryFn: () => fetchReports(statusFilter === 'all' ? undefined : statusFilter),
@@ -55,11 +57,25 @@ export function ReportList() {
             className="block rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md overflow-hidden"
           >
             {report.imageUrl && (
-              <img
-                src={report.imageUrl}
-                alt="Report"
-                className="w-full h-48 object-cover"
-              />
+              <div className="w-full bg-slate-100 p-3">
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    setPreviewImageUrl(report.imageUrl)
+                    setPreviewImageAlt(report.description?.trim() || 'Report image')
+                  }}
+                  className="mx-auto block w-full max-w-[320px] overflow-hidden rounded-xl"
+                  aria-label="Open report image preview"
+                >
+                  <img
+                    src={report.imageUrl}
+                    alt={report.description?.trim() || 'Report image'}
+                    className="aspect-square w-full object-cover transition-transform duration-200 hover:scale-[1.02]"
+                  />
+                </button>
+              </div>
             )}
             <div className="p-4">
               <span
@@ -81,6 +97,30 @@ export function ReportList() {
           </Link>
         ))}
       </div>
+
+      {previewImageUrl && (
+        <div
+          className="fixed inset-0 z-[3500] flex items-center justify-center bg-black/75 p-4"
+          onClick={() => setPreviewImageUrl(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="relative w-full max-w-3xl overflow-hidden rounded-2xl bg-black"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setPreviewImageUrl(null)}
+              className="absolute right-3 top-3 z-10 rounded-full bg-black/60 px-3 py-1 text-sm font-semibold text-white"
+              aria-label="Close image preview"
+            >
+              Close
+            </button>
+            <img src={previewImageUrl} alt={previewImageAlt} className="max-h-[85vh] w-full object-contain" />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
