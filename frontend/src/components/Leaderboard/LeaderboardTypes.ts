@@ -8,6 +8,7 @@ export type LeaderboardEntry = {
   rank: number;
   reportsSubmitted: number;
   reportsResolved: number;
+  verificationVotes: number;
   createdAt: string;
 };
 

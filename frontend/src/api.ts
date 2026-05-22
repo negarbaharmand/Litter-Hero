@@ -18,11 +18,48 @@ export type Report = {
   longitude: number | null;
   description: string | null;
   size: string | null;
-  status: 'pending' | 'verified' | 'disputed' | 'cleaned' | 'rejected' ;
-  rejectionReason: string | null; 
   imageUrl: string | null;
+  status: 'pending' | 'verified' | 'disputed' | 'cleaned' | 'rejected' | 'open' | 'cleanup_pending_vote';
+  rejectionReason: string | null;
+  cleanedByUserId: number | null;
+  cleanedAt: string | null;
   createdAt: string;
 };
+
+export type CleanupSubmission = {
+  id: number;
+  reportId: number;
+  userId: number;
+  imageUrl: string;
+  note: string | null;
+  status: 'pending' | 'approved' | 'rejected' | 'expired';
+  createdAt: string | null;
+  resolvedAt: string | null;
+};
+
+export type VoteSummary = {
+  totalVotes: number;
+  cleanVotes: number;
+  notCleanVotes: number;
+  myVote: 'clean' | 'not_clean' | null;
+};
+
+export type CleanupSubmissionWithVotes = CleanupSubmission & {
+  voteSummary: VoteSummary;
+};
+
+export type ReportDetails = Report & {
+  winningSubmission: CleanupSubmission | null;
+  cleanupSubmissions: CleanupSubmissionWithVotes[];
+};
+
+export type VoteOnCleanupResponse = {
+  status: 'pending' | 'approved' | 'rejected';
+  submission?: CleanupSubmission;
+  voteSummary: VoteSummary;
+};
+
+export type ReportStatusFilter = 'pending' | 'verified' | 'disputed' | 'cleaned' | 'rejected' | 'open' | 'cleanup_pending_vote';
 
 export type CreateReportPayload = {
   location: string;
@@ -44,12 +81,28 @@ export type User = {
   createdAt: string;
 };
 
+export type LeaderboardUser = User & {
+  reportsCreated: number;
+  cleanupsApproved: number;
+  verificationVotes: number;
+};
+
 import type { LeaderboardData, LeaderboardEntry } from './components/Leaderboard/LeaderboardTypes';
 // 2. Export functions that use that URL
-export const fetchReports = async (): Promise<Report[]> => {
-  const response = await fetch(`${API_BASE_URL}/api/reports`);
+export const fetchReports = async (status?: ReportStatusFilter): Promise<Report[]> => {
+  const query = status ? `?status=${encodeURIComponent(status)}` : '';
+  const response = await fetch(`${API_BASE_URL}/api/reports${query}`);
   if (!response.ok) {
     throw new Error('Network response was not ok');
+  }
+  return response.json();
+};
+
+export const fetchReportById = async (reportId: number): Promise<ReportDetails> => {
+  const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}`);
+  if (!response.ok) {
+    if (response.status === 404) throw new Error('Report not found');
+    throw new Error('Failed to fetch report details');
   }
   return response.json();
 };
@@ -99,18 +152,19 @@ export const fetchLeaderboard = async (timePeriod: 'allTime' | 'monthly' | 'week
     throw new Error(message);
   }
   
-  const users = await response.json();
+  const users = (await response.json()) as LeaderboardUser[];
   
   // Transform backend response to LeaderboardData format
-  const entries: LeaderboardEntry[] = users.map((user: User, index: number) => ({
+  const entries: LeaderboardEntry[] = users.map((user: LeaderboardUser, index: number) => ({
     id: user.id,
     username: user.username || `User${user.id}`,
     email: user.email,
     points: user.points,
     rank: index + 1,
     profilePictureUrl: null,
-    reportsSubmitted: 0, //placeholder, in case we want to add this to the backend later 
-    reportsResolved: 0, //same as above
+    reportsSubmitted: user.reportsCreated,
+    reportsResolved: user.cleanupsApproved,
+    verificationVotes: user.verificationVotes,
     createdAt: user.createdAt,
   }));
   
@@ -137,6 +191,9 @@ export type MeUser = AuthUser & {
   username: string | null
   weeklyPoints: number
   badges: string[]
+  reportsCreated: number
+  cleanupsApproved: number
+  verificationVotes: number
 }
 
 export type AuthResponse = {
@@ -242,4 +299,64 @@ export const createReport = async (newReport: CreateReportPayload): Promise<Repo
   }
 
   return response.json();
+};
+
+export const createCleanupSubmission = async (
+  reportId: number,
+  payload: { imageUrl: string; note?: string }
+): Promise<CleanupSubmission & { voteSummary: VoteSummary }> => {
+  const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}/cleanup-submissions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message =
+      typeof data === 'object' &&
+      data &&
+      'error' in data &&
+      typeof (data as { error?: unknown }).error === 'string'
+        ? (data as { error: string }).error
+        : 'Failed to submit cleanup proof';
+    throw new Error(message);
+  }
+
+  return data as CleanupSubmission & { voteSummary: VoteSummary };
+};
+
+export const voteOnCleanupSubmission = async (
+  reportId: number,
+  submissionId: number,
+  vote: 'clean' | 'not_clean'
+): Promise<VoteOnCleanupResponse> => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/reports/${reportId}/cleanup-submissions/${submissionId}/votes`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders(),
+      },
+      body: JSON.stringify({ vote }),
+    }
+  );
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message =
+      typeof data === 'object' &&
+      data &&
+      'error' in data &&
+      typeof (data as { error?: unknown }).error === 'string'
+        ? (data as { error: string }).error
+        : 'Failed to submit vote';
+    throw new Error(message);
+  }
+
+  return data as VoteOnCleanupResponse;
 };

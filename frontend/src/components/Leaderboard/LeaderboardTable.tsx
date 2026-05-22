@@ -40,6 +40,9 @@ export function LeaderboardTable({ entries, sortBy }: LeaderboardTableProps) {
               <div className="text-body-sm font-medium mt-1" style={{ color: 'var(--color-text-primary)' }}>
                 {entry.points} pts
               </div>
+              <div className="mt-2 text-[11px] text-slate-600">
+                {entry.reportsSubmitted} reports · {entry.reportsResolved} cleanups
+              </div>
               <div
                 className="mt-2 inline-block rounded-full px-3 py-1 text-body-xs font-semibold text-white"
                 style={{ backgroundColor: 'var(--color-green-dark)' }}
@@ -60,7 +63,10 @@ export function LeaderboardTable({ entries, sortBy }: LeaderboardTableProps) {
             </div>
             <ProfilePicture username={entry.username} profilePictureUrl={entry.profilePictureUrl} />
             <div className="flex-1 text-body-lg" style={{ color: 'var(--color-text-primary)' }}>
-              {entry.username}
+              <div>{entry.username}</div>
+              <div className="text-xs text-slate-600">
+                {entry.reportsSubmitted} reports · {entry.reportsResolved} cleanups
+              </div>
             </div>
             <div className="font-bold" style={{ color: 'var(--color-text-primary)' }}>
               {entry.points} pts
