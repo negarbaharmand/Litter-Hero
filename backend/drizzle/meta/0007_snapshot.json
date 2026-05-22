@@ -1,6 +1,6 @@
 {
-  "id": "6692e2c5-b78a-4b7f-bce5-781851b721d3",
-  "prevId": "f2f73418-f9be-4675-af07-2bad798a1369",
+  "id": "ba3c1f2f-f17d-4aea-af69-298635468d9e",
+  "prevId": "6692e2c5-b78a-4b7f-bce5-781851b721d3",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -260,6 +260,18 @@
         "size": {
           "name": "size",
           "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_size_bytes": {
+          "name": "image_size_bytes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rejection_reason": {
+          "name": "rejection_reason",
+          "type": "varchar(500)",
           "primaryKey": false,
           "notNull": false
         },

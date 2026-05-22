@@ -11,6 +11,7 @@ const allTimeData: LeaderboardEntry[] = [
     rank: 1,
     reportsSubmitted: 12,
     reportsResolved: 8,
+    verificationVotes: 15,
     createdAt: '2025-01-15',
   },
   {
@@ -22,6 +23,7 @@ const allTimeData: LeaderboardEntry[] = [
     rank: 2,
     reportsSubmitted: 10,
     reportsResolved: 7,
+    verificationVotes: 10,
     createdAt: '2025-02-01',
   },
   {
@@ -33,6 +35,7 @@ const allTimeData: LeaderboardEntry[] = [
     rank: 3,
     reportsSubmitted: 9,
     reportsResolved: 5,
+    verificationVotes: 7,
     createdAt: '2025-01-20',
   },
   {
@@ -44,6 +47,7 @@ const allTimeData: LeaderboardEntry[] = [
     rank: 4,
     reportsSubmitted: 8,
     reportsResolved: 4,
+    verificationVotes: 6,
     createdAt: '2025-03-05',
   },
   {
@@ -55,6 +59,7 @@ const allTimeData: LeaderboardEntry[] = [
     rank: 5,
     reportsSubmitted: 6,
     reportsResolved: 3,
+    verificationVotes: 4,
     createdAt: '2025-03-10',
   },
 ];
@@ -70,6 +75,7 @@ const monthlyData: LeaderboardEntry[] = [
     rank: 1,
     reportsSubmitted: 4,
     reportsResolved: 3,
+    verificationVotes: 5,
     createdAt: '2025-02-01',
   },
   {
@@ -81,6 +87,7 @@ const monthlyData: LeaderboardEntry[] = [
     rank: 2,
     reportsSubmitted: 3,
     reportsResolved: 2,
+    verificationVotes: 4,
     createdAt: '2025-01-15',
   },
   {
@@ -92,6 +99,7 @@ const monthlyData: LeaderboardEntry[] = [
     rank: 3,
     reportsSubmitted: 2,
     reportsResolved: 1,
+    verificationVotes: 3,
     createdAt: '2025-03-10',
   },
 ];
@@ -107,6 +115,7 @@ const weeklyData: LeaderboardEntry[] = [
     rank: 1,
     reportsSubmitted: 2,
     reportsResolved: 1,
+    verificationVotes: 2,
     createdAt: '2025-01-20',
   },
   {
@@ -118,6 +127,7 @@ const weeklyData: LeaderboardEntry[] = [
     rank: 2,
     reportsSubmitted: 1,
     reportsResolved: 1,
+    verificationVotes: 1,
     createdAt: '2025-03-05',
   },
 ];
