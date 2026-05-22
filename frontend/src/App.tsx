@@ -7,6 +7,7 @@ import { ReportsPage } from './pages/Reports'
 import UserProfile from './pages/UserProfile'
 import { LoginPage } from './pages/LoginPage'
 import { AddPicturePage } from './pages/AddPicturePage'
+import { ReportDetailPage } from './pages/ReportDetailPage'
 import PrivateRoute from './components/PrivateRoute'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
         <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/reports/:id" element={<ReportDetailPage />} />
         <Route path="/add-picture" element={<AddPicturePage />} />
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<UserProfile />} />

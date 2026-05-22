@@ -44,6 +44,9 @@ const options = {
             role: { type: "string", nullable: true },
             points: { type: "integer", nullable: true },
             createdAt: { type: "string", format: "date-time", nullable: true },
+            reportsCreated: { type: "integer", nullable: true },
+            cleanupsApproved: { type: "integer", nullable: true },
+            verificationVotes: { type: "integer", nullable: true },
           },
           required: ["id", "email"],
         },
@@ -78,11 +81,80 @@ const options = {
             userId: { type: "integer" },
             imageUrl: { type: "string", nullable: true },
             location: { type: "string" },
+            latitude: { type: "number", nullable: true },
+            longitude: { type: "number", nullable: true },
             description: { type: "string", nullable: true },
             size: { type: "string", nullable: true },
+            status: {
+              type: "string",
+              enum: ["pending", "verified", "disputed", "cleaned", "rejected", "open", "cleanup_pending_vote"],
+            },
+            cleanedByUserId: { type: "integer", nullable: true },
+            cleanedAt: { type: "string", format: "date-time", nullable: true },
             createdAt: { type: "string", format: "date-time", nullable: true },
           },
           required: ["id", "userId", "location"],
+        },
+        CleanupSubmission: {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            reportId: { type: "integer" },
+            userId: { type: "integer" },
+            imageUrl: { type: "string" },
+            note: { type: "string", nullable: true },
+            status: { type: "string", enum: ["pending", "approved", "rejected", "expired"] },
+            createdAt: { type: "string", format: "date-time", nullable: true },
+            resolvedAt: { type: "string", format: "date-time", nullable: true },
+          },
+          required: ["id", "reportId", "userId", "imageUrl", "status"],
+        },
+        VoteSummary: {
+          type: "object",
+          properties: {
+            totalVotes: { type: "integer" },
+            cleanVotes: { type: "integer" },
+            notCleanVotes: { type: "integer" },
+            myVote: {
+              type: "string",
+              enum: ["clean", "not_clean"],
+              nullable: true,
+            },
+          },
+          required: ["totalVotes", "cleanVotes", "notCleanVotes", "myVote"],
+        },
+        CleanupSubmissionWithVotes: {
+          allOf: [
+            { $ref: "#/components/schemas/CleanupSubmission" },
+            {
+              type: "object",
+              properties: {
+                voteSummary: { $ref: "#/components/schemas/VoteSummary" },
+              },
+              required: ["voteSummary"],
+            },
+          ],
+        },
+        ReportDetails: {
+          allOf: [
+            { $ref: "#/components/schemas/Report" },
+            {
+              type: "object",
+              properties: {
+                winningSubmission: {
+                  oneOf: [
+                    { $ref: "#/components/schemas/CleanupSubmission" },
+                    { type: "null" },
+                  ],
+                },
+                cleanupSubmissions: {
+                  type: "array",
+                  items: { $ref: "#/components/schemas/CleanupSubmissionWithVotes" },
+                },
+              },
+              required: ["winningSubmission", "cleanupSubmissions"],
+            },
+          ],
         },
         ConfigTestResponse: {
           type: "object",

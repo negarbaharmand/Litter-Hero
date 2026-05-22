@@ -31,7 +31,13 @@ const UserProfile = () => {
   return (
     <PageShell>
       <ProfileHeader username={user?.username} level={12} createdAt={user?.createdAt} />
-      <PointsCard totalPoints={user?.points ?? 0} weeklyPoints={user?.weeklyPoints ?? 0} />
+      <PointsCard
+        totalPoints={user?.points ?? 0}
+        weeklyPoints={user?.weeklyPoints ?? 0}
+        reportsCreated={user?.reportsCreated ?? 0}
+        cleanupsApproved={user?.cleanupsApproved ?? 0}
+        verificationVotes={user?.verificationVotes ?? 0}
+      />
       <BadgeList badges={[
         { id: 0, label: "🔥|3 day streak" }, // TODO: implement streak logic
         ...(user?.badges?.map((label: string, index: number) => ({
