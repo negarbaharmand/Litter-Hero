@@ -24,12 +24,12 @@ export function ReportList() {
       </div>
     )
   }
-
+  const visibleReports = (data ?? []).filter((report) => report.status != 'rejected')
   return (
     <div className="p-1">
       <div className="flex items-center justify-between gap-4">
         <span className="rounded-full bg-emerald-300 px-3 py-1 text-sm text-white">
-          {data?.length ?? 0} reports
+          {visibleReports.length} reports
         </span>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
@@ -50,7 +50,7 @@ export function ReportList() {
       </div>
 
       <div className="mt-6 grid gap-4">
-        {data?.map((report) => (
+        {visibleReports.map((report) => (
           <Link
             key={report.id}
             to={`/reports/${report.id}`}

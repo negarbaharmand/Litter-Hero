@@ -58,7 +58,7 @@ export function ReportDetailPage() {
   const submitCleanupMutation = useMutation({
     mutationFn: async () => {
       if (!proofFile) throw new Error('Please upload a cleanup photo.');
-      const imageUrl = await uploadReportImage(proofFile);
+      const { imageUrl } = await uploadReportImage(proofFile);
       return createCleanupSubmission(reportId, {
         imageUrl,
         note: note.trim() || undefined,

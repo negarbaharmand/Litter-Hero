@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { db } from '../db/index.js';
-import { and, eq, ne, sql } from 'drizzle-orm';
+import { and, eq, gt, ne, sql } from 'drizzle-orm';
 import { cleanupSubmissions, cleanupSubmissionVotes, reports, users } from '../db/schema.js';
 import {
   CLEANUP_VOTE_THRESHOLD,
@@ -50,6 +50,10 @@ async function getVoteSummary(submissionId: number, currentUserId?: number) {
   };
 }
 
+const maxReportsPerHour = Number(process.env.MAX_REPORTS_PER_HOUR ?? 5);
+const minImageBytes = 50 * 1024;
+const duplicateRadiusMeters = 20;
+
 // Get all reports
 export const getAllReports = async (req: Request, res: Response) => {
   try {
@@ -71,6 +75,7 @@ export const getAllReports = async (req: Request, res: Response) => {
         status: reports.status,
         cleanedByUserId: reports.cleanedByUserId,
         cleanedAt: reports.cleanedAt,
+        rejectionReason: reports.rejectionReason,
         createdAt: reports.createdAt,
       })
       .from(reports);
@@ -103,6 +108,7 @@ export const getReportById = async (req: Request, res: Response) => {
         status: reports.status,
         cleanedByUserId: reports.cleanedByUserId,
         cleanedAt: reports.cleanedAt,
+        rejectionReason: reports.rejectionReason,
         createdAt: reports.createdAt,
       })
       .from(reports)
@@ -141,7 +147,8 @@ export const getReportById = async (req: Request, res: Response) => {
 export const createReport = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
-    const { imageUrl, location, description, size, latitude, longitude } = req.body;
+    const { imageUrl, location, description, size, latitude, longitude, imageSizeBytes } =
+      req.body;
 
     const parseNullableReal = (value: unknown): number | null | undefined => {
       if (value === undefined) return undefined;
@@ -166,25 +173,100 @@ export const createReport = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'longitude must be a valid number' });
     }
 
+    const parsedImageSizeBytes =
+      imageSizeBytes === undefined || imageSizeBytes === null || imageSizeBytes === ''
+        ? undefined
+        : Number(imageSizeBytes);
+
+    const validImageSize =
+      parsedImageSizeBytes !== undefined &&
+      Number.isFinite(parsedImageSizeBytes) &&
+      parsedImageSizeBytes >= minImageBytes;
+
+    const gpsValid =
+      parsedLatitude !== null &&
+      parsedLongitude !== null &&
+      parsedLatitude !== undefined &&
+      parsedLongitude !== undefined &&
+      parsedLatitude >= -90 &&
+      parsedLatitude <= 90 &&
+      parsedLongitude >= -180 &&
+      parsedLongitude <= 180;
+
+    const rejectionReasons: string[] = [];
+
+    if (!imageUrl) rejectionReasons.push('No image attached');
+    if (!gpsValid) rejectionReasons.push('GPS location is missing or invalid');
+    if (!validImageSize) rejectionReasons.push('Image file is too small (under 50kb)');
+
+    const [rateRow] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(reports)
+      .where(
+        and(eq(reports.userId, userId), gt(reports.createdAt, sql`now() - interval '1 hour'`))
+      );
+
+    if ((rateRow?.count ?? 0) >= maxReportsPerHour) {
+      rejectionReasons.push('Rate limit exceeded: too many reports this hour');
+    }
+
+    if (gpsValid) {
+      const [duplicate] = await db
+        .select({ id: reports.id })
+        .from(reports)
+        .where(sql`
+      ${reports.latitude} IS NOT NULL
+      AND ${reports.longitude} IS NOT NULL
+      AND ${reports.status} <> 'rejected'
+      AND (
+        6371000 * acos(
+          least(
+            1,
+            greatest(
+              -1,
+              cos(radians(${parsedLatitude})) * cos(radians(${reports.latitude})) *
+              cos(radians(${reports.longitude}) - radians(${parsedLongitude})) +
+              sin(radians(${parsedLatitude})) * sin(radians(${reports.latitude}))
+            )
+          )
+        )
+      ) <= ${duplicateRadiusMeters}
+    `)
+        .limit(1);
+
+      if (duplicate) {
+        rejectionReasons.push(
+          'Duplicate report: same location within 20m already reported'
+        );
+      }
+    }
+
+    const autoRejected = rejectionReasons.length > 0;
+
     const [newReport] = await db
       .insert(reports)
       .values({
         userId,
         imageUrl,
         location,
-      latitude: parsedLatitude,
-      longitude: parsedLongitude,
+        latitude: gpsValid ? parsedLatitude : null,
+        longitude: gpsValid ? parsedLongitude : null,
         description,
         size,
+        imageSizeBytes: parsedImageSizeBytes ?? null,
+        status: autoRejected ? 'rejected' : 'open',
+        rejectionReason: autoRejected ? rejectionReasons.join('; ') : null,
       })
       .returning();
 
-    await db
-      .update(users)
-      .set({
-        points: sql`${users.points} + ${getReportPointsForSize(size)}`,
-      })
-      .where(eq(users.id, userId));
+    if (!autoRejected) {
+      await db
+        .update(users)
+        .set({
+          points: sql`${users.points} + ${getReportPointsForSize(size)}`,
+        })
+        .where(eq(users.id, userId));
+    }
 
     return res.status(201).json(newReport);
   } catch (error) {
