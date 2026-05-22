@@ -100,7 +100,7 @@ deploy production:
   image: $CI_REGISTRY_IMAGE/utils:latest
   environment:
     name: production
-    url: https://litterhero.cc.k3s.chas-lab.dev
+    url: https://$FRONTEND_HOST
   script:
     - ./scripts/deploy-k8s.sh
   rules:
