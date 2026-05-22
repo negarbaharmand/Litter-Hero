@@ -57,6 +57,7 @@ metadata:
   name: backend-${CI_COMMIT_REF_SLUG}
   labels:
     app: backend-${CI_COMMIT_REF_SLUG}
+    component: backend
 spec:
   type: ClusterIP
   selector:

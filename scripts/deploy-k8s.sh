@@ -30,4 +30,6 @@ kubectl apply -n "${NAMESPACE}" -f k8s/70-middleware.yml
 
 envsubst '${CI_COMMIT_REF_SLUG} ${FRONTEND_HOST} ${BACKEND_HOST}' <k8s/80-ingress.yml | kubectl apply -n "${NAMESPACE}" -f -
 
-kubectl apply -n "${NAMESPACE}" -f k8s/90-monitoring.yml
+if [[ "${CI_COMMIT_REF_NAME}" == "${CI_DEFAULT_BRANCH}" ]]; then
+  kubectl apply -n "${NAMESPACE}" -f k8s/90-monitoring.yml
+fi
