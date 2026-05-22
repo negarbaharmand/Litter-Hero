@@ -28,6 +28,23 @@ const googleSchema = z.object({
   idToken: z.string().min(1, 'idToken is required'),
 });
 
+type PgErrorLike = { code?: string; constraint_name?: string };
+
+function getUniqueViolation(error: unknown): PgErrorLike | null {
+  for (const e of [error, (error as { cause?: unknown })?.cause]) {
+    if (e && typeof e === 'object' && (e as PgErrorLike).code === '23505') {
+      return e as PgErrorLike;
+    }
+  }
+  return null;
+}
+
+function duplicateUserMessage(constraint?: string): string {
+  if (constraint === 'users_email_unique') return 'Email is already registered';
+  if (constraint === 'users_username_unique') return 'Username is already taken';
+  return 'Email or username is already in use';
+}
+
 export const register = async (req: Request, res: Response) => {
   const parsed = registerSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -65,6 +82,10 @@ export const register = async (req: Request, res: Response) => {
 
     return res.status(201).json({ token, user });
   } catch (error) {
+    const uniqueViolation = getUniqueViolation(error);
+    if (uniqueViolation) {
+      return res.status(409).json({ error: duplicateUserMessage(uniqueViolation.constraint_name) });
+    }
     console.error('Error registering user:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
@@ -156,6 +177,10 @@ export const googleSignIn = async (req: Request, res: Response) => {
 
     return res.status(200).json({ token, user });
   } catch (error) {
+    const uniqueViolation = getUniqueViolation(error);
+    if (uniqueViolation) {
+      return res.status(409).json({ error: duplicateUserMessage(uniqueViolation.constraint_name) });
+    }
     console.error('Error with Google sign-in:', error);
     return res.status(401).json({ error: 'Invalid Google token' });
   }

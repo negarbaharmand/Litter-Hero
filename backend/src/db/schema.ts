@@ -23,6 +23,8 @@ export const reports = pgTable('reports', {
   longitude: real('longitude'),
   description: varchar('description', { length: 1000 }),
   size: varchar('size', { length: 50 }), // e.g., small, medium, large
+  imageSizeBytes: integer('image_size_bytes'),
+  rejectionReason: varchar('rejection_reason', {length: 500}),
   status: statusEnum('status').default('pending').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
 });
