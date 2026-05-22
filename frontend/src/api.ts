@@ -18,6 +18,8 @@ export type Report = {
   longitude: number | null;
   description: string | null;
   size: string | null;
+  status: 'pending' | 'verified' | 'disputed' | 'cleaned' | 'rejected' ;
+  rejectionReason: string | null; 
   imageUrl: string | null;
   createdAt: string;
 };
@@ -29,6 +31,7 @@ export type CreateReportPayload = {
   imageUrl?: string;
   latitude?: number;
   longitude?: number;
+  imageSizeBytes?:number;
 };
 
 export type User = {
@@ -202,7 +205,7 @@ export const logoutUser = async (): Promise<void> => {
  * Uploads an image file to Garage via the backend and returns the public URL.
  * Requires an authenticated user (JWT token in localStorage).
  */
-export const uploadReportImage = async (file: File): Promise<string> => {
+export const uploadReportImage = async (file: File): Promise<{imageUrl: string; imageSizeBytes: number}> => {
   const formData = new FormData();
   formData.append('image', file);
 
@@ -217,7 +220,7 @@ export const uploadReportImage = async (file: File): Promise<string> => {
     throw new Error(data.error ?? 'Failed to upload image');
   }
 
-  return (data as { imageUrl: string }).imageUrl;
+  return data as { imageUrl: string; imageSizeBytes: number };
 };
 
 // ── Reports ──────────────────────────────────────────────────────────────────
@@ -233,8 +236,9 @@ export const createReport = async (newReport: CreateReportPayload): Promise<Repo
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to create report');
+    const errorData = await response.json().catch(()=> ({}));
+    throw new Error(
+      typeof errorData?.error === 'string' ? errorData.error : 'Failed to create report');
   }
 
   return response.json();
