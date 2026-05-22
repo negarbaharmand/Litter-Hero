@@ -123,6 +123,18 @@ const options = {
           },
           required: ["totalVotes", "cleanVotes", "notCleanVotes", "myVote"],
         },
+        CleanupSubmissionWithVotes: {
+          allOf: [
+            { $ref: "#/components/schemas/CleanupSubmission" },
+            {
+              type: "object",
+              properties: {
+                voteSummary: { $ref: "#/components/schemas/VoteSummary" },
+              },
+              required: ["voteSummary"],
+            },
+          ],
+        },
         ReportDetails: {
           allOf: [
             { $ref: "#/components/schemas/Report" },
@@ -135,8 +147,12 @@ const options = {
                     { type: "null" },
                   ],
                 },
+                cleanupSubmissions: {
+                  type: "array",
+                  items: { $ref: "#/components/schemas/CleanupSubmissionWithVotes" },
+                },
               },
-              required: ["winningSubmission"],
+              required: ["winningSubmission", "cleanupSubmissions"],
             },
           ],
         },

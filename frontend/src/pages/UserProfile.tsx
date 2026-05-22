@@ -36,6 +36,7 @@ const UserProfile = () => {
         weeklyPoints={user?.weeklyPoints ?? 0}
         reportsCreated={user?.reportsCreated ?? 0}
         cleanupsApproved={user?.cleanupsApproved ?? 0}
+        verificationVotes={user?.verificationVotes ?? 0}
       />
       <BadgeList badges={[
         { id: 0, label: "🔥|3 day streak" }, // TODO: implement streak logic
