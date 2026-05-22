@@ -15,7 +15,7 @@ export function ReportList() {
     queryFn: () => fetchReports(statusFilter === 'all' ? undefined : statusFilter),
   })
 
-  if (isLoading) return <div className="p-6 text-slate-600">Loading reports... ⏳</div>
+  if (isLoading) return <div className="p-6" style={{ color: 'var(--color-text-muted)' }}>Loading reports... ⏳</div>
 
   if (isError) {
     return (
@@ -54,7 +54,8 @@ export function ReportList() {
           <Link
             key={report.id}
             to={`/reports/${report.id}`}
-            className="block rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md overflow-hidden"
+            className="block rounded-xl border shadow-sm transition hover:shadow-md overflow-hidden"
+            style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
           >
             {report.imageUrl && (
               <div className="w-full bg-slate-100 p-3">
@@ -85,13 +86,15 @@ export function ReportList() {
               >
                 {getStatusPresentation(report.status).label}
               </span>
-              <p className="font-semibold" style={{ color: '#224A32', fontSize: '21px' }}>
+              <p className="font-semibold" style={{ color: 'var(--color-text-primary)', fontSize: '21px' }}>
                 {report.description ?? 'No description'}
               </p>
-              <p className="font-medium text-slate-900 mt-3">
-                <span className="text-slate-500">Location:</span> {report.location}
+              <p className="font-medium mt-3" style={{ color: 'var(--color-text-body)' }}>
+                <span style={{ color: 'var(--color-text-muted)' }}>Location:</span> {report.location}
               </p>
-              <p className="mt-3 text-sm italic text-slate-500">Size: {report.size ?? 'Unknown'}</p>
+              <p className="mt-3 text-sm italic" style={{ color: 'var(--color-text-muted)' }}>
+                Size: {report.size ?? 'Unknown'}
+              </p>
               <p className="mt-3 text-sm font-medium text-emerald-700">Open details</p>
             </div>
           </Link>
