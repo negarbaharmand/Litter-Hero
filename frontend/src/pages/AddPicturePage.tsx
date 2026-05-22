@@ -51,6 +51,11 @@ export function AddPicturePage() {
 
 	useEffect(() => {
 		detectLocation()
+		return () => {
+			if(popupTimerRef.current){
+				clearTimeout(popupTimerRef.current)
+			}
+		}
 	}, [])
 
 	function detectLocation() {
@@ -109,7 +114,20 @@ export function AddPicturePage() {
 		setSubmitError(null)
 		requireAuth('Create an account to submit a report', submitReport)
 	}
+	
+	const popupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+	function showPopUp(message: string){
+		setSubmitError(message)
+
+		if(popupTimerRef.current){
+			clearTimeout(popupTimerRef.current)
+		}
+		popupTimerRef.current = setTimeout(() => {
+			setSubmitError(null)
+			popupTimerRef.current = null 
+		}, 5000)
+	}
 	async function submitReport() {
 		if (!capturedImage) {
 			setSubmitError('Please add a photo before submitting.')
@@ -133,23 +151,33 @@ export function AddPicturePage() {
 
 		setIsSubmitting(true)
 		try {
-			let imageUrl: string | undefined
+			let uploadResult: {imageUrl: string; imageSizeBytes: number  }| undefined
 			if (imageFile) {
-				imageUrl = await uploadReportImage(imageFile)
+				uploadResult = await uploadReportImage(imageFile)
 			}
 
-			await createReport({
+			const created =await createReport({
 				location: location.trim(),
 				description: fullDescription,
 				size: size.toLowerCase(),
-				imageUrl,
+				imageUrl: uploadResult?.imageUrl,
+				imageSizeBytes: uploadResult?.imageSizeBytes,
 				latitude: latitude ?? undefined,
 				longitude: longitude ?? undefined,
-			})
+			}); 
+			
+			if (created.status === 'rejected'){
+				showPopUp(
+					created.rejectionReason ? 
+					`report was rejected: ${created.rejectionReason}` 
+					: 'report was rejected by automatic verification'
+				)
+				return
+			}
 			refreshUser()
 			setSubmitSuccess(true)
-		} catch {
-			setSubmitError('Failed to submit report. Please try again.')
+		} catch (err){
+			showPopUp(err instanceof Error ? err.message : 'Failed to submit report. Please try again. ')
 		} finally {
 			setIsSubmitting(false)
 		}
@@ -433,8 +461,30 @@ export function AddPicturePage() {
 
 				{/* Error message */}
 				{submitError && (
-					<p className="mt-2 text-sm text-red-500 text-center">{submitError}</p>
-				)}
+				<div className="fixed top-5 right-5 z-50 max-w-sm w-[calc(100%-2rem)] rounded-xl border border-red-300 bg-red-50 text-red-900 shadow-lg">
+					<div className="flex items-start gap-3 p-4">
+						<div className="flex-1 text-sm leading-5">
+							<strong className="block mb-1">Report rejected</strong>
+							<span>{submitError}</span>
+						</div>
+
+						<button
+							onClick={() => {
+								setSubmitError(null)
+
+								if (popupTimerRef.current) {
+									clearTimeout(popupTimerRef.current)
+									popupTimerRef.current = null
+								}
+							}}
+							aria-label="Close notification"
+							className="shrink-0 rounded-md px-2 py-1 text-red-700 hover:bg-red-100"
+						>
+							x
+						</button>
+					</div>
+				</div>
+)}
 			</div>
 
 			{/* Hidden file input */}
