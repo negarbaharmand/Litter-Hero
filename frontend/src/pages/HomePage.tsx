@@ -18,9 +18,13 @@ export function HomePage() {
 	const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
 	const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
 	const [statusFilter, setStatusFilter] = useState<ReportStatusFilter>('all');
+	const [needsVotesOnly, setNeedsVotesOnly] = useState(false);
+
+	const effectiveFilter: ReportStatusFilter = needsVotesOnly ? 'cleanup_pending_vote' : statusFilter;
+
 	const { data: reports = [] } = useQuery({
-		queryKey: ['reports', statusFilter],
-		queryFn: () => fetchReports(statusFilter === 'all' ? undefined : statusFilter),
+		queryKey: ['reports', effectiveFilter],
+		queryFn: () => fetchReports(effectiveFilter === 'all' ? undefined : effectiveFilter),
 	});
 	const mapReports = reports.filter(
         (report) => report.latitude !== null && report.longitude !== null
@@ -60,22 +64,36 @@ export function HomePage() {
 					theme={theme} 
 				/>
 			</div>
-			<div className="fixed left-3 top-4 z-2000 flex max-w-[90vw] flex-wrap gap-2 rounded-xl bg-white/90 p-2 shadow">
+		<div className="fixed left-3 top-4 z-2000 flex max-w-[90vw] flex-col gap-2 md:top-24">
+			<div className="flex flex-wrap gap-2 rounded-xl bg-white/90 p-2 shadow">
 				{STATUS_FILTER_OPTIONS.map((option) => (
 					<button
 						key={option.value}
 						type="button"
-						onClick={() => setStatusFilter(option.value)}
+						onClick={() => { setStatusFilter(option.value); setNeedsVotesOnly(false); }}
+						disabled={needsVotesOnly}
 						className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-							statusFilter === option.value
+							!needsVotesOnly && statusFilter === option.value
 								? 'bg-emerald-600 text-white'
-								: 'bg-white text-slate-700 border border-slate-200'
+								: 'bg-white text-slate-700 border border-slate-200 disabled:opacity-40'
 						}`}
 					>
 						{option.label}
 					</button>
 				))}
 			</div>
+			<button
+				type="button"
+				onClick={() => setNeedsVotesOnly((prev) => !prev)}
+				className={`self-start rounded-full px-3 py-1 text-xs font-semibold shadow transition ${
+					needsVotesOnly
+						? 'bg-amber-500 text-white'
+						: 'bg-white/90 text-amber-700 border border-amber-300'
+				}`}
+			>
+				{needsVotesOnly ? '✓ Needs votes' : 'Show needs votes'}
+			</button>
+		</div>
 
 			<div className="fixed bottom-28 right-3 z-2000 pointer-events-auto lg:bottom-24">
 				<button

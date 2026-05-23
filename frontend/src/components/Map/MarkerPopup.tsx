@@ -40,14 +40,19 @@ export default function MarkerPopup({
 				<p className="mt-1 text-xs text-slate-500">
 					{lat.toFixed(5)}, {lng.toFixed(5)}
 				</p>
-				{typeof reportId === 'number' && (
-					<Link
-						to={`/reports/${reportId}`}
-						className="mt-3 inline-block text-xs font-semibold text-emerald-700 hover:underline"
-					>
-						Open report details
-					</Link>
-				)}
+			{status === 'cleanup_pending_vote' && (
+				<p className="mt-2 text-xs font-semibold text-amber-600">
+					⚠ Verification needed — community vote open
+				</p>
+			)}
+			{typeof reportId === 'number' && (
+				<Link
+					to={`/reports/${reportId}`}
+					className="mt-3 inline-block text-xs font-semibold text-emerald-700 hover:underline"
+				>
+					Open report details
+				</Link>
+			)}
 			</div>
 		</Popup>
 	);
