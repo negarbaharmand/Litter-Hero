@@ -80,7 +80,7 @@ export const getAllReports = async (req: Request, res: Response) => {
         pendingSubmissionsCount: sql<number>`(
           SELECT COUNT(*)::int
           FROM cleanup_submissions cs
-          WHERE cs.report_id = ${reports.id}
+          WHERE cs.report_id = ${sql.raw('"reports"."id"')}
             AND cs.status = 'pending'
         )`,
         topPendingVoteCount: sql<number>`(
@@ -89,7 +89,7 @@ export const getAllReports = async (req: Request, res: Response) => {
             SELECT COUNT(*)::int AS cnt
             FROM cleanup_submission_votes csv
             INNER JOIN cleanup_submissions cs ON cs.id = csv.submission_id
-            WHERE cs.report_id = ${reports.id}
+            WHERE cs.report_id = ${sql.raw('"reports"."id"')}
               AND cs.status = 'pending'
             GROUP BY csv.submission_id
           ) AS vote_counts
