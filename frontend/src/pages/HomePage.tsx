@@ -65,17 +65,17 @@ export function HomePage() {
 				/>
 			</div>
 		<div className="fixed left-3 top-4 z-2000 flex max-w-[90vw] flex-col gap-2 md:top-24">
-			<div className="flex flex-wrap gap-2 rounded-xl bg-white/90 p-2 shadow">
+			<div className="flex flex-wrap gap-2 rounded-xl bg-white/90 dark:bg-neutral-800/90 p-2 shadow">
 				{STATUS_FILTER_OPTIONS.map((option) => (
 					<button
 						key={option.value}
 						type="button"
 						onClick={() => { setStatusFilter(option.value); setNeedsVotesOnly(false); }}
 						disabled={needsVotesOnly}
-						className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+						className={`rounded-full px-3 py-1 text-xs font-semibold transition disabled:opacity-40 ${
 							!needsVotesOnly && statusFilter === option.value
 								? 'bg-emerald-600 text-white'
-								: 'bg-white text-slate-700 border border-slate-200 disabled:opacity-40'
+								: 'bg-white dark:bg-neutral-700 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-600'
 						}`}
 					>
 						{option.label}
@@ -88,7 +88,7 @@ export function HomePage() {
 				className={`self-start rounded-full px-3 py-1 text-xs font-semibold shadow transition ${
 					needsVotesOnly
 						? 'bg-amber-500 text-white'
-						: 'bg-white/90 text-amber-700 border border-amber-300'
+						: 'bg-white/90 dark:bg-neutral-800/90 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-600'
 				}`}
 			>
 				{needsVotesOnly ? '✓ Needs votes' : 'Show needs votes'}

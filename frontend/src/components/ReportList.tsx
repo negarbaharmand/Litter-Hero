@@ -53,7 +53,7 @@ export function ReportList() {
             className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
               statusFilter === option.value
                 ? 'bg-emerald-600 text-white'
-                : 'bg-white text-slate-700 border border-slate-200'
+                : 'bg-white dark:bg-neutral-700 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-600'
             }`}
           >
             {option.label}
@@ -70,7 +70,7 @@ export function ReportList() {
             style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
           >
             {report.imageUrl && (
-              <div className="w-full bg-slate-100 p-3">
+              <div className="w-full bg-slate-100 dark:bg-neutral-800 p-3">
                 <button
                   type="button"
                   onClick={(event) => {
@@ -100,7 +100,7 @@ export function ReportList() {
                   {getStatusPresentation(report.status).label}
                 </span>
                 {report.status === 'cleanup_pending_vote' && report.pendingSubmissionsCount > 0 && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-xs font-medium text-amber-700">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
                     <span>{report.topPendingVoteCount}/{VOTE_THRESHOLD} votes</span>
                   </span>
                 )}
