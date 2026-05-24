@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import ProfileHeader from '../components/ProfileHeader'
 import PointsCard from '../components/PointsCard'
 import BadgeList from '../components/BadgeList'
@@ -46,6 +46,18 @@ const UserProfile = () => {
         })) ?? [])
       ]} />
       <SettingsButton onClick={() => console.log('Settings clicked')} />
+      <Link
+        to="/about"
+        className="mx-4 mt-3 flex items-center justify-between rounded-xl px-4 py-3 transition-colors hover:opacity-90"
+        style={{
+          backgroundColor: 'var(--color-surface)',
+          color: 'var(--color-text-body)',
+          border: '1px solid var(--color-border)',
+        }}
+      >
+        <span className="font-medium">About us</span>
+        <span aria-hidden="true" style={{ color: 'var(--color-text-muted)' }}>→</span>
+      </Link>
       <Button
         variant="primary"
         fullWidth

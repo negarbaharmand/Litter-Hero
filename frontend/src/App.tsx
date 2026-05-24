@@ -8,6 +8,7 @@ import UserProfile from './pages/UserProfile'
 import { LoginPage } from './pages/LoginPage'
 import { AddPicturePage } from './pages/AddPicturePage'
 import { ReportDetailPage } from './pages/ReportDetailPage'
+import { AboutPage } from './pages/AboutPage'
 import PrivateRoute from './components/PrivateRoute'
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         </Route>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
