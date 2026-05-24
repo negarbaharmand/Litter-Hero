@@ -60,7 +60,7 @@ export function AboutPage() {
           <p style={{ color: 'var(--color-text-body)' }}>
             We're working toward turning those points into something tangible: gift
             cards and discounts at local stores and brands that care about the same things
-            you do. Doing good for the environment can be more rewarding than just the works itself.
+            you do. Doing good for the environment can be more rewarding than just the work itself.
           </p>
         </section>
 
