@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CameraCapture } from '../components/CameraCapture'
 import { LocationPicker } from '../components/LocationPicker'
@@ -6,6 +6,7 @@ import { createReport, uploadReportImage } from '../api'
 import { useAuth } from '../hooks/useAuth'
 import { AuthGateModal } from '../components/AuthGateModal'
 import { useAuthGate } from '../hooks/useAuthGate'
+import exifr from 'exifr'
 import { reverseGeocode } from '../utils/geocoding'
 
 const CATEGORIES = ['Mixed', 'Plastic', 'Cardboard', 'Metal', 'Glass', 'Organic']
@@ -17,6 +18,7 @@ export function AddPicturePage() {
 	const { refreshUser } = useAuth()
 	const { gate, dismiss, requireAuth } = useAuthGate()
 	const fileInputRef = useRef<HTMLInputElement>(null)
+	const popupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	const [showCamera, setShowCamera] = useState(false)
 	const [capturedImage, setCapturedImage] = useState<string | null>(null)
@@ -33,9 +35,9 @@ export function AddPicturePage() {
 	const [submitError, setSubmitError] = useState<string | null>(null)
 	const [submitSuccess, setSubmitSuccess] = useState(false)
 	const [showSizeInfo, setShowSizeInfo] = useState(false)
+	const [locationRequired, setLocationRequired] = useState(false)
 
 	useEffect(() => {
-		detectLocation()
 		return () => {
 			if(popupTimerRef.current){
 				clearTimeout(popupTimerRef.current)
@@ -43,37 +45,65 @@ export function AddPicturePage() {
 		}
 	}, [])
 
-	function detectLocation() {
-		if (!navigator.geolocation) {
-			setLocation('Geolocation not supported')
-			return
-		}
-		setIsLocating(true)
-		navigator.geolocation.getCurrentPosition(
-			async ({ coords: { latitude, longitude } }) => {
-				try {
-					const address = await reverseGeocode(latitude, longitude)
-					setLocation(address)
-					setLatitude(latitude)
-					setLongitude(longitude)
-				} catch {
-					setLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`)
-					setLatitude(latitude)
-					setLongitude(longitude)
-				}
-				setIsLocating(false)
-			},
-			() => {
-				setLocation('Could not detect location')
-				setIsLocating(false)
-			},
-			{ timeout: 10000 }
-		)
-	}
+	async function processImageLocation(file: File | Blob) {
+        setIsLocating(true)
+        setLocationRequired(false)
+        setSubmitError(null)
+	
+
+        try {
+            // Step A: Attempt to fetch GPS from EXIF metadata
+            const gps = await exifr.gps(file)
+
+            if (gps && gps.latitude && gps.longitude) {
+                const address = await reverseGeocode(gps.latitude, gps.longitude)
+                setLocation(address)
+                setLatitude(gps.latitude)
+                setLongitude(gps.longitude)
+                setIsLocating(false)
+                return
+            }
+        } catch (err) {
+            console.warn("EXIF processing bypassed or failed:", err)
+        }
+
+        // Step B: Fallback to Browser Geolocation API
+        if (!navigator.geolocation) {
+            triggerManualFallback("Geolocation not supported by your browser")
+            return
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async ({ coords: { latitude, longitude } }) => {
+                try {
+                    const address = await reverseGeocode(latitude, longitude)
+                    setLocation(address)
+                    setLatitude(latitude)
+                    setLongitude(longitude)
+                } catch {
+                    setLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`)
+                    setLatitude(latitude)
+                    setLongitude(longitude)
+                }
+                setIsLocating(false)
+            },
+            () => {
+                triggerManualFallback("Location could not be detected — please enter it manually.")
+            },
+            { timeout: 10000 }
+        )
+    }
+	function triggerManualFallback(message: string) {
+        setLocation(message)
+        setLatitude(null)
+        setLongitude(null)
+        setLocationRequired(true)
+        setIsLocating(false)
+    }
 
 	function handleCameraCapture(imageDataUrl: string) {
 		setCapturedImage(imageDataUrl)
-		// Convert the base64 data URL from the camera into a File so it can be uploaded
+		
 		const byteString = atob(imageDataUrl.split(',')[1])
 		const mimeType = imageDataUrl.split(',')[0].split(':')[1].split(';')[0]
 		const byteArray = new Uint8Array(byteString.length)
@@ -81,17 +111,25 @@ export function AddPicturePage() {
 			byteArray[i] = byteString.charCodeAt(i)
 		}
 		const blob = new Blob([byteArray], { type: mimeType })
-		setImageFile(new File([blob], 'camera-capture.jpg', { type: mimeType }))
-		setShowCamera(false)
+		const file = new File([blob], 'camera-capture.jpg', { type: mimeType })
+
+		setImageFile(file)
+        setShowCamera(false)
+
+		// Extract geolocation from the captured photo stream
+        processImageLocation(blob)
 	}
 
 	function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const file = e.target.files?.[0]
 		if (!file) return
 		setImageFile(file)
+
 		const reader = new FileReader()
 		reader.onload = (ev) => setCapturedImage(ev.target?.result as string)
 		reader.readAsDataURL(file)
+		// Extract geolocation from uploaded gallery file
+        processImageLocation(file)
 		e.target.value = ''
 	}
 
@@ -100,8 +138,6 @@ export function AddPicturePage() {
 		requireAuth('Create an account to submit a report', submitReport)
 	}
 	
-	const popupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
 	function showPopUp(message: string){
 		setSubmitError(message)
 
@@ -118,11 +154,14 @@ export function AddPicturePage() {
 			setSubmitError('Please add a photo before submitting.')
 			return
 		}
+		// Strict location block verification
 		if (
 			!location.trim() ||
+			locationRequired ||
 			location === 'Could not detect location' ||
 			location === 'Geolocation not supported'
 		) {
+			setLocationRequired(true)
 			setSubmitError('Please provide a valid location.')
 			return
 		}
@@ -420,7 +459,7 @@ export function AddPicturePage() {
 							setLongitude(longitude)
 						}}
 						isLocating={isLocating}
-						onUseCurrentLocation={detectLocation}
+						onUseCurrentLocation={() => processImageLocation(new Blob())}
 					/>
 				</div>
 
@@ -474,16 +513,16 @@ export function AddPicturePage() {
 			/>
 
 			{/* Floating submit button — sits in the bottom navbar's center notch */}
-			<div className="fixed inset-x-0 bottom-0 z-40 h-[94px] flex items-start justify-center pointer-events-none md:hidden">
+			<div className="fixed inset-x-0 bottom-0 z-40 h-24 flex items-start justify-center pointer-events-none md:hidden">
 				<button
 					onClick={handleSubmit}
 					disabled={isSubmitting}
 					aria-label="Submit report"
-					className="h-18 w-18 -mt-[14px] -translate-y-[1px] rounded-full flex items-center justify-center bg-[var(--nav-camera-bg)] pointer-events-auto disabled:opacity-60 active:scale-95 transition-transform"
+					className="h-18 w-18 -mt-3.5 -translate-y-px rounded-full flex items-center justify-center bg-(--nav-camera-bg) pointer-events-auto disabled:opacity-60 active:scale-95 transition-transform"
 				>
 					{isSubmitting ? (
 						<svg
-							className="animate-spin h-7 w-7 dark:[filter:brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
+							className="animate-spin h-7 w-7 dark:filter-[brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
 							fill="none"
 							stroke="#1a5c35"
 							strokeWidth="2.5"
@@ -494,7 +533,7 @@ export function AddPicturePage() {
 						</svg>
 					) : (
 						<svg
-							className="h-7 w-7 dark:[filter:brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
+							className="h-7 w-7 dark:filter-[brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
 							fill="none"
 							stroke="#1a5c35"
 							strokeWidth="2.5"
