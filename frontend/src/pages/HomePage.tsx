@@ -64,8 +64,8 @@ export function HomePage() {
 					theme={theme} 
 				/>
 			</div>
-		<div className="fixed left-3 top-4 z-2000 flex max-w-[90vw] flex-col gap-2 md:top-24">
-			<div className="flex flex-wrap gap-2 rounded-xl bg-white/90 dark:bg-neutral-800/90 p-2 shadow">
+		<div className="fixed left-1/2 top-4 z-2000 flex max-w-[90vw] -translate-x-1/2 flex-col items-center gap-2 md:top-24">
+			<div className="flex flex-wrap items-center gap-2 rounded-xl bg-white/90 dark:bg-neutral-800/90 p-2 shadow">
 				{STATUS_FILTER_OPTIONS.map((option) => (
 					<button
 						key={option.value}
@@ -85,7 +85,7 @@ export function HomePage() {
 			<button
 				type="button"
 				onClick={() => setNeedsVotesOnly((prev) => !prev)}
-				className={`self-start rounded-full px-3 py-1 text-xs font-semibold shadow transition ${
+				className={`rounded-full px-3 py-1 text-xs font-semibold shadow transition ${
 					needsVotesOnly
 						? 'bg-amber-500 text-white'
 						: 'bg-white/90 dark:bg-neutral-800/90 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-600'
