@@ -65,14 +65,14 @@ export function HomePage() {
 				/>
 			</div>
 		<div className="fixed left-1/2 top-4 z-2000 flex max-w-[90vw] -translate-x-1/2 flex-col items-center gap-2 md:top-24">
-			<div className="flex flex-wrap items-center gap-2 rounded-xl bg-white/90 dark:bg-neutral-800/90 p-2 shadow">
+			<div className="flex flex-nowrap items-center gap-2 overflow-x-auto rounded-xl bg-white/90 dark:bg-neutral-800/90 p-2 shadow">
 				{STATUS_FILTER_OPTIONS.map((option) => (
 					<button
 						key={option.value}
 						type="button"
 						onClick={() => { setStatusFilter(option.value); setNeedsVotesOnly(false); }}
 						disabled={needsVotesOnly}
-						className={`rounded-full px-3 py-1 text-xs font-semibold transition disabled:opacity-40 ${
+						className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold transition disabled:opacity-40 ${
 							!needsVotesOnly && statusFilter === option.value
 								? 'bg-emerald-600 text-white'
 								: 'bg-white dark:bg-neutral-700 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-600'
