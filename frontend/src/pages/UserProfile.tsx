@@ -53,11 +53,11 @@ const UserProfile = () => {
             </div>
           </div>
           <Link
-            to="/reports?filter=cleanup_pending_vote"
+            to="/reports?filter=needs_votes"
             className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors"
             style={{ backgroundColor: 'var(--color-green-normal)', color: '#ffffff' }}
           >
-            Needs votes
+            Help verify
           </Link>
         </div>
       </div>

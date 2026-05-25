@@ -124,6 +124,11 @@ export const getAllReports = async (req: Request, res: Response) => {
             GROUP BY csv.submission_id
           ) AS vote_counts
         )`,
+        reportVerificationVoteCount: sql<number>`(
+          SELECT COUNT(*)::int
+          FROM report_verification_votes rvv
+          WHERE rvv.report_id = ${sql.raw('"reports"."id"')}
+        )`,
       })
       .from(reports);
 
