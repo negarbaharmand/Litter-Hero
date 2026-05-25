@@ -84,7 +84,7 @@ export function ReportDetailPage() {
 
   const canSubmitCleanup = useMemo(() => {
     if (!report) return false;
-    return report.status === 'verified' || report.status === 'cleanup_pending_vote' || report.status === 'open';
+    return report.status !== 'cleaned' && report.status !== 'rejected';
   }, [report]);
 
   function handleSubmitCleanup() {
@@ -242,11 +242,9 @@ export function ReportDetailPage() {
 
           {!canSubmitCleanup && (
             <p className="mt-3 text-sm text-slate-600">
-              {report.status === 'pending'
-                ? 'This report needs community verification before cleanup submissions are accepted.'
-                : report.status === 'rejected'
-                  ? 'This report was rejected and does not accept cleanup submissions.'
-                  : 'This report is already cleaned and no longer accepts cleanup submissions.'}
+              {report.status === 'rejected'
+                ? 'This report was rejected and does not accept cleanup submissions.'
+                : 'This report is already cleaned and no longer accepts cleanup submissions.'}
             </p>
           )}
         </div>

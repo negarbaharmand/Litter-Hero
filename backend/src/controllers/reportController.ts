@@ -356,9 +356,6 @@ export const createCleanupSubmission = async (req: Request, res: Response) => {
     if (report.status === 'cleaned') {
       return res.status(409).json({ error: 'Report is already cleaned' });
     }
-    if (report.status === 'pending') {
-      return res.status(409).json({ error: 'Report is still pending community verification' });
-    }
     if (report.status === 'rejected') {
       return res.status(409).json({ error: 'Report has been rejected' });
     }
@@ -382,11 +379,13 @@ export const createCleanupSubmission = async (req: Request, res: Response) => {
         resolvedAt: cleanupSubmissions.resolvedAt,
       });
 
-    if (report.status === 'verified') {
+    // Cleanup proof on a pending report bypasses verification — the physical
+    // act of cleaning is stronger evidence than 3 remote votes.
+    if (report.status === 'pending' || report.status === 'verified' || report.status === 'open') {
       await db
         .update(reports)
         .set({ status: 'cleanup_pending_vote' })
-        .where(and(eq(reports.id, reportId), eq(reports.status, 'verified')));
+        .where(and(eq(reports.id, reportId), eq(reports.status, report.status)));
     }
 
     return res.status(201).json({
