@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { db } from '../db/index.js';
 import { cleanupSubmissions, cleanupSubmissionVotes, reportVerificationVotes, reports, users } from '../db/schema.js';
 import { publicUserColumns } from '../db/userPublicColumns.js';
-import { count, desc, eq, gte, and } from 'drizzle-orm';
+import { count, desc, eq, gte, and, sql } from 'drizzle-orm';
 import { calculateWeeklyPoints } from './reportWorkflow.js';
 
 export const listUsers = async (req: Request, res: Response) => {
