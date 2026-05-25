@@ -82,7 +82,7 @@ export default function ReportMap({
         )}
       </MapContainer>
       {currentLocation && (
-        <div className="pointer-events-none absolute bottom-3 left-3 rounded-lg bg-white/90 px-3 py-2 text-xs text-slate-700 shadow">
+        <div className="pointer-events-none absolute bottom-3 left-3 rounded-lg bg-white/90 dark:bg-neutral-800/90 px-3 py-2 text-xs text-slate-700 dark:text-neutral-200 shadow">
           Your location: {currentLocation[0].toFixed(5)}, {currentLocation[1].toFixed(5)}
         </div>
       )}

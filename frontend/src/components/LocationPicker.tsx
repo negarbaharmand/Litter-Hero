@@ -3,6 +3,20 @@ import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-lea
 import L from 'leaflet'
 import { reverseGeocode, searchPlaces, type PlaceSuggestion } from '../utils/geocoding'
 
+function useTheme(): 'light' | 'dark' {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() =>
+    document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
+  )
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light')
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => observer.disconnect()
+  }, [])
+  return theme
+}
+
 const DEFAULT_CENTER: [number, number] = [59.3293, 18.0686]
 
 const PickMarkerIcon = L.divIcon({
@@ -48,6 +62,7 @@ export function LocationPicker({
 	isLocating = false,
 	onUseCurrentLocation,
 }: LocationPickerProps) {
+	const theme = useTheme()
 	const listboxId = useId()
 	const [query, setQuery] = useState(value.location)
 	const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([])
@@ -160,18 +175,24 @@ export function LocationPicker({
 					aria-expanded={showSuggestions && suggestions.length > 0}
 					aria-controls={listboxId}
 					aria-autocomplete="list"
-					className="w-full bg-white rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:ring-2 min-w-0"
-					style={{ '--tw-ring-color': '#53E086' } as React.CSSProperties}
+					className="w-full rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 min-w-0"
+					style={{
+						backgroundColor: 'var(--color-surface)',
+						color: 'var(--color-text-body)',
+						border: '1px solid var(--color-border)',
+						'--tw-ring-color': '#53E086',
+					} as React.CSSProperties}
 				/>
 
 				{showSuggestions && query.trim().length >= 2 && (
 					<ul
 						id={listboxId}
 						role="listbox"
-						className="absolute z-20 mt-1 w-full max-h-48 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-lg"
+						className="absolute z-20 mt-1 w-full max-h-48 overflow-y-auto rounded-xl shadow-lg"
+					style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
 					>
 						{isSearching && (
-							<li className="px-4 py-2.5 text-sm text-gray-400">Searching…</li>
+							<li className="px-4 py-2.5 text-sm" style={{ color: 'var(--color-text-muted)' }}>Searching…</li>
 						)}
 						{!isSearching && searchError && (
 							<li className="px-4 py-2.5 text-sm text-red-500">{searchError}</li>
@@ -179,7 +200,7 @@ export function LocationPicker({
 						{!isSearching &&
 							!searchError &&
 							suggestions.length === 0 && (
-								<li className="px-4 py-2.5 text-sm text-gray-400">
+								<li className="px-4 py-2.5 text-sm" style={{ color: 'var(--color-text-muted)' }}>
 									No places found. Try another search or tap the map.
 								</li>
 							)}
@@ -189,13 +210,13 @@ export function LocationPicker({
 									type="button"
 									onMouseDown={(e) => e.preventDefault()}
 									onClick={() => selectSuggestion(suggestion)}
-									className="w-full px-4 py-2.5 text-left text-sm hover:bg-[#EEFCF3] transition-colors"
+									className="w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-[var(--color-page-bg)]"
 								>
-									<span className="block font-medium text-gray-800 truncate">
+									<span className="block font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>
 										{suggestion.label}
 									</span>
 									{suggestion.displayName !== suggestion.label && (
-										<span className="block text-xs text-gray-400 truncate mt-0.5">
+										<span className="block text-xs truncate mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
 											{suggestion.displayName}
 										</span>
 									)}
@@ -219,11 +240,11 @@ export function LocationPicker({
 					</button>
 				)}
 				{(isResolvingMapPoint || isLocating) && (
-					<span className="text-xs text-gray-500 self-center">Updating place…</span>
+					<span className="text-xs self-center" style={{ color: 'var(--color-text-muted)' }}>Updating place…</span>
 				)}
 			</div>
 
-			<div className="rounded-2xl overflow-hidden border border-gray-200 bg-white">
+			<div className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
 				<MapContainer
 					center={mapCenter}
 					zoom={hasMapPin ? 16 : 12}
@@ -231,8 +252,16 @@ export function LocationPicker({
 					scrollWheelZoom={false}
 				>
 					<TileLayer
-						attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-						url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+						attribution={
+							theme === 'dark'
+								? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+								: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+						}
+						url={
+							theme === 'dark'
+								? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+								: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+						}
 					/>
 					<MapRecenter center={mapCenter} />
 					<MapClickHandler onPick={handleMapPick} />
@@ -250,7 +279,7 @@ export function LocationPicker({
 						/>
 					)}
 				</MapContainer>
-				<p className="px-3 py-2 text-xs text-gray-500">
+				<p className="px-3 py-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
 					Tap the map or drag the pin to set an exact spot. Search above for named places.
 				</p>
 			</div>

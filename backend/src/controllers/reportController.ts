@@ -77,6 +77,23 @@ export const getAllReports = async (req: Request, res: Response) => {
         cleanedAt: reports.cleanedAt,
         rejectionReason: reports.rejectionReason,
         createdAt: reports.createdAt,
+        pendingSubmissionsCount: sql<number>`(
+          SELECT COUNT(*)::int
+          FROM cleanup_submissions cs
+          WHERE cs.report_id = ${sql.raw('"reports"."id"')}
+            AND cs.status = 'pending'
+        )`,
+        topPendingVoteCount: sql<number>`(
+          SELECT COALESCE(MAX(vote_counts.cnt), 0)
+          FROM (
+            SELECT COUNT(*)::int AS cnt
+            FROM cleanup_submission_votes csv
+            INNER JOIN cleanup_submissions cs ON cs.id = csv.submission_id
+            WHERE cs.report_id = ${sql.raw('"reports"."id"')}
+              AND cs.status = 'pending'
+            GROUP BY csv.submission_id
+          ) AS vote_counts
+        )`,
       })
       .from(reports);
 
