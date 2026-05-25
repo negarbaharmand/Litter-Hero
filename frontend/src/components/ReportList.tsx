@@ -6,7 +6,7 @@ import { fetchReports } from '../api'
 import type { Report } from '../api'
 import { getStatusPresentation, STATUS_FILTER_OPTIONS, type ReportStatusFilter } from '../utils/reportStatus'
 
-const VOTE_THRESHOLD = 3
+import { VOTE_THRESHOLD } from '../constants'
 
 function isValidFilter(value: string | null): value is ReportStatusFilter {
   return STATUS_FILTER_OPTIONS.some((opt) => opt.value === value)
