@@ -46,11 +46,19 @@ export type VoteSummary = {
   myVote: 'clean' | 'not_clean' | null;
 };
 
+export type ReportVerificationVoteSummary = {
+  totalVotes: number;
+  legitVotes: number;
+  notTrashVotes: number;
+  myVote: 'legit' | 'not_trash' | null;
+};
+
 export type CleanupSubmissionWithVotes = CleanupSubmission & {
   voteSummary: VoteSummary;
 };
 
 export type ReportDetails = Report & {
+  verificationVoteSummary: ReportVerificationVoteSummary;
   winningSubmission: CleanupSubmission | null;
   cleanupSubmissions: CleanupSubmissionWithVotes[];
 };
@@ -61,7 +69,12 @@ export type VoteOnCleanupResponse = {
   voteSummary: VoteSummary;
 };
 
-export type ReportStatusFilter = 'pending' | 'verified' | 'disputed' | 'cleaned' | 'rejected' | 'open' | 'cleanup_pending_vote';
+export type VoteOnReportVerificationResponse = {
+  status: 'pending' | 'verified' | 'rejected';
+  voteSummary: ReportVerificationVoteSummary;
+};
+
+export type ReportStatusFilter = 'pending' | 'verified' | 'disputed' | 'cleaned' | 'rejected' | 'open' | 'cleanup_pending_vote' | 'needs_votes';
 
 export type CreateReportPayload = {
   location: string;
@@ -86,6 +99,7 @@ export type User = {
 export type LeaderboardUser = User & {
   reportsCreated: number;
   cleanupsApproved: number;
+  reportVerificationVotes: number;
   verificationVotes: number;
 };
 
@@ -195,6 +209,7 @@ export type MeUser = AuthUser & {
   badges: string[]
   reportsCreated: number
   cleanupsApproved: number
+  reportVerificationVotes: number
   verificationVotes: number
 }
 
@@ -361,4 +376,35 @@ export const voteOnCleanupSubmission = async (
   }
 
   return data as VoteOnCleanupResponse;
+};
+
+export const voteOnReportVerification = async (
+  reportId: number,
+  vote: 'legit' | 'not_trash'
+): Promise<VoteOnReportVerificationResponse> => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/reports/${reportId}/verification-votes`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders(),
+      },
+      body: JSON.stringify({ vote }),
+    }
+  );
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message =
+      typeof data === 'object' &&
+      data &&
+      'error' in data &&
+      typeof (data as { error?: unknown }).error === 'string'
+        ? (data as { error: string }).error
+        : 'Failed to submit vote';
+    throw new Error(message);
+  }
+
+  return data as VoteOnReportVerificationResponse;
 };
