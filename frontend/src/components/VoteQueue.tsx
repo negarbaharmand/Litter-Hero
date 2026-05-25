@@ -7,7 +7,7 @@ import { ReportVerificationCard } from './ReportVerificationCard';
 import { CleanupSubmissionCard } from './CleanupSubmissionCard';
 
 export function VoteQueue() {
-  const { requireAuth, authGateProps } = useAuthGate();
+  const { gate, dismiss, requireAuth } = useAuthGate();
   const { data, isLoading, isError } = useQuery({
     queryKey: ['vote-queue'],
     queryFn: fetchVoteQueue,
@@ -126,7 +126,7 @@ export function VoteQueue() {
         </section>
       )}
 
-      <AuthGateModal {...authGateProps} />
+      <AuthGateModal open={gate.open} message={gate.message} onDismiss={dismiss} />
     </div>
   );
 }
