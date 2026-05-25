@@ -66,18 +66,8 @@ app.get('/db-check', async (req: Request, res: Response) => {
       results[table] = { ok: false, error: e instanceof Error ? e.message : String(e) };
     }
   }
-
-  // Check drizzle migrations journal to see what migrations drizzle thinks ran
-  let journal: unknown = null;
-  try {
-    const rows = await db.execute(sql.raw(`SELECT * FROM "__drizzle_migrations" ORDER BY created_at`));
-    journal = rows;
-  } catch (e: unknown) {
-    journal = { error: e instanceof Error ? e.message : String(e) };
-  }
-
   const allOk = Object.values(results).every((r) => r.ok);
-  return res.status(allOk ? 200 : 500).json({ allOk, tables: results, journal });
+  return res.status(allOk ? 200 : 500).json({ allOk, tables: results });
 });
 
 app.listen(PORT, () => {
