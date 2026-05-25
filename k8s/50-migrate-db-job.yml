@@ -14,6 +14,11 @@ spec:
         - name: migrate
           image: ${CI_REGISTRY_IMAGE}/backend:${CI_COMMIT_SHA}
           command: ["npm", "run", "db:migrate"]
+          env:
+            - name: NO_COLOR
+              value: "1"
+            - name: CI
+              value: "true"
           envFrom:
             - secretRef:
                 name: cc-secrets
