@@ -20,7 +20,27 @@ kubectl rollout status statefulset database -n "${NAMESPACE}" --timeout=5m
 kubectl delete job backend-migrate-"${CI_COMMIT_REF_SLUG}" -n "${NAMESPACE}" --ignore-not-found
 
 envsubst '${CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE} ${CI_COMMIT_SHA}' <k8s/50-migrate-db-job.yml | kubectl apply -n "${NAMESPACE}" -f -
-kubectl wait job/backend-migrate-"${CI_COMMIT_REF_SLUG}" -n "${NAMESPACE}" --for=condition=complete --timeout=5m
+
+# Poll every 5s — fail fast if the job fails instead of waiting the full timeout
+echo "Waiting for migration job to complete..."
+for i in $(seq 1 60); do
+  JOB_STATUS=$(kubectl get job backend-migrate-"${CI_COMMIT_REF_SLUG}" -n "${NAMESPACE}" \
+    -o jsonpath='{.status.conditions[0].type}' 2>/dev/null || echo "")
+  if [[ "$JOB_STATUS" == "Complete" ]]; then
+    echo "Migration completed successfully."
+    break
+  elif [[ "$JOB_STATUS" == "Failed" ]]; then
+    echo "=== Migration job FAILED. Logs ==="
+    kubectl logs job/backend-migrate-"${CI_COMMIT_REF_SLUG}" -n "${NAMESPACE}" || true
+    exit 1
+  fi
+  if [[ $i -eq 60 ]]; then
+    echo "=== Migration job timed out. Logs ==="
+    kubectl logs job/backend-migrate-"${CI_COMMIT_REF_SLUG}" -n "${NAMESPACE}" || true
+    exit 1
+  fi
+  sleep 5
+done
 
 envsubst '${CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE} ${CI_COMMIT_SHA}' <k8s/40-deploy-backend.yml | kubectl apply -n "${NAMESPACE}" -f -
 kubectl rollout status deployment backend-"${CI_COMMIT_REF_SLUG}" -n "${NAMESPACE}" --timeout=5m
