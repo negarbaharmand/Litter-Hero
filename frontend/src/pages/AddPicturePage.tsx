@@ -6,7 +6,7 @@ import { createReport, uploadReportImage } from "../api";
 import { useAuth } from "../hooks/useAuth";
 import { AuthGateModal } from "../components/AuthGateModal";
 import { useAuthGate } from "../hooks/useAuthGate";
-// import import exifr from "exifr";
+import exifr from "exifr";
 import { reverseGeocode } from "../utils/geocoding";
 
 const CATEGORIES = [
