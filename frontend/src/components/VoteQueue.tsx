@@ -43,7 +43,7 @@ export function VoteQueue() {
     <div className="space-y-6">
       <p className="text-sm px-1" style={{ color: 'var(--color-text-muted)' }}>
         {totalItems} item{totalItems === 1 ? '' : 's'} waiting for your vote.
-        Each vote earns you <span className="font-semibold text-emerald-700">+3 points</span>.
+        Each vote earns you <span className="font-semibold" style={{ color: 'var(--color-green-dark)' }}>+3 points</span>.
       </p>
 
       {trashItems.length > 0 && (
@@ -54,7 +54,8 @@ export function VoteQueue() {
           </h3>
           <div className="space-y-4">
             {trashItems.map((item) => (
-              <div key={item.reportId} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div key={item.reportId} className="rounded-2xl p-4 shadow-sm"
+                style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div>
                     <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
@@ -100,7 +101,8 @@ export function VoteQueue() {
           </h3>
           <div className="space-y-4">
             {cleanupItems.map((item) => (
-              <div key={item.submission.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div key={item.submission.id} className="rounded-2xl p-4 shadow-sm"
+                style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                     {item.reportLocation}

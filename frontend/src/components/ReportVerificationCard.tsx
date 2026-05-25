@@ -57,21 +57,22 @@ export function ReportVerificationCard({
   const votesNeeded = Math.max(0, REPORT_VOTE_THRESHOLD - voteSummary.totalVotes);
 
   return (
-    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
+    <div className="rounded-2xl p-4 shadow-sm"
+      style={{ backgroundColor: 'var(--color-page-bg)', border: '1px solid var(--color-border)' }}>
       <div className="flex items-center gap-2">
         <span className="text-lg">🗳️</span>
-        <h2 className="text-base font-semibold text-slate-900">Is this actually trash?</h2>
+        <h2 className="text-base font-semibold" style={{ color: 'var(--color-text-primary)' }}>Is this actually trash?</h2>
       </div>
-      <p className="mt-1 text-sm text-slate-600">
-        Help the community verify this report. Three votes decide — earn <span className="font-semibold text-emerald-700">+3 points</span> for each vote you cast.
+      <p className="mt-1 text-sm" style={{ color: 'var(--color-text-body)' }}>
+        Help the community verify this report. Three votes decide — earn <span className="font-semibold" style={{ color: 'var(--color-green-dark)' }}>+3 points</span> for each vote you cast.
       </p>
 
-      <div className="mt-3 flex flex-wrap gap-3 text-sm text-slate-700">
+      <div className="mt-3 flex flex-wrap gap-3 text-sm" style={{ color: 'var(--color-text-body)' }}>
         <span>
-          <span className="font-semibold text-emerald-700">{voteSummary.legitVotes}</span> legit
+          <span className="font-semibold" style={{ color: 'var(--color-green-dark)' }}>{voteSummary.legitVotes}</span> legit
         </span>
         <span>
-          <span className="font-semibold text-amber-700">{voteSummary.notTrashVotes}</span> not trash
+          <span className="font-semibold text-amber-500">{voteSummary.notTrashVotes}</span> not trash
         </span>
         <span>
           <span className="font-semibold">{voteSummary.totalVotes}</span>/{REPORT_VOTE_THRESHOLD} votes
@@ -79,7 +80,7 @@ export function ReportVerificationCard({
       </div>
 
       {votesNeeded > 0 && !voteSummary.myVote && (
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
           {votesNeeded} more vote{votesNeeded === 1 ? '' : 's'} needed for a decision.
         </p>
       )}
@@ -90,7 +91,8 @@ export function ReportVerificationCard({
             type="button"
             onClick={() => handleVote('legit')}
             disabled={voteMutation.isPending}
-            className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="rounded-lg px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            style={{ backgroundColor: 'var(--color-green-dark)' }}
           >
             Looks like trash
           </button>
@@ -98,7 +100,8 @@ export function ReportVerificationCard({
             type="button"
             onClick={() => handleVote('not_trash')}
             disabled={voteMutation.isPending}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-60"
+            className="rounded-lg px-3 py-2 text-sm font-semibold disabled:opacity-60"
+            style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-body)', border: '1px solid var(--color-border)' }}
           >
             Not trash
           </button>
@@ -106,16 +109,16 @@ export function ReportVerificationCard({
       )}
 
       {cannotVoteReason && (
-        <p className="mt-3 text-sm text-slate-500">{cannotVoteReason}</p>
+        <p className="mt-3 text-sm" style={{ color: 'var(--color-text-muted)' }}>{cannotVoteReason}</p>
       )}
 
       {voteSummary.myVote && (
-        <p className="mt-2 text-sm text-emerald-700">
+        <p className="mt-2 text-sm" style={{ color: 'var(--color-green-dark)' }}>
           Your vote: {voteSummary.myVote === 'legit' ? 'Looks like trash' : 'Not trash'}
         </p>
       )}
 
-      {voteError && <p className="mt-2 text-sm text-red-600">{voteError}</p>}
+      {voteError && <p className="mt-2 text-sm text-red-500">{voteError}</p>}
     </div>
   );
 }
