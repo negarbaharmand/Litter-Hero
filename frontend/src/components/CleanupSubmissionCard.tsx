@@ -46,11 +46,9 @@ export function CleanupSubmissionCard({
       ? 'This submission is already resolved.'
       : currentUserId === submission.userId
         ? 'You cannot vote on your own cleanup submission.'
-        : currentUserId === reportOwnerUserId
-          ? 'You cannot vote on cleanup for your own report.'
-          : submission.voteSummary.myVote
-            ? 'You already voted on this submission.'
-            : null;
+        : submission.voteSummary.myVote
+          ? 'You already voted on this submission.'
+          : null;
 
   const voteMutation = useMutation({
     mutationFn: (vote: 'clean' | 'not_clean') =>

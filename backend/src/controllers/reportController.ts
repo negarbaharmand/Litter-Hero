@@ -485,10 +485,7 @@ export const voteOnCleanupSubmission = async (req: Request, res: Response) => {
         return { type: 'already_cleaned' } as const;
       }
 
-      if (
-        userId === submissionWithReport.submitterUserId ||
-        userId === submissionWithReport.reportOwnerUserId
-      ) {
+      if (userId === submissionWithReport.submitterUserId) {
         return { type: 'forbidden_self_vote' } as const;
       }
 
@@ -811,7 +808,6 @@ export const getVoteQueue = async (req: Request, res: Response) => {
     ];
     if (currentUserId) {
       cleanupConditions.push(ne(cleanupSubmissions.userId, currentUserId));
-      cleanupConditions.push(ne(reports.userId, currentUserId));
       cleanupConditions.push(
         notExists(
           db.select({ _: sql`1` })
