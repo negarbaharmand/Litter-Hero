@@ -10,6 +10,17 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 
+// Apply the saved/preferred theme before React renders, so dark mode works
+// on every page — including ones reached by typing the URL directly.
+const savedTheme = localStorage.getItem('theme')
+const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches
+document.documentElement.dataset.theme =
+  savedTheme === 'dark' || savedTheme === 'light'
+    ? savedTheme
+    : prefersDark
+      ? 'dark'
+      : 'light'
+
 const queryClient = new QueryClient()
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? ''
 

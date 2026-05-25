@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import MarkerPopup from './MarkerPopup';
@@ -15,36 +15,28 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
+const CurrentLocationIcon = L.divIcon({
+  className: 'current-location-marker',
+  html: '<div style="width:16px;height:16px;border-radius:9999px;background:#ef4444;border:2px solid #ffffff;box-shadow:0 1px 4px rgba(0,0,0,0.35);"></div>',
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
+});
+
 export default function ReportMap({
   reports,
-  position,
-  setPosition,
+  center,
+  currentLocation,
   theme = 'light',
 }: {
   reports?: Report[];
-  position: [number, number];
-  setPosition: (pos: [number, number]) => void;
+  center: [number, number];
+  currentLocation: [number, number] | null;
   theme?: 'light' | 'dark';
 }) {
-
-  function LocationMarker() {
-    useMapEvents({
-      click(e) {
-        setPosition([e.latlng.lat, e.latlng.lng]);
-      },
-    });
-
-    return position === null ? null : (
-      <Marker position={position}>
-        <MarkerPopup lat={position[0]} lng={position[1]} title="Din valda plats" description="Här hittade jag skräp!" />
-      </Marker>
-    );
-  }
-
   return (
     <div className="relative h-full w-full overflow-hidden">
       <MapContainer
-        center={position}
+        center={center}
         zoom={13}
         style={{ height: '100%', width: '100%' }}
       >
@@ -69,18 +61,31 @@ export default function ReportMap({
               <MarkerPopup
                 lat={report.latitude}
                 lng={report.longitude}
-                title={`Rapport #${report.id}`}
+                title="Trash report"
                 description={report.description || 'Ingen beskrivning tillgänglig'}
                 size={report.size || 'Okänd storlek'}
+                reportId={report.id}
+                status={report.status}
               />
             </Marker>
           ))}
 
-        <LocationMarker />
+        {currentLocation && (
+          <Marker position={currentLocation} icon={CurrentLocationIcon}>
+            <MarkerPopup
+              lat={currentLocation[0]}
+              lng={currentLocation[1]}
+              title="Your location"
+              description="Approximate GPS location"
+            />
+          </Marker>
+        )}
       </MapContainer>
-      <div className="pointer-events-none absolute bottom-3 left-3 rounded-lg bg-white/90 px-3 py-2 text-xs text-slate-700 shadow">
-        Chosen coordinates: {position[0].toFixed(5)}, {position[1].toFixed(5)}
-      </div>
+      {currentLocation && (
+        <div className="pointer-events-none absolute bottom-3 left-3 rounded-lg bg-white/90 dark:bg-neutral-800/90 px-3 py-2 text-xs text-slate-700 dark:text-neutral-200 shadow">
+          Your location: {currentLocation[0].toFixed(5)}, {currentLocation[1].toFixed(5)}
+        </div>
+      )}
     </div>
   );
 }

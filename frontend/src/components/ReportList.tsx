@@ -1,15 +1,33 @@
 
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { fetchReports } from '../api'
 import type { Report } from '../api'
+import { getStatusPresentation, STATUS_FILTER_OPTIONS, type ReportStatusFilter } from '../utils/reportStatus'
+
+const VOTE_THRESHOLD = 3
+
+function isValidFilter(value: string | null): value is ReportStatusFilter {
+  return STATUS_FILTER_OPTIONS.some((opt) => opt.value === value)
+}
 
 export function ReportList() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const rawFilter = searchParams.get('filter')
+  const statusFilter: ReportStatusFilter = isValidFilter(rawFilter) ? rawFilter : 'all'
+
+  function setStatusFilter(next: ReportStatusFilter) {
+    setSearchParams(next === 'all' ? {} : { filter: next }, { replace: true })
+  }
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null)
+  const [previewImageAlt, setPreviewImageAlt] = useState<string>('Report image')
   const { data, isLoading, isError, error } = useQuery<Report[]>({
-    queryKey: ['reports'],
-    queryFn: fetchReports,
+    queryKey: ['reports', statusFilter],
+    queryFn: () => fetchReports(statusFilter === 'all' ? undefined : statusFilter),
   })
 
-  if (isLoading) return <div className="p-6 text-slate-600">Loading reports... ⏳</div>
+  if (isLoading) return <div className="p-6" style={{ color: 'var(--color-text-muted)' }}>Loading reports... ⏳</div>
 
   if (isError) {
     return (
@@ -18,37 +36,113 @@ export function ReportList() {
       </div>
     )
   }
-
+  const visibleReports = (data ?? []).filter((report) => report.status != 'rejected')
   return (
     <div className="p-1">
       <div className="flex items-center justify-between gap-4">
         <span className="rounded-full bg-emerald-300 px-3 py-1 text-sm text-white">
-          {data?.length ?? 0} reports
+          {visibleReports.length} reports
         </span>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {STATUS_FILTER_OPTIONS.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => setStatusFilter(option.value)}
+            className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+              statusFilter === option.value
+                ? 'bg-emerald-600 text-white'
+                : 'bg-white dark:bg-neutral-700 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-600'
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
 
       <div className="mt-6 grid gap-4">
-        {data?.map((report) => (
-          <div key={report.id} className="rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md overflow-hidden">
+        {visibleReports.map((report) => (
+          <Link
+            key={report.id}
+            to={`/reports/${report.id}`}
+            className="block rounded-xl border shadow-sm transition hover:shadow-md overflow-hidden"
+            style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+          >
             {report.imageUrl && (
-              <img
-                src={report.imageUrl}
-                alt="Report"
-                className="w-full h-48 object-cover"
-              />
+              <div className="w-full bg-slate-100 dark:bg-neutral-800 p-3">
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    setPreviewImageUrl(report.imageUrl)
+                    setPreviewImageAlt(report.description?.trim() || 'Report image')
+                  }}
+                  className="mx-auto block w-full max-w-[320px] overflow-hidden rounded-xl"
+                  aria-label="Open report image preview"
+                >
+                  <img
+                    src={report.imageUrl}
+                    alt={report.description?.trim() || 'Report image'}
+                    className="aspect-square w-full object-cover transition-transform duration-200 hover:scale-[1.02]"
+                  />
+                </button>
+              </div>
             )}
             <div className="p-4">
-              <p className="font-semibold" style={{ color: '#224A32', fontSize: '21px' }}>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span
+                  className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${
+                    getStatusPresentation(report.status).className
+                  }`}
+                >
+                  {getStatusPresentation(report.status).label}
+                </span>
+                {report.status === 'cleanup_pending_vote' && report.pendingSubmissionsCount > 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
+                    <span>{report.topPendingVoteCount}/{VOTE_THRESHOLD} votes</span>
+                  </span>
+                )}
+              </div>
+              <p className="font-semibold" style={{ color: 'var(--color-text-primary)', fontSize: '21px' }}>
                 {report.description ?? 'No description'}
               </p>
-              <p className="font-medium text-slate-900 mt-3">
-                <span className="text-slate-500">Location:</span> {report.location}
+              <p className="font-medium mt-3" style={{ color: 'var(--color-text-body)' }}>
+                <span style={{ color: 'var(--color-text-muted)' }}>Location:</span> {report.location}
               </p>
-              <p className="mt-3 text-sm italic text-slate-500">Size: {report.size ?? 'Unknown'}</p>
+              <p className="mt-3 text-sm italic" style={{ color: 'var(--color-text-muted)' }}>
+                Size: {report.size ?? 'Unknown'}
+              </p>
+              <p className="mt-3 text-sm font-medium text-emerald-700">Open details</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
+
+      {previewImageUrl && (
+        <div
+          className="fixed inset-0 z-[3500] flex items-center justify-center bg-black/75 p-4"
+          onClick={() => setPreviewImageUrl(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="relative w-full max-w-3xl overflow-hidden rounded-2xl bg-black"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setPreviewImageUrl(null)}
+              className="absolute right-3 top-3 z-10 rounded-full bg-black/60 px-3 py-1 text-sm font-semibold text-white"
+              aria-label="Close image preview"
+            >
+              Close
+            </button>
+            <img src={previewImageUrl} alt={previewImageAlt} className="max-h-[85vh] w-full object-contain" />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

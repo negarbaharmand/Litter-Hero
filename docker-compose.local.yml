@@ -22,6 +22,11 @@ services:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       - JWT_SECRET=${JWT_SECRET}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - S3_URL=${S3_URL}
+      - S3_BUCKET=${S3_BUCKET}
+      - S3_REGION=${S3_REGION}
+      - access_key_S3=${access_key_S3}
+      - secret_key_S3=${secret_key_S3}
     ports:
       - 3000:3000
     volumes:

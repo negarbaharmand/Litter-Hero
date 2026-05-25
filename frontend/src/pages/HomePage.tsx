@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import ReportMap from '../components/Map/ReportMap';
 import { fetchReports } from '../api';
+import { STATUS_FILTER_OPTIONS, type ReportStatusFilter } from '../utils/reportStatus';
 
 function getInitialTheme(): 'light' | 'dark' {
 	const saved = localStorage.getItem('theme');
@@ -13,15 +14,36 @@ function getInitialTheme(): 'light' | 'dark' {
 }
 
 export function HomePage() {
-	const [position, setPosition] = useState<[number, number]>([59.3293, 18.0686]);
+	const [mapCenter, setMapCenter] = useState<[number, number]>([59.3293, 18.0686]);
+	const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
 	const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
+	const [statusFilter, setStatusFilter] = useState<ReportStatusFilter>('all');
+	const [needsVotesOnly, setNeedsVotesOnly] = useState(false);
+
+	const effectiveFilter: ReportStatusFilter = needsVotesOnly ? 'cleanup_pending_vote' : statusFilter;
+
 	const { data: reports = [] } = useQuery({
-		queryKey: ['reports'],
-		queryFn: fetchReports,
+		queryKey: ['reports', effectiveFilter],
+		queryFn: () => fetchReports(effectiveFilter === 'all' ? undefined : effectiveFilter),
 	});
 	const mapReports = reports.filter(
         (report) => report.latitude !== null && report.longitude !== null
     );
+
+	useEffect(() => {
+		if (!navigator.geolocation) return;
+		navigator.geolocation.getCurrentPosition(
+			({ coords }) => {
+				const nextPosition: [number, number] = [coords.latitude, coords.longitude];
+				setCurrentLocation(nextPosition);
+				setMapCenter(nextPosition);
+			},
+			() => {
+				// Keep Stockholm fallback center if geolocation is blocked/unavailable.
+			},
+			{ timeout: 10000 }
+		);
+	}, []);
 
 	function toggleTheme() {
 		const next = theme === 'dark' ? 'light' : 'dark';
@@ -37,11 +59,41 @@ export function HomePage() {
 			<div className="absolute inset-0">
 				<ReportMap 
 					reports={mapReports} 
-					position={position} 
-					setPosition={setPosition} 
+					center={mapCenter}
+					currentLocation={currentLocation}
 					theme={theme} 
 				/>
 			</div>
+		<div className="fixed left-3 top-4 z-2000 flex max-w-[90vw] flex-col gap-2 md:top-24">
+			<div className="flex flex-wrap gap-2 rounded-xl bg-white/90 dark:bg-neutral-800/90 p-2 shadow">
+				{STATUS_FILTER_OPTIONS.map((option) => (
+					<button
+						key={option.value}
+						type="button"
+						onClick={() => { setStatusFilter(option.value); setNeedsVotesOnly(false); }}
+						disabled={needsVotesOnly}
+						className={`rounded-full px-3 py-1 text-xs font-semibold transition disabled:opacity-40 ${
+							!needsVotesOnly && statusFilter === option.value
+								? 'bg-emerald-600 text-white'
+								: 'bg-white dark:bg-neutral-700 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-600'
+						}`}
+					>
+						{option.label}
+					</button>
+				))}
+			</div>
+			<button
+				type="button"
+				onClick={() => setNeedsVotesOnly((prev) => !prev)}
+				className={`self-start rounded-full px-3 py-1 text-xs font-semibold shadow transition ${
+					needsVotesOnly
+						? 'bg-amber-500 text-white'
+						: 'bg-white/90 dark:bg-neutral-800/90 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-600'
+				}`}
+			>
+				{needsVotesOnly ? '✓ Needs votes' : 'Show needs votes'}
+			</button>
+		</div>
 
 			<div className="fixed bottom-28 right-3 z-2000 pointer-events-auto lg:bottom-24">
 				<button
