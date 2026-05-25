@@ -10,7 +10,7 @@
     "check": "tsc --noEmit",
     "test": "tsx --test src/**/*.test.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
+    "db:migrate": "node dist/migrate.js",
     "db:studio": "drizzle-kit studio"
   },
   "keywords": [],
