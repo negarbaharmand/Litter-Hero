@@ -3,7 +3,7 @@ kind: ServiceMonitor
 metadata:
   name: litter-hero-dashboard
   labels:
-    release: monitoring # This label must be there!
+    release: monitoring
 spec:
   selector:
     matchLabels:
@@ -18,7 +18,7 @@ kind: PrometheusRule
 metadata:
   name: litter-hero-dashboard
   labels:
-    release: monitoring # This needs to be there!
+    release: monitoring
 spec:
   groups:
     - name: backend.rules
@@ -66,7 +66,7 @@ kind: ConfigMap
 metadata:
   name: litter-hero-dashboard
   labels:
-    grafana_dashboard: "1" # This needs to be there!
+    grafana_dashboard: "1"
 data:
   litter-hero-dashboard.json: |
     {
