@@ -92,6 +92,8 @@ const options = {
             cleanedByUserId: { type: "integer", nullable: true },
             cleanedAt: { type: "string", format: "date-time", nullable: true },
             createdAt: { type: "string", format: "date-time", nullable: true },
+            pendingSubmissionsCount: { type: "integer", description: "Number of pending cleanup submissions awaiting community votes" },
+            topPendingVoteCount: { type: "integer", description: "Highest vote count reached on any single pending submission (max possible: 3)" },
           },
           required: ["id", "userId", "location"],
         },
