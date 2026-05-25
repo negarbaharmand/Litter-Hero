@@ -1,6 +1,8 @@
 import { pgTable, serial, varchar, integer, timestamp, pgEnum, real, uniqueIndex } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
+export const reportVerificationVoteEnum = pgEnum('report_verification_vote', ['legit', 'not_trash']);
+
 export const statusEnum = pgEnum('status', [
   'pending',
   'verified',
@@ -91,11 +93,33 @@ export const cleanupSubmissionVotes = pgTable(
   })
 );
 
-// This helps Drizzle understand the "One-to-Many" relationship
+export const reportVerificationVotes = pgTable(
+  'report_verification_votes',
+  {
+    id: serial('id').primaryKey(),
+    reportId: integer('report_id')
+      .references(() => reports.id)
+      .notNull(),
+    userId: integer('user_id')
+      .references(() => users.id)
+      .notNull(),
+    vote: reportVerificationVoteEnum('vote').notNull(),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => ({
+    uniqueVotePerReportIdx: uniqueIndex('report_verification_votes_report_user_idx').on(
+      table.reportId,
+      table.userId
+    ),
+  })
+);
+
+// This helps Drizzle understand the "One-to-Many" relationships
 export const usersRelations = relations(users, ({ many }) => ({
   reports: many(reports),
   cleanupSubmissions: many(cleanupSubmissions),
   cleanupSubmissionVotes: many(cleanupSubmissionVotes),
+  reportVerificationVotes: many(reportVerificationVotes),
 }));
 
 export const reportsRelations = relations(reports, ({ one, many }) => ({
@@ -108,6 +132,7 @@ export const reportsRelations = relations(reports, ({ one, many }) => ({
     references: [users.id],
   }),
   cleanupSubmissions: many(cleanupSubmissions),
+  verificationVotes: many(reportVerificationVotes),
 }));
 
 export const cleanupSubmissionsRelations = relations(cleanupSubmissions, ({ one, many }) => ({
@@ -129,6 +154,17 @@ export const cleanupSubmissionVotesRelations = relations(cleanupSubmissionVotes,
   }),
   voter: one(users, {
     fields: [cleanupSubmissionVotes.userId],
+    references: [users.id],
+  }),
+}));
+
+export const reportVerificationVotesRelations = relations(reportVerificationVotes, ({ one }) => ({
+  report: one(reports, {
+    fields: [reportVerificationVotes.reportId],
+    references: [reports.id],
+  }),
+  voter: one(users, {
+    fields: [reportVerificationVotes.userId],
     references: [users.id],
   }),
 }));

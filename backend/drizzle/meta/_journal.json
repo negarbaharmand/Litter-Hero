@@ -57,6 +57,13 @@
       "when": 1779386302183,
       "tag": "0007_deep_wong",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1748167800000,
+      "tag": "0008_report_verification_votes",
+      "breakpoints": true
     }
   ]
 }
