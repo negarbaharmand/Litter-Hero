@@ -1,46 +1,60 @@
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { fetchReports } from "../api";
+import type { Report } from "../api";
+import {
+  getStatusPresentation,
+  STATUS_FILTER_OPTIONS,
+  type ReportStatusFilter,
+} from "../utils/reportStatus";
 
-import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import { fetchReports } from '../api'
-import type { Report } from '../api'
-import { getStatusPresentation, STATUS_FILTER_OPTIONS, type ReportStatusFilter } from '../utils/reportStatus'
-
-const VOTE_THRESHOLD = 3
+const VOTE_THRESHOLD = 3;
 
 function isValidFilter(value: string | null): value is ReportStatusFilter {
-  return STATUS_FILTER_OPTIONS.some((opt) => opt.value === value)
+  return STATUS_FILTER_OPTIONS.some((opt) => opt.value === value);
 }
 
 export function ReportList() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const rawFilter = searchParams.get('filter')
-  const statusFilter: ReportStatusFilter = isValidFilter(rawFilter) ? rawFilter : 'all'
+  const [searchParams, setSearchParams] = useSearchParams();
+  const rawFilter = searchParams.get("filter");
+  const statusFilter: ReportStatusFilter = isValidFilter(rawFilter)
+    ? rawFilter
+    : "all";
 
   function setStatusFilter(next: ReportStatusFilter) {
-    setSearchParams(next === 'all' ? {} : { filter: next }, { replace: true })
+    setSearchParams(next === "all" ? {} : { filter: next }, { replace: true });
   }
-  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null)
-  const [previewImageAlt, setPreviewImageAlt] = useState<string>('Report image')
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
+  const [previewImageAlt, setPreviewImageAlt] =
+    useState<string>("Report image");
   const { data, isLoading, isError, error } = useQuery<Report[]>({
-    queryKey: ['reports', statusFilter],
-    queryFn: () => fetchReports(statusFilter === 'all' ? undefined : statusFilter),
-  })
+    queryKey: ["reports", statusFilter],
+    queryFn: () =>
+      fetchReports(statusFilter === "all" ? undefined : statusFilter),
+  });
 
-  if (isLoading) return <div className="p-6" style={{ color: 'var(--color-text-muted)' }}>Loading reports... ⏳</div>
+  if (isLoading)
+    return (
+      <div className="p-6" style={{ color: "var(--color-text-muted)" }}>
+        Loading reports... ⏳
+      </div>
+    );
 
   if (isError) {
     return (
       <div className="p-6 text-red-600">
         Error: {(error as Error).message} ❌
       </div>
-    )
+    );
   }
-  const visibleReports = (data ?? []).filter((report) => report.status != 'rejected')
+  const visibleReports = (data ?? []).filter(
+    (report) => report.status != "rejected",
+  );
   return (
     <div className="p-1">
       <div className="flex items-center justify-between gap-4">
-        <span className="rounded-full bg-emerald-300 px-3 py-1 text-sm text-white">
+        <span className="rounded-full bg-emerald-300 px-3 py-1 text-sm text-gray-950">
           {visibleReports.length} reports
         </span>
       </div>
@@ -52,8 +66,8 @@ export function ReportList() {
             onClick={() => setStatusFilter(option.value)}
             className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
               statusFilter === option.value
-                ? 'bg-emerald-600 text-white'
-                : 'bg-white dark:bg-neutral-700 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-600'
+                ? "bg-emerald-300 text-gray-950"
+                : "bg-white dark:bg-neutral-700 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-600"
             }`}
           >
             {option.label}
@@ -67,24 +81,29 @@ export function ReportList() {
             key={report.id}
             to={`/reports/${report.id}`}
             className="block rounded-xl border shadow-sm transition hover:shadow-md overflow-hidden"
-            style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+            style={{
+              borderColor: "var(--color-border)",
+              backgroundColor: "var(--color-surface)",
+            }}
           >
             {report.imageUrl && (
               <div className="w-full bg-slate-100 dark:bg-neutral-800 p-3">
                 <button
                   type="button"
                   onClick={(event) => {
-                    event.preventDefault()
-                    event.stopPropagation()
-                    setPreviewImageUrl(report.imageUrl)
-                    setPreviewImageAlt(report.description?.trim() || 'Report image')
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setPreviewImageUrl(report.imageUrl);
+                    setPreviewImageAlt(
+                      report.description?.trim() || "Report image",
+                    );
                   }}
                   className="mx-auto block w-full max-w-[320px] overflow-hidden rounded-xl"
                   aria-label="Open report image preview"
                 >
                   <img
                     src={report.imageUrl}
-                    alt={report.description?.trim() || 'Report image'}
+                    alt={report.description?.trim() || "Report image"}
                     className="aspect-square w-full object-cover transition-transform duration-200 hover:scale-[1.02]"
                   />
                 </button>
@@ -99,22 +118,39 @@ export function ReportList() {
                 >
                   {getStatusPresentation(report.status).label}
                 </span>
-                {report.status === 'cleanup_pending_vote' && report.pendingSubmissionsCount > 0 && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
-                    <span>{report.topPendingVoteCount}/{VOTE_THRESHOLD} votes</span>
-                  </span>
-                )}
+                {report.status === "cleanup_pending_vote" &&
+                  report.pendingSubmissionsCount > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
+                      <span>
+                        {report.topPendingVoteCount}/{VOTE_THRESHOLD} votes
+                      </span>
+                    </span>
+                  )}
               </div>
-              <p className="font-semibold" style={{ color: 'var(--color-text-primary)', fontSize: '21px' }}>
-                {report.description ?? 'No description'}
+              <p
+                className="font-semibold"
+                style={{ color: "var(--color-text-primary)", fontSize: "21px" }}
+              >
+                {report.description ?? "No description"}
               </p>
-              <p className="font-medium mt-3" style={{ color: 'var(--color-text-body)' }}>
-                <span style={{ color: 'var(--color-text-muted)' }}>Location:</span> {report.location}
+              <p
+                className="font-medium mt-3"
+                style={{ color: "var(--color-text-body)" }}
+              >
+                <span style={{ color: "var(--color-text-muted)" }}>
+                  Location:
+                </span>{" "}
+                {report.location}
               </p>
-              <p className="mt-3 text-sm italic" style={{ color: 'var(--color-text-muted)' }}>
-                Size: {report.size ?? 'Unknown'}
+              <p
+                className="mt-3 text-sm italic"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                Size: {report.size ?? "Unknown"}
               </p>
-              <p className="mt-3 text-sm font-medium text-emerald-700">Open details</p>
+              <p className="mt-3 text-sm font-medium text-emerald-700">
+                Open details
+              </p>
             </div>
           </Link>
         ))}
@@ -139,10 +175,14 @@ export function ReportList() {
             >
               Close
             </button>
-            <img src={previewImageUrl} alt={previewImageAlt} className="max-h-[85vh] w-full object-contain" />
+            <img
+              src={previewImageUrl}
+              alt={previewImageAlt}
+              className="max-h-[85vh] w-full object-contain"
+            />
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }
