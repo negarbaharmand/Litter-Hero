@@ -12,6 +12,12 @@ export function AuthGateModal({ open, message, onDismiss }: AuthGateModalProps) 
 
   useEffect(() => {
     if (!open) return
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onDismiss()
     }
