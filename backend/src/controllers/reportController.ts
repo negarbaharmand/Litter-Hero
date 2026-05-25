@@ -14,7 +14,7 @@ import {
   summarizeVotes,
 } from './reportWorkflow.js';
 
-const REPORT_STATUSES = new Set([
+const DB_REPORT_STATUSES = new Set([
   'pending',
   'verified',
   'disputed',
@@ -22,8 +22,12 @@ const REPORT_STATUSES = new Set([
   'rejected',
   'open',
   'cleanup_pending_vote',
-  'needs_votes',
 ]);
+
+// Virtual filter combining pending + cleanup_pending_vote — not a real DB status
+const VIRTUAL_STATUS_FILTERS = new Set(['needs_votes']);
+
+const REPORT_STATUSES = new Set([...DB_REPORT_STATUSES, ...VIRTUAL_STATUS_FILTERS]);
 
 function parsePositiveId(value: unknown): number | null {
   if (typeof value !== 'string') return null;
@@ -41,8 +45,7 @@ async function getVoteSummary(submissionId: number, currentUserId?: number) {
     .from(cleanupSubmissionVotes)
     .where(eq(cleanupSubmissionVotes.submissionId, submissionId));
 
-  const cleanVotes = votes.filter((vote) => vote.vote === 'clean').length;
-  const notCleanVotes = votes.filter((vote) => vote.vote === 'not_clean').length;
+  const { cleanVotes, notCleanVotes } = summarizeVotes(votes.map((v) => v.vote));
 
   return {
     totalVotes: votes.length,
@@ -51,7 +54,7 @@ async function getVoteSummary(submissionId: number, currentUserId?: number) {
     myVote:
       currentUserId === undefined
         ? null
-        : votes.find((vote) => vote.userId === currentUserId)?.vote ?? null,
+        : votes.find((v) => v.userId === currentUserId)?.vote ?? null,
   };
 }
 
