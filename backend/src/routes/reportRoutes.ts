@@ -6,6 +6,7 @@ import {
   getCleanupSubmissionById,
   getReportById,
   voteOnCleanupSubmission,
+  voteOnReportVerification,
 } from '../controllers/reportController.js';
 import { authenticate } from '../middleware/authenticate.js';
 
@@ -273,5 +274,52 @@ router.get('/:id/cleanup-submissions/:submissionId', getCleanupSubmissionById);
  *         description: Internal server error
  */
 router.post('/:id/cleanup-submissions/:submissionId/votes', authenticate, voteOnCleanupSubmission);
+
+/**
+ * @swagger
+ * /api/reports/{id}/verification-votes:
+ *   post:
+ *     tags: [Reports]
+ *     summary: Vote on whether a report is legitimate trash
+ *     description: |
+ *       Cast a community vote on a pending report. One vote per user.
+ *       Reporter cannot vote on their own report. At 3 votes, majority decides:
+ *       'legit' majority → report becomes verified and reporter earns size-based points;
+ *       'not_trash' majority → report is rejected.
+ *       Voter earns +3 points immediately on each vote.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [vote]
+ *             properties:
+ *               vote:
+ *                 type: string
+ *                 enum: [legit, not_trash]
+ *     responses:
+ *       201:
+ *         description: Vote accepted; report may still be pending or become verified/rejected
+ *       400:
+ *         description: Invalid report id or invalid vote value
+ *       401:
+ *         description: Missing or invalid JWT
+ *       403:
+ *         description: Forbidden self-vote
+ *       404:
+ *         description: Report not found
+ *       409:
+ *         description: Duplicate vote or report is not pending verification
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/:id/verification-votes', authenticate, voteOnReportVerification);
 
 export default router;

@@ -1,12 +1,16 @@
 import type { Request, Response } from 'express';
 import { db } from '../db/index.js';
-import { and, eq, gt, ne, sql } from 'drizzle-orm';
-import { cleanupSubmissions, cleanupSubmissionVotes, reports, users } from '../db/schema.js';
+import { and, eq, gt, inArray, ne, sql } from 'drizzle-orm';
+import { cleanupSubmissions, cleanupSubmissionVotes, reportVerificationVotes, reports, users } from '../db/schema.js';
 import {
   CLEANUP_VOTE_THRESHOLD,
   getCleanupPointsForSize,
   getReportPointsForSize,
+  REPORT_VERIFICATION_VOTER_POINTS,
+  REPORT_VOTE_THRESHOLD,
   resolveCleanupFromVotes,
+  resolveReportFromVotes,
+  summarizeReportVotes,
   summarizeVotes,
 } from './reportWorkflow.js';
 
@@ -18,6 +22,7 @@ const REPORT_STATUSES = new Set([
   'rejected',
   'open',
   'cleanup_pending_vote',
+  'needs_votes',
 ]);
 
 function parsePositiveId(value: unknown): number | null {
@@ -47,6 +52,28 @@ async function getVoteSummary(submissionId: number, currentUserId?: number) {
       currentUserId === undefined
         ? null
         : votes.find((vote) => vote.userId === currentUserId)?.vote ?? null,
+  };
+}
+
+async function getReportVerificationVoteSummary(reportId: number, currentUserId?: number) {
+  const votes = await db
+    .select({
+      vote: reportVerificationVotes.vote,
+      userId: reportVerificationVotes.userId,
+    })
+    .from(reportVerificationVotes)
+    .where(eq(reportVerificationVotes.reportId, reportId));
+
+  const { legitVotes, notTrashVotes } = summarizeReportVotes(votes.map((v) => v.vote));
+
+  return {
+    totalVotes: votes.length,
+    legitVotes,
+    notTrashVotes,
+    myVote:
+      currentUserId === undefined
+        ? null
+        : votes.find((v) => v.userId === currentUserId)?.vote ?? null,
   };
 }
 
@@ -97,9 +124,11 @@ export const getAllReports = async (req: Request, res: Response) => {
       })
       .from(reports);
 
-    const allReports = statusFilter
-      ? await query.where(eq(reports.status, statusFilter as (typeof reports.$inferSelect)['status']))
-      : await query;
+    const allReports = statusFilter === 'needs_votes'
+      ? await query.where(inArray(reports.status, ['pending', 'cleanup_pending_vote']))
+      : statusFilter
+        ? await query.where(eq(reports.status, statusFilter as (typeof reports.$inferSelect)['status']))
+        : await query;
 
     return res.json(allReports);
   } catch (error) {
@@ -158,8 +187,11 @@ export const getReportById = async (req: Request, res: Response) => {
     const winningSubmission =
       cleanupSubmissionsWithVotes.find((submission) => submission.status === 'approved') ?? null;
 
+    const verificationVoteSummary = await getReportVerificationVoteSummary(reportId, req.user?.id);
+
     return res.json({
       ...report,
+      verificationVoteSummary,
       winningSubmission,
       cleanupSubmissions: cleanupSubmissionsWithVotes,
     });
@@ -279,19 +311,10 @@ export const createReport = async (req: Request, res: Response) => {
         description,
         size,
         imageSizeBytes: parsedImageSizeBytes ?? null,
-        status: autoRejected ? 'rejected' : 'open',
+        status: autoRejected ? 'rejected' : 'pending',
         rejectionReason: autoRejected ? rejectionReasons.join('; ') : null,
       })
       .returning();
-
-    if (!autoRejected) {
-      await db
-        .update(users)
-        .set({
-          points: sql`${users.points} + ${getReportPointsForSize(size)}`,
-        })
-        .where(eq(users.id, userId));
-    }
 
     return res.status(201).json(newReport);
   } catch (error) {
@@ -325,6 +348,12 @@ export const createCleanupSubmission = async (req: Request, res: Response) => {
     if (report.status === 'cleaned') {
       return res.status(409).json({ error: 'Report is already cleaned' });
     }
+    if (report.status === 'pending') {
+      return res.status(409).json({ error: 'Report is still pending community verification' });
+    }
+    if (report.status === 'rejected') {
+      return res.status(409).json({ error: 'Report has been rejected' });
+    }
 
     const [createdSubmission] = await db
       .insert(cleanupSubmissions)
@@ -345,11 +374,11 @@ export const createCleanupSubmission = async (req: Request, res: Response) => {
         resolvedAt: cleanupSubmissions.resolvedAt,
       });
 
-    if (report.status === 'open') {
+    if (report.status === 'verified') {
       await db
         .update(reports)
         .set({ status: 'cleanup_pending_vote' })
-        .where(and(eq(reports.id, reportId), eq(reports.status, 'open')));
+        .where(and(eq(reports.id, reportId), eq(reports.status, 'verified')));
     }
 
     return res.status(201).json({
@@ -574,7 +603,7 @@ export const voteOnCleanupSubmission = async (req: Request, res: Response) => {
         if ((pendingSubmissionCount?.count ?? 0) === 0) {
           await tx
             .update(reports)
-            .set({ status: 'open' })
+            .set({ status: 'verified' })
             .where(and(eq(reports.id, reportId), eq(reports.status, 'cleanup_pending_vote')));
         }
       }
@@ -613,6 +642,111 @@ export const voteOnCleanupSubmission = async (req: Request, res: Response) => {
           submission: outcome.submission,
           voteSummary: outcome.voteSummary,
         });
+      default:
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const voteOnReportVerification = async (req: Request, res: Response) => {
+  try {
+    const reportId = parsePositiveId(req.params.id);
+    if (!reportId) return res.status(400).json({ error: 'Invalid report id' });
+
+    const userId = req.user!.id;
+    const vote = req.body?.vote;
+    if (vote !== 'legit' && vote !== 'not_trash') {
+      return res.status(400).json({ error: "vote must be either 'legit' or 'not_trash'" });
+    }
+
+    const outcome = await db.transaction(async (tx) => {
+      const [report] = await tx
+        .select({
+          id: reports.id,
+          status: reports.status,
+          userId: reports.userId,
+          size: reports.size,
+        })
+        .from(reports)
+        .where(eq(reports.id, reportId))
+        .limit(1);
+
+      if (!report) return { type: 'not_found' } as const;
+      if (report.status !== 'pending') return { type: 'not_pending' } as const;
+      if (report.userId === userId) return { type: 'forbidden_self_vote' } as const;
+
+      try {
+        await tx.insert(reportVerificationVotes).values({ reportId, userId, vote });
+      } catch (error) {
+        const maybePgError = error as { code?: string };
+        if (maybePgError.code === '23505') return { type: 'duplicate_vote' } as const;
+        throw error;
+      }
+
+      await tx
+        .update(users)
+        .set({ points: sql`${users.points} + ${REPORT_VERIFICATION_VOTER_POINTS}` })
+        .where(eq(users.id, userId));
+
+      const allVotes = await tx
+        .select({ vote: reportVerificationVotes.vote })
+        .from(reportVerificationVotes)
+        .where(eq(reportVerificationVotes.reportId, reportId));
+
+      const { totalVotes, legitVotes, notTrashVotes } = summarizeReportVotes(allVotes.map((v) => v.vote));
+
+      if (totalVotes < REPORT_VOTE_THRESHOLD) {
+        return {
+          type: 'pending',
+          voteSummary: { totalVotes, legitVotes, notTrashVotes, myVote: vote },
+        } as const;
+      }
+
+      const resolution = resolveReportFromVotes(allVotes.map((v) => v.vote));
+      if (resolution === 'pending') {
+        return {
+          type: 'pending',
+          voteSummary: { totalVotes, legitVotes, notTrashVotes, myVote: vote },
+        } as const;
+      }
+
+      await tx
+        .update(reports)
+        .set({
+          status: resolution,
+          rejectionReason: resolution === 'rejected' ? 'Community verification failed' : null,
+        })
+        .where(and(eq(reports.id, reportId), eq(reports.status, 'pending')));
+
+      if (resolution === 'verified') {
+        await tx
+          .update(users)
+          .set({ points: sql`${users.points} + ${getReportPointsForSize(report.size)}` })
+          .where(eq(users.id, report.userId));
+      }
+
+      return {
+        type: 'resolved',
+        resolution,
+        voteSummary: { totalVotes, legitVotes, notTrashVotes, myVote: vote },
+      } as const;
+    });
+
+    switch (outcome.type) {
+      case 'not_found':
+        return res.status(404).json({ error: 'Report not found' });
+      case 'not_pending':
+        return res.status(409).json({ error: 'Report is not pending verification' });
+      case 'forbidden_self_vote':
+        return res.status(403).json({ error: 'You cannot vote on your own report' });
+      case 'duplicate_vote':
+        return res.status(409).json({ error: 'You have already voted on this report' });
+      case 'pending':
+        return res.status(201).json({ status: 'pending', voteSummary: outcome.voteSummary });
+      case 'resolved':
+        return res.status(201).json({ status: outcome.resolution, voteSummary: outcome.voteSummary });
       default:
         return res.status(500).json({ error: 'Internal server error' });
     }
