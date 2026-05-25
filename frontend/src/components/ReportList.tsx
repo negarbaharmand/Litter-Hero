@@ -1,13 +1,25 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { fetchReports } from '../api'
 import type { Report } from '../api'
 import { getStatusPresentation, STATUS_FILTER_OPTIONS, type ReportStatusFilter } from '../utils/reportStatus'
 
+const VOTE_THRESHOLD = 3
+
+function isValidFilter(value: string | null): value is ReportStatusFilter {
+  return STATUS_FILTER_OPTIONS.some((opt) => opt.value === value)
+}
+
 export function ReportList() {
-  const [statusFilter, setStatusFilter] = useState<ReportStatusFilter>('all')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const rawFilter = searchParams.get('filter')
+  const statusFilter: ReportStatusFilter = isValidFilter(rawFilter) ? rawFilter : 'all'
+
+  function setStatusFilter(next: ReportStatusFilter) {
+    setSearchParams(next === 'all' ? {} : { filter: next }, { replace: true })
+  }
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null)
   const [previewImageAlt, setPreviewImageAlt] = useState<string>('Report image')
   const { data, isLoading, isError, error } = useQuery<Report[]>({
@@ -41,7 +53,7 @@ export function ReportList() {
             className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
               statusFilter === option.value
                 ? 'bg-emerald-600 text-white'
-                : 'bg-white text-slate-700 border border-slate-200'
+                : 'bg-white dark:bg-neutral-700 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-600'
             }`}
           >
             {option.label}
@@ -58,7 +70,7 @@ export function ReportList() {
             style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
           >
             {report.imageUrl && (
-              <div className="w-full bg-slate-100 p-3">
+              <div className="w-full bg-slate-100 dark:bg-neutral-800 p-3">
                 <button
                   type="button"
                   onClick={(event) => {
@@ -79,13 +91,20 @@ export function ReportList() {
               </div>
             )}
             <div className="p-4">
-              <span
-                className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${
-                  getStatusPresentation(report.status).className
-                }`}
-              >
-                {getStatusPresentation(report.status).label}
-              </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span
+                  className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${
+                    getStatusPresentation(report.status).className
+                  }`}
+                >
+                  {getStatusPresentation(report.status).label}
+                </span>
+                {report.status === 'cleanup_pending_vote' && report.pendingSubmissionsCount > 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
+                    <span>{report.topPendingVoteCount}/{VOTE_THRESHOLD} votes</span>
+                  </span>
+                )}
+              </div>
               <p className="font-semibold" style={{ color: 'var(--color-text-primary)', fontSize: '21px' }}>
                 {report.description ?? 'No description'}
               </p>

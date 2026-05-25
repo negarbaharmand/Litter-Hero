@@ -14,7 +14,7 @@ const STATUS_PRESENTATION: Record<ReportStatus, StatusPresentation> = {
     className: 'bg-emerald-100 text-emerald-800',
   },
   cleanup_pending_vote: {
-    label: 'Cleanup pending vote',
+    label: 'Needs votes',
     className: 'bg-amber-100 text-amber-800',
   },
   cleaned: {
@@ -42,7 +42,7 @@ const STATUS_PRESENTATION: Record<ReportStatus, StatusPresentation> = {
 export const STATUS_FILTER_OPTIONS: Array<{ value: ReportStatusFilter; label: string }> = [
   { value: 'all', label: 'All' },
   { value: 'open', label: 'Open' },
-  { value: 'cleanup_pending_vote', label: 'Cleanup pending vote' },
+  { value: 'cleanup_pending_vote', label: 'Needs votes' },
   { value: 'cleaned', label: 'Cleaned' },
 ];
 

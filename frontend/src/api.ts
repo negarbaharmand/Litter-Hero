@@ -24,6 +24,8 @@ export type Report = {
   cleanedByUserId: number | null;
   cleanedAt: string | null;
   createdAt: string;
+  pendingSubmissionsCount: number;
+  topPendingVoteCount: number;
 };
 
 export type CleanupSubmission = {
