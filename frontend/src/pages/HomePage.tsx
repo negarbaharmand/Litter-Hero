@@ -74,16 +74,20 @@ export function HomePage() {
 					className="flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-neutral-700 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-600 transition hover:bg-slate-100 dark:hover:bg-neutral-600"
 				>
 					<svg
-						width="14"
-						height="14"
+						width="16"
+						height="16"
 						viewBox="0 0 24 24"
 						fill="none"
 						xmlns="http://www.w3.org/2000/svg"
 						aria-hidden="true"
 					>
+						<circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+						<circle cx="12" cy="8" r="1.25" fill="currentColor" />
 						<path
-							d="M16 14a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-8 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm0 2c-2.67 0-8 1.34-8 4v2h9v-2c0-1.04.5-2.05 1.3-2.85A12.4 12.4 0 0 0 8 16Zm8 0c-.29 0-.62.02-.97.05A5.51 5.51 0 0 1 18 20v2h6v-2c0-2.66-5.33-4-8-4Z"
-							fill="currentColor"
+							d="M12 11.5v6"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
 						/>
 					</svg>
 				</Link>
