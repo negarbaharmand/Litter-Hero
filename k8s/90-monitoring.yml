@@ -3,7 +3,7 @@ kind: ServiceMonitor
 metadata:
   name: litter-hero-dashboard
   labels:
-    release: monitoring # This label must be there!
+    release: monitoring
 spec:
   selector:
     matchLabels:
@@ -18,12 +18,12 @@ kind: PrometheusRule
 metadata:
   name: litter-hero-dashboard
   labels:
-    release: monitoring # This needs to be there!
+    release: monitoring
 spec:
   groups:
     - name: backend.rules
       rules:
-        - alert: backendHighErrorRate
+        - alert: LitterHeroHighErrorRate
           expr: |
             sum(rate(http_request_duration_seconds_count{namespace="doe25-group-2",status_code=~"5..",path!="/metrics"}[5m]))
               /
@@ -33,23 +33,40 @@ spec:
           labels:
             severity: warning
           annotations:
-            summary: "test-rest-api 5xx rate above 5% (5m)"
+            summary: "LitterHero 5xx rate above 5% (5m)"
             description: "More than 5% of requests are returning 5xx for the last 5 minutes."
-        - alert: TestRestApiNoTraffic
+        - alert: LitterHeroNoTraffic
           expr: |
             sum(rate(http_request_duration_seconds_count{namespace="doe25-group-2",path!="/metrics"}[10m])) == 0
-          for: 15m
+          for: 5m
           labels:
             severity: info
           annotations:
-            summary: "test-rest-api has received no traffic for 15m"
+            summary: "LitterHero has received no traffic for 5m"
+        - alert: LitterHeroManyReq
+          expr: |
+            sum(rate(http_request_duration_seconds_count{namespace="doe25-group-2",path!="/metrics"}[5m])) > 100
+          for: 5m
+          labels:
+            severity: info
+          annotations:
+            summary: "LitterHero are receiving 100req/s+ for 5m"
+        - alert: LitterHeroToDamnManyReq
+          expr: |
+            sum(rate(http_request_duration_seconds_count{namespace="doe25-group-2",path!="/metrics"}[5m])) > 200
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "LitterHero are receiving 200req/s+ for 5m"
+
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: litter-hero-dashboard
   labels:
-    grafana_dashboard: "1" # This needs to be there!
+    grafana_dashboard: "1"
 data:
   litter-hero-dashboard.json: |
     {
