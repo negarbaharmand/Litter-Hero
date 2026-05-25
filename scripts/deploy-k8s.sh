@@ -16,6 +16,9 @@ kubectl apply -n "${NAMESPACE}" -f k8s/20-gitlab-secrets.yml \
 kubectl apply -n "${NAMESPACE}" -f k8s/30-deploy-database.yml
 kubectl rollout status statefulset database -n "${NAMESPACE}" --timeout=5m
 
+envsubst '${CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE} ${CI_COMMIT_SHA}' <k8s/40-deploy-backend.yml | kubectl apply -n "${NAMESPACE}" -f -
+kubectl rollout status deployment backend-"${CI_COMMIT_REF_SLUG}" -n "${NAMESPACE}" --timeout=5m
+
 # Run migrations before deploying the backend so the schema is ready when the backend starts
 kubectl delete job backend-migrate-"${CI_COMMIT_REF_SLUG}" -n "${NAMESPACE}" --ignore-not-found
 
@@ -42,12 +45,6 @@ for i in $(seq 1 60); do
   sleep 5
 done
 
-<<<<<<< Updated upstream
-envsubst '${CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE} ${CI_COMMIT_SHA}' <k8s/40-deploy-backend.yml | kubectl apply -n "${NAMESPACE}" -f -
-kubectl rollout status deployment backend-"${CI_COMMIT_REF_SLUG}" -n "${NAMESPACE}" --timeout=5m
-
-=======
->>>>>>> Stashed changes
 envsubst '${CI_COMMIT_REF_SLUG} ${CI_REGISTRY_IMAGE} ${CI_COMMIT_SHA}' <k8s/60-deploy-frontend.yml | kubectl apply -n "${NAMESPACE}" -f -
 kubectl rollout status deployment frontend-"${CI_COMMIT_REF_SLUG}" -n "${NAMESPACE}" --timeout=5m
 
