@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import ReportMap from '../components/Map/ReportMap';
 import { fetchReports } from '../api';
 import { STATUS_FILTER_OPTIONS, type ReportStatusFilter } from '../utils/reportStatus';
@@ -65,7 +66,27 @@ export function HomePage() {
 				/>
 			</div>
 		<div className="fixed left-3 top-4 z-2000 flex max-w-[90vw] flex-col gap-2 md:top-24">
-			<div className="flex flex-wrap gap-2 rounded-xl bg-white/90 dark:bg-neutral-800/90 p-2 shadow">
+			<div className="flex flex-wrap items-center gap-2 rounded-xl bg-white/90 dark:bg-neutral-800/90 p-2 shadow">
+				<Link
+					to="/about"
+					aria-label="About us"
+					title="About us"
+					className="flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-neutral-700 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-600 transition hover:bg-slate-100 dark:hover:bg-neutral-600"
+				>
+					<svg
+						width="14"
+						height="14"
+						viewBox="0 0 24 24"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true"
+					>
+						<path
+							d="M16 14a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-8 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm0 2c-2.67 0-8 1.34-8 4v2h9v-2c0-1.04.5-2.05 1.3-2.85A12.4 12.4 0 0 0 8 16Zm8 0c-.29 0-.62.02-.97.05A5.51 5.51 0 0 1 18 20v2h6v-2c0-2.66-5.33-4-8-4Z"
+							fill="currentColor"
+						/>
+					</svg>
+				</Link>
 				{STATUS_FILTER_OPTIONS.map((option) => (
 					<button
 						key={option.value}
