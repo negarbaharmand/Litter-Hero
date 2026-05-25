@@ -4,10 +4,10 @@ metadata:
   name: backend-migrate-${CI_COMMIT_REF_SLUG}
 spec:
   backoffLimit: 2
-  ttlSecondsAfterFinished: 300
+  ttlSecondsAfterFinished: 3600
   template:
     spec:
-      restartPolicy: OnFailure
+      restartPolicy: Never
       imagePullSecrets:
         - name: gitlab-registry
       containers:
