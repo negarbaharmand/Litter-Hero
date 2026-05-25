@@ -17,10 +17,7 @@ export function AboutPage() {
         <section className="card">
           <h2 className="mb-3">Our mission</h2>
           <p style={{ color: 'var(--color-text-body)' }}>
-            We built Litter Hero because litter is genuinely annoying,
-            and doing nothing about it is worse. The idea is simple: when you spot a mess, you report it.
-            That small act goes into a shared map, other people see it,and slowly things actually get better.
-            No shaming, no preaching. Just people looking out for the earth we live on while doing something good.
+            We built Litter Hero because we genuinely care about the environment and want to see it thrive for future generations. The idea is simple: Think of it as Pokemon Go but for litter - when you spot a mess, you report it. That small act goes into a shared map, other people can see it, clean it up, and slowly things actually get better. No shaming, no preaching. Just people looking out for the environment while doing something good.
           </p>
         </section>
 
@@ -44,7 +41,8 @@ export function AboutPage() {
         <section className="card">
           <h2 className="mb-3">How it came to be</h2>
           <p style={{ color: 'var(--color-text-body)' }}>
-            not sure what to write :p
+            We at Litter Hero genuinely care about the environment and wanted to help people who care about the environment make their efforts more rewarding than just the work itself. 
+            
           </p>
         </section>
 
@@ -54,11 +52,11 @@ export function AboutPage() {
             className="mb-3"
             style={{ color: 'var(--color-text-body)' }}
           >
-            Reporting and cleaning up earns you points. Right now those points gets you a
-            place on the leaderboard. But that's only the start.
+            Reporting and cleaning up earns you points. Right now those points lands you a
+            spot on the leaderboard. But that's only the start.
           </p>
           <p style={{ color: 'var(--color-text-body)' }}>
-            We're working toward turning those points into something tangible: gift
+            We're working toward turning those points into something tangible - gift
             cards and discounts at local stores and brands that care about the same things
             you do. Doing good for the environment can be more rewarding than just the work itself.
           </p>
