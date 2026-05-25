@@ -75,6 +75,29 @@ export type VoteOnReportVerificationResponse = {
   voteSummary: ReportVerificationVoteSummary;
 };
 
+export type TrashVerificationQueueItem = {
+  reportId: number;
+  location: string;
+  description: string | null;
+  imageUrl: string | null;
+  ownerUserId: number;
+  size: string | null;
+  createdAt: string;
+  voteSummary: ReportVerificationVoteSummary;
+};
+
+export type CleanupVerificationQueueItem = {
+  reportId: number;
+  reportLocation: string;
+  reportOwnerUserId: number;
+  submission: CleanupSubmissionWithVotes;
+};
+
+export type VoteQueueResponse = {
+  trashVerifications: TrashVerificationQueueItem[];
+  cleanupVerifications: CleanupVerificationQueueItem[];
+};
+
 export type ReportStatusFilter = 'pending' | 'verified' | 'disputed' | 'cleaned' | 'rejected' | 'open' | 'cleanup_pending_vote' | 'needs_votes';
 
 export type CreateReportPayload = {
@@ -421,4 +444,12 @@ export const voteOnReportVerification = async (
   }
 
   return data as VoteOnReportVerificationResponse;
+};
+
+export const fetchVoteQueue = async (): Promise<VoteQueueResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/reports/vote-queue`, {
+    headers: { ...authHeaders() },
+  });
+  if (!response.ok) throw new Error('Failed to fetch vote queue');
+  return response.json() as Promise<VoteQueueResponse>;
 };

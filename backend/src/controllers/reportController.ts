@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { db } from '../db/index.js';
-import { and, eq, gt, inArray, ne, sql } from 'drizzle-orm';
+import { and, eq, gt, inArray, ne, notExists, sql } from 'drizzle-orm';
 import { cleanupSubmissions, cleanupSubmissionVotes, reportVerificationVotes, reports, users } from '../db/schema.js';
 import {
   CLEANUP_VOTE_THRESHOLD,
@@ -758,6 +758,138 @@ export const voteOnReportVerification = async (req: Request, res: Response) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
   } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const getVoteQueue = async (req: Request, res: Response) => {
+  try {
+    const currentUserId = req.user?.id;
+
+    // --- Trash verifications: pending reports user can still vote on ---
+    const trashConditions = [eq(reports.status, 'pending')];
+    if (currentUserId) {
+      trashConditions.push(ne(reports.userId, currentUserId));
+      trashConditions.push(
+        notExists(
+          db.select({ _: sql`1` })
+            .from(reportVerificationVotes)
+            .where(
+              and(
+                eq(reportVerificationVotes.reportId, reports.id),
+                eq(reportVerificationVotes.userId, currentUserId)
+              )
+            )
+        )
+      );
+    }
+
+    const trashRows = await db
+      .select({
+        reportId: reports.id,
+        location: reports.location,
+        description: reports.description,
+        imageUrl: reports.imageUrl,
+        ownerUserId: reports.userId,
+        size: reports.size,
+        createdAt: reports.createdAt,
+        totalVotes: sql<number>`(SELECT COUNT(*)::int FROM report_verification_votes rvv WHERE rvv.report_id = ${sql.raw('"reports"."id"')})`,
+        legitVotes: sql<number>`(SELECT COUNT(*)::int FROM report_verification_votes rvv WHERE rvv.report_id = ${sql.raw('"reports"."id"')} AND rvv.vote = 'legit')`,
+        notTrashVotes: sql<number>`(SELECT COUNT(*)::int FROM report_verification_votes rvv WHERE rvv.report_id = ${sql.raw('"reports"."id"')} AND rvv.vote = 'not_trash')`,
+        myVote: currentUserId
+          ? sql<'legit' | 'not_trash' | null>`(SELECT rvv.vote FROM report_verification_votes rvv WHERE rvv.report_id = ${sql.raw('"reports"."id"')} AND rvv.user_id = ${currentUserId} LIMIT 1)`
+          : sql<null>`NULL`,
+      })
+      .from(reports)
+      .where(and(...trashConditions))
+      .orderBy(reports.createdAt);
+
+    // --- Cleanup verifications: pending submissions on cleanup_pending_vote reports ---
+    const cleanupConditions = [
+      eq(cleanupSubmissions.status, 'pending'),
+      eq(reports.status, 'cleanup_pending_vote'),
+    ];
+    if (currentUserId) {
+      cleanupConditions.push(ne(cleanupSubmissions.userId, currentUserId));
+      cleanupConditions.push(ne(reports.userId, currentUserId));
+      cleanupConditions.push(
+        notExists(
+          db.select({ _: sql`1` })
+            .from(cleanupSubmissionVotes)
+            .where(
+              and(
+                eq(cleanupSubmissionVotes.submissionId, cleanupSubmissions.id),
+                eq(cleanupSubmissionVotes.userId, currentUserId)
+              )
+            )
+        )
+      );
+    }
+
+    const cleanupRows = await db
+      .select({
+        reportId: reports.id,
+        reportLocation: reports.location,
+        reportOwnerUserId: reports.userId,
+        submissionId: cleanupSubmissions.id,
+        submissionUserId: cleanupSubmissions.userId,
+        imageUrl: cleanupSubmissions.imageUrl,
+        note: cleanupSubmissions.note,
+        submissionStatus: cleanupSubmissions.status,
+        submissionCreatedAt: cleanupSubmissions.createdAt,
+        submissionResolvedAt: cleanupSubmissions.resolvedAt,
+        totalVotes: sql<number>`(SELECT COUNT(*)::int FROM cleanup_submission_votes csv WHERE csv.submission_id = ${sql.raw('"cleanup_submissions"."id"')})`,
+        cleanVotes: sql<number>`(SELECT COUNT(*)::int FROM cleanup_submission_votes csv WHERE csv.submission_id = ${sql.raw('"cleanup_submissions"."id"')} AND csv.vote = 'clean')`,
+        notCleanVotes: sql<number>`(SELECT COUNT(*)::int FROM cleanup_submission_votes csv WHERE csv.submission_id = ${sql.raw('"cleanup_submissions"."id"')} AND csv.vote = 'not_clean')`,
+        myVote: currentUserId
+          ? sql<'clean' | 'not_clean' | null>`(SELECT csv.vote FROM cleanup_submission_votes csv WHERE csv.submission_id = ${sql.raw('"cleanup_submissions"."id"')} AND csv.user_id = ${currentUserId} LIMIT 1)`
+          : sql<null>`NULL`,
+      })
+      .from(cleanupSubmissions)
+      .innerJoin(reports, eq(cleanupSubmissions.reportId, reports.id))
+      .where(and(...cleanupConditions))
+      .orderBy(cleanupSubmissions.createdAt);
+
+    return res.json({
+      trashVerifications: trashRows.map((r) => ({
+        reportId: r.reportId,
+        location: r.location,
+        description: r.description,
+        imageUrl: r.imageUrl,
+        ownerUserId: r.ownerUserId,
+        size: r.size,
+        createdAt: r.createdAt,
+        voteSummary: {
+          totalVotes: r.totalVotes,
+          legitVotes: r.legitVotes,
+          notTrashVotes: r.notTrashVotes,
+          myVote: r.myVote ?? null,
+        },
+      })),
+      cleanupVerifications: cleanupRows.map((c) => ({
+        reportId: c.reportId,
+        reportLocation: c.reportLocation,
+        reportOwnerUserId: c.reportOwnerUserId,
+        submission: {
+          id: c.submissionId,
+          reportId: c.reportId,
+          userId: c.submissionUserId,
+          imageUrl: c.imageUrl,
+          note: c.note,
+          status: c.submissionStatus,
+          createdAt: c.submissionCreatedAt,
+          resolvedAt: c.submissionResolvedAt,
+          voteSummary: {
+            totalVotes: c.totalVotes,
+            cleanVotes: c.cleanVotes,
+            notCleanVotes: c.notCleanVotes,
+            myVote: c.myVote ?? null,
+          },
+        },
+      })),
+    });
+  } catch (error) {
+    console.error('getVoteQueue error:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };

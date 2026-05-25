@@ -250,7 +250,7 @@ export function AddPicturePage() {
 							Up to <span className="font-semibold text-emerald-700">+{getReportPointsForSize(size)} points</span> once the community confirms it's trash 🎉
 						</p>
 						<button
-							onClick={() => navigate('/reports?filter=needs_votes')}
+							onClick={() => navigate('/reports?tab=vote-queue')}
 							className="btn-primary w-full mb-3"
 						>
 							Help verify reports

@@ -59,6 +59,7 @@ export function CleanupSubmissionCard({
       setVoteError(null);
       queryClient.invalidateQueries({ queryKey: ['report', reportId] });
       queryClient.invalidateQueries({ queryKey: ['reports'] });
+      queryClient.invalidateQueries({ queryKey: ['vote-queue'] });
       refreshUser();
     },
     onError: (err) => {

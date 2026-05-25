@@ -5,10 +5,11 @@ import {
   getAllReports,
   getCleanupSubmissionById,
   getReportById,
+  getVoteQueue,
   voteOnCleanupSubmission,
   voteOnReportVerification,
 } from '../controllers/reportController.js';
-import { authenticate } from '../middleware/authenticate.js';
+import { authenticate, authenticateOptional } from '../middleware/authenticate.js';
 
 const router = Router();
 
@@ -45,6 +46,25 @@ const router = Router();
  *               $ref: '#/components/schemas/ErrorMessage'
  */
 router.get('/', getAllReports);
+
+/**
+ * @swagger
+ * /api/reports/vote-queue:
+ *   get:
+ *     tags: [Reports]
+ *     summary: Get combined vote queue (trash + cleanup verifications)
+ *     description: |
+ *       Returns pending reports needing trash verification and pending cleanup
+ *       submissions needing cleanup votes. If authenticated, items the current
+ *       user already voted on or owns are excluded.
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Vote queue with trashVerifications and cleanupVerifications arrays
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/vote-queue', authenticateOptional, getVoteQueue);
 
 /**
  * @swagger
