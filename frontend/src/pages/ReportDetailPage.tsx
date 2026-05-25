@@ -10,6 +10,7 @@ import {
 import { useAuthGate } from '../hooks/useAuthGate';
 import { AuthGateModal } from '../components/AuthGateModal';
 import { useAuth } from '../hooks/useAuth';
+import { CleanupSubmissionCard } from '../components/CleanupSubmissionCard';
 
 function formatStatus(status: ReportDetails['status']) {
   switch (status) {
@@ -148,14 +149,29 @@ export function ReportDetailPage() {
           </div>
         </div>
 
-        {report.winningSubmission && (
-          <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-            <p className="font-semibold text-emerald-900">Approved cleanup proof</p>
-            <img
-              src={report.winningSubmission.imageUrl}
-              alt="Approved cleanup proof"
-              className="mt-3 max-h-64 w-full rounded-lg object-cover"
-            />
+        {(report.cleanupSubmissions ?? []).length > 0 && (
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-900">Community verification</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Vote on cleanup proof submissions. Three votes with a majority decide the outcome.
+            </p>
+            <div className="mt-4 space-y-4">
+              {[...(report.cleanupSubmissions ?? [])]
+                .sort((a, b) => {
+                  if (a.status === 'pending' && b.status !== 'pending') return -1;
+                  if (b.status === 'pending' && a.status !== 'pending') return 1;
+                  return b.id - a.id;
+                })
+                .map((submission) => (
+                <CleanupSubmissionCard
+                  key={submission.id}
+                  reportId={report.id}
+                  reportOwnerUserId={report.userId}
+                  submission={submission}
+                  requireAuth={requireAuth}
+                />
+              ))}
+            </div>
           </div>
         )}
 

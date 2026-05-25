@@ -77,6 +77,23 @@ export const getAllReports = async (req: Request, res: Response) => {
         cleanedAt: reports.cleanedAt,
         rejectionReason: reports.rejectionReason,
         createdAt: reports.createdAt,
+        pendingSubmissionsCount: sql<number>`(
+          SELECT COUNT(*)::int
+          FROM cleanup_submissions cs
+          WHERE cs.report_id = ${sql.raw('"reports"."id"')}
+            AND cs.status = 'pending'
+        )`,
+        topPendingVoteCount: sql<number>`(
+          SELECT COALESCE(MAX(vote_counts.cnt), 0)
+          FROM (
+            SELECT COUNT(*)::int AS cnt
+            FROM cleanup_submission_votes csv
+            INNER JOIN cleanup_submissions cs ON cs.id = csv.submission_id
+            WHERE cs.report_id = ${sql.raw('"reports"."id"')}
+              AND cs.status = 'pending'
+            GROUP BY csv.submission_id
+          ) AS vote_counts
+        )`,
       })
       .from(reports);
 
@@ -117,7 +134,7 @@ export const getReportById = async (req: Request, res: Response) => {
 
     if (!report) return res.status(404).json({ error: 'Report not found' });
 
-    const [winningSubmission] = await db
+    const submissions = await db
       .select({
         id: cleanupSubmissions.id,
         reportId: cleanupSubmissions.reportId,
@@ -129,14 +146,22 @@ export const getReportById = async (req: Request, res: Response) => {
         resolvedAt: cleanupSubmissions.resolvedAt,
       })
       .from(cleanupSubmissions)
-      .where(
-        and(eq(cleanupSubmissions.reportId, reportId), eq(cleanupSubmissions.status, 'approved'))
-      )
-      .limit(1);
+      .where(eq(cleanupSubmissions.reportId, reportId));
+
+    const cleanupSubmissionsWithVotes = await Promise.all(
+      submissions.map(async (submission) => ({
+        ...submission,
+        voteSummary: await getVoteSummary(submission.id, req.user?.id),
+      }))
+    );
+
+    const winningSubmission =
+      cleanupSubmissionsWithVotes.find((submission) => submission.status === 'approved') ?? null;
 
     return res.json({
       ...report,
-      winningSubmission: winningSubmission ?? null,
+      winningSubmission,
+      cleanupSubmissions: cleanupSubmissionsWithVotes,
     });
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error' });

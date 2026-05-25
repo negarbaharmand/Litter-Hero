@@ -2,13 +2,20 @@ import { Link } from 'react-router-dom'
 
 export function NotFoundPage() {
 	return (
-		<main className="flex min-h-screen items-center justify-center bg-slate-50 px-6 pb-24 text-slate-900 lg:pt-[74px] lg:pb-10">
-			<div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-				<h1 className="text-3xl font-semibold tracking-tight">404</h1>
-				<p className="mt-2 text-slate-600">Page not found.</p>
+		<main
+			className="flex min-h-screen items-center justify-center px-6 pb-24 lg:pt-[74px] lg:pb-10"
+			style={{ backgroundColor: 'var(--color-page-bg)', color: 'var(--color-text-body)' }}
+		>
+			<div
+				className="w-full max-w-md rounded-2xl border p-8 text-center shadow-sm"
+				style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+			>
+				<h1 className="text-3xl font-semibold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>404</h1>
+				<p className="mt-2" style={{ color: 'var(--color-text-muted)' }}>Page not found.</p>
 				<Link
 					to="/"
-					className="mt-6 inline-block rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+					className="mt-6 inline-block rounded-lg px-4 py-2 text-sm font-medium text-white"
+					style={{ backgroundColor: 'var(--color-green-dark)' }}
 				>
 					Go back home
 				</Link>

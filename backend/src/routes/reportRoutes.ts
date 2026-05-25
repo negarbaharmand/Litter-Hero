@@ -60,7 +60,7 @@ router.get('/', getAllReports);
  *           type: integer
  *     responses:
  *       200:
- *         description: Report details with winning cleanup submission (if approved)
+ *         description: Report details with all cleanup submissions (each includes voteSummary) and winningSubmission when approved
  *         content:
  *           application/json:
  *             schema:
@@ -218,8 +218,10 @@ router.get('/:id/cleanup-submissions/:submissionId', getCleanupSubmissionById);
  * /api/reports/{id}/cleanup-submissions/{submissionId}/votes:
  *   post:
  *     tags: [Reports]
- *     summary: Vote on cleanup submission
- *     description: One vote per user. Submitter and original reporter cannot vote. At threshold, submission resolves and approved cleanup awards points.
+ *     summary: Vote on a cleanup submission (community verification)
+ *     description: |
+ *       Cast a community vote on cleanup proof. This is not `/api/reports/{id}/vote` — voting is per cleanup submission.
+ *       One vote per user. Submitter and original reporter cannot vote. At 3 votes, majority decides approved/rejected; approved cleanup awards size-based points.
  *     parameters:
  *       - in: path
  *         name: id
@@ -245,6 +247,18 @@ router.get('/:id/cleanup-submissions/:submissionId', getCleanupSubmissionById);
  *     responses:
  *       201:
  *         description: Vote accepted; submission may still be pending or become approved/rejected
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   enum: [pending, approved, rejected]
+ *                 voteSummary:
+ *                   $ref: '#/components/schemas/VoteSummary'
+ *                 submission:
+ *                   $ref: '#/components/schemas/CleanupSubmission'
  *       400:
  *         description: Invalid ids or invalid vote value
  *       401:

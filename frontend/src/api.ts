@@ -24,6 +24,8 @@ export type Report = {
   cleanedByUserId: number | null;
   cleanedAt: string | null;
   createdAt: string;
+  pendingSubmissionsCount: number;
+  topPendingVoteCount: number;
 };
 
 export type CleanupSubmission = {
@@ -44,8 +46,19 @@ export type VoteSummary = {
   myVote: 'clean' | 'not_clean' | null;
 };
 
+export type CleanupSubmissionWithVotes = CleanupSubmission & {
+  voteSummary: VoteSummary;
+};
+
 export type ReportDetails = Report & {
   winningSubmission: CleanupSubmission | null;
+  cleanupSubmissions: CleanupSubmissionWithVotes[];
+};
+
+export type VoteOnCleanupResponse = {
+  status: 'pending' | 'approved' | 'rejected';
+  submission?: CleanupSubmission;
+  voteSummary: VoteSummary;
 };
 
 export type ReportStatusFilter = 'pending' | 'verified' | 'disputed' | 'cleaned' | 'rejected' | 'open' | 'cleanup_pending_vote';
@@ -316,4 +329,36 @@ export const createCleanupSubmission = async (
   }
 
   return data as CleanupSubmission & { voteSummary: VoteSummary };
+};
+
+export const voteOnCleanupSubmission = async (
+  reportId: number,
+  submissionId: number,
+  vote: 'clean' | 'not_clean'
+): Promise<VoteOnCleanupResponse> => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/reports/${reportId}/cleanup-submissions/${submissionId}/votes`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders(),
+      },
+      body: JSON.stringify({ vote }),
+    }
+  );
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message =
+      typeof data === 'object' &&
+      data &&
+      'error' in data &&
+      typeof (data as { error?: unknown }).error === 'string'
+        ? (data as { error: string }).error
+        : 'Failed to submit vote';
+    throw new Error(message);
+  }
+
+  return data as VoteOnCleanupResponse;
 };
