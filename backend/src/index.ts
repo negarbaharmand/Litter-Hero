@@ -10,6 +10,8 @@ import cors from 'cors';
 import promBundle from 'express-prom-bundle';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger.js';
+import { db } from './db/index.js';
+import { sql } from 'drizzle-orm';
 
 if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required');
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required');
@@ -44,6 +46,28 @@ app.get('/config-test', (req: Request, res: Response) => {
     port: PORT,
     db_connected: !!process.env.DATABASE_URL,
   });
+});
+
+// Diagnostic route — checks each table exists and is queryable
+app.get('/db-check', async (req: Request, res: Response) => {
+  const tables = [
+    'users',
+    'reports',
+    'cleanup_submissions',
+    'cleanup_submission_votes',
+    'report_verification_votes',
+  ];
+  const results: Record<string, { ok: boolean; error?: string }> = {};
+  for (const table of tables) {
+    try {
+      await db.execute(sql.raw(`SELECT 1 FROM "${table}" LIMIT 1`));
+      results[table] = { ok: true };
+    } catch (e: unknown) {
+      results[table] = { ok: false, error: e instanceof Error ? e.message : String(e) };
+    }
+  }
+  const allOk = Object.values(results).every((r) => r.ok);
+  return res.status(allOk ? 200 : 500).json({ allOk, tables: results });
 });
 
 app.listen(PORT, () => {
