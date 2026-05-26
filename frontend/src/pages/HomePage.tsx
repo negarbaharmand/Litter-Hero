@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import ReportMap from '../components/Map/ReportMap';
 import { fetchReports } from '../api';
 import { STATUS_FILTER_OPTIONS, type ReportStatusFilter } from '../utils/reportStatus';
+import { SWEDEN_DEFAULT_CENTER, clampToSweden, isInSweden } from '../utils/swedenMap';
 
 function getInitialTheme(): 'light' | 'dark' {
 	const saved = localStorage.getItem('theme');
@@ -15,7 +16,7 @@ function getInitialTheme(): 'light' | 'dark' {
 }
 
 export function HomePage() {
-	const [mapCenter, setMapCenter] = useState<[number, number]>([59.3293, 18.0686]);
+	const [mapCenter, setMapCenter] = useState<[number, number]>(SWEDEN_DEFAULT_CENTER);
 	const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
 	const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
 	const [statusFilter, setStatusFilter] = useState<ReportStatusFilter>('all');
@@ -35,7 +36,9 @@ export function HomePage() {
 		if (!navigator.geolocation) return;
 		navigator.geolocation.getCurrentPosition(
 			({ coords }) => {
-				const nextPosition: [number, number] = [coords.latitude, coords.longitude];
+				const nextPosition: [number, number] = isInSweden(coords.latitude, coords.longitude)
+					? [coords.latitude, coords.longitude]
+					: clampToSweden(coords.latitude, coords.longitude);
 				setCurrentLocation(nextPosition);
 				setMapCenter(nextPosition);
 			},

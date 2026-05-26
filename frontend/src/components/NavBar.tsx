@@ -130,7 +130,7 @@ export function NavBar() {
                         to="/"
                         end
                         aria-label="Litter Hero — Home"
-                        className="flex h-10 items-center text-black dark:text-white [&_svg]:h-full [&_svg]:w-auto"
+                        className="flex h-16 shrink-0 items-center [&_svg]:h-full [&_svg]:w-auto"
                         dangerouslySetInnerHTML={{ __html: logoRaw }}
                     />
 
