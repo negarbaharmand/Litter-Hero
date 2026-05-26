@@ -5,8 +5,6 @@ import reportsIcon from "../assets/reports-svgrepo-com.svg";
 import ranksIcon from "../assets/ranks.svg";
 import profileIcon from "../assets/profile.svg";
 import logoRaw from "../assets/litter-hero-logo.svg?raw";
-import { AuthGateModal } from "./AuthGateModal";
-import { useAuthGate } from "../hooks/useAuthGate";
 import { useAuth } from "../hooks/useAuth";
 
 type NavItemProps = {
@@ -84,13 +82,7 @@ function DesktopNavLink({
 
 export function NavBar() {
     const navigate = useNavigate();
-    const { gate, dismiss, requireAuth } = useAuthGate();
     const { authState } = useAuth();
-
-    const onCameraClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-        e.preventDefault();
-        requireAuth('Create an account to submit a report', () => navigate('/add-picture'));
-    };
 
     const onProfileClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
@@ -116,14 +108,13 @@ export function NavBar() {
                     <NavLink
                         to="/add-picture"
                         aria-label="Add Report"
-                        onClick={onCameraClick}
                         className="flex h-18 w-18 -translate-y-[1px] items-center justify-center rounded-full bg-[var(--nav-camera-bg)] transition-colors"
                     >
                         <img
                             src={cameraIcon}
                             alt=""
                             aria-hidden="true"
-                            className="h-7 w-7 dark:[filter:brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
+                            className="h-7 w-7 [filter:brightness(0)_invert(1)] dark:[filter:brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
                         />
                     </NavLink>
 
@@ -146,14 +137,12 @@ export function NavBar() {
                     <div className="flex items-center gap-8">
                         <DesktopNavLink to="/" label="Map" end />
                         <DesktopNavLink to="/reports" label="Reports" />
-                        <DesktopNavLink to="/add-picture" label="Add Report" onClick={onCameraClick} />
+                        <DesktopNavLink to="/add-picture" label="Add Report" />
                         <DesktopNavLink to="/leaderboard" label="Ranks" />
                         <DesktopNavLink to="/profile" label="Profile" onClick={onProfileClick} />
                     </div>
                 </nav>
             </header>
-
-            <AuthGateModal open={gate.open} message={gate.message} onDismiss={dismiss} />
         </>
     );
 }

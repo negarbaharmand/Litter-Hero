@@ -1,8 +1,27 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import type { AuthUser, MeUser } from '../api'
+import { emptyActivityHeatmap } from '../api'
 import { AuthContext, type AuthState } from './authContext'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? ''
+
+function normalizeMeUser(user: MeUser): MeUser {
+  const activity =
+    user.activity &&
+    typeof user.activity.weeks === 'number' &&
+    Array.isArray(user.activity.grid)
+      ? user.activity
+      : emptyActivityHeatmap()
+
+  return {
+    ...user,
+    currentStreak: typeof user.currentStreak === 'number' ? user.currentStreak : 0,
+    longestStreak: typeof user.longestStreak === 'number' ? user.longestStreak : 0,
+    weeklyPoints: typeof user.weeklyPoints === 'number' ? user.weeklyPoints : 0,
+    badges: Array.isArray(user.badges) ? user.badges : [],
+    activity,
+  }
+}
 
 function getInitialAuthState(): AuthState {
   const token = localStorage.getItem('token')
@@ -24,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!res.ok) throw new Error('Unauthorized')
         return res.json() as Promise<MeUser>
       })
-      .then((user) => setAuthState({ status: 'authenticated', user }))
+      .then((user) => setAuthState({ status: 'authenticated', user: normalizeMeUser(user) }))
       .catch(() => {
         localStorage.removeItem('token')
         localStorage.removeItem('user')
@@ -40,8 +59,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
       .then((res) => res.json() as Promise<MeUser>)
       .then((meUser) => {
-        localStorage.setItem('user', JSON.stringify(meUser))
-        setAuthState({ status: 'authenticated', user: meUser })
+        const user = normalizeMeUser(meUser)
+        localStorage.setItem('user', JSON.stringify(user))
+        setAuthState({ status: 'authenticated', user })
       })
       .catch(() => {
         localStorage.removeItem('token')
@@ -49,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
   }
 
-  function refreshUser() {
+  const refreshUser = useCallback(() => {
     const token = localStorage.getItem('token')
     if (!token) return
     fetch(`${API_BASE_URL}/api/users/me`, {
@@ -60,15 +80,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return res.json() as Promise<MeUser>
       })
       .then((user) => {
-        localStorage.setItem('user', JSON.stringify(user))
-        setAuthState({ status: 'authenticated', user })
+        const normalized = normalizeMeUser(user)
+        localStorage.setItem('user', JSON.stringify(normalized))
+        setAuthState({ status: 'authenticated', user: normalized })
       })
       .catch(() => {
         localStorage.removeItem('token')
         localStorage.removeItem('user')
         setAuthState({ status: 'unauthenticated' })
       })
-  }
+  }, [])
 
   function clearAuth() {
     localStorage.removeItem('token')

@@ -1,7 +1,7 @@
 import type { Report } from '../api';
 
 export type ReportStatus = Report['status'];
-export type ReportStatusFilter = 'all' | ReportStatus;
+export type ReportStatusFilter = 'all' | ReportStatus | 'needs_votes';
 
 type StatusPresentation = {
   label: string;
@@ -22,8 +22,8 @@ const STATUS_PRESENTATION: Record<ReportStatus, StatusPresentation> = {
     className: 'bg-sky-100 text-sky-800',
   },
   pending: {
-    label: 'Pending',
-    className: 'bg-slate-100 text-slate-800',
+    label: 'Needs verification',
+    className: 'bg-amber-100 text-amber-800',
   },
   verified: {
     label: 'Verified',
@@ -41,8 +41,8 @@ const STATUS_PRESENTATION: Record<ReportStatus, StatusPresentation> = {
 
 export const STATUS_FILTER_OPTIONS: Array<{ value: ReportStatusFilter; label: string }> = [
   { value: 'all', label: 'All' },
-  { value: 'open', label: 'Open' },
-  { value: 'cleanup_pending_vote', label: 'Needs votes' },
+  { value: 'needs_votes', label: 'Needs votes' },
+  { value: 'verified', label: 'Verified' },
   { value: 'cleaned', label: 'Cleaned' },
 ];
 
