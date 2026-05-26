@@ -3,39 +3,53 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import ReportMap from '../components/Map/ReportMap';
 import { fetchReports } from '../api';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { STATUS_FILTER_OPTIONS, type ReportStatusFilter } from '../utils/reportStatus';
+import { SWEDEN_DEFAULT_CENTER, clampToSweden, isInSweden } from '../utils/swedenMap';
 
-function getInitialTheme(): 'light' | 'dark' {
-	const saved = localStorage.getItem('theme');
-	const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches;
-	const next: 'light' | 'dark' =
-		saved === 'dark' || saved === 'light' ? (saved as 'light' | 'dark') : prefersDark ? 'dark' : 'light';
-	document.documentElement.dataset.theme = next;
-	return next;
+function getInitialTheme(): "light" | "dark" {
+  const saved = localStorage.getItem("theme");
+  const prefersDark = window.matchMedia?.(
+    "(prefers-color-scheme: dark)",
+  )?.matches;
+  const next: "light" | "dark" =
+    saved === "dark" || saved === "light"
+      ? (saved as "light" | "dark")
+      : prefersDark
+        ? "dark"
+        : "light";
+  document.documentElement.dataset.theme = next;
+  return next;
 }
 
 export function HomePage() {
-	const [mapCenter, setMapCenter] = useState<[number, number]>([59.3293, 18.0686]);
+	useDocumentTitle('Map')
+	const [mapCenter, setMapCenter] = useState<[number, number]>(SWEDEN_DEFAULT_CENTER);
 	const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
 	const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
 	const [statusFilter, setStatusFilter] = useState<ReportStatusFilter>('all');
 	const [needsVotesOnly, setNeedsVotesOnly] = useState(false);
 
-	const effectiveFilter: ReportStatusFilter = needsVotesOnly ? 'cleanup_pending_vote' : statusFilter;
+  const effectiveFilter: ReportStatusFilter = needsVotesOnly
+    ? "cleanup_pending_vote"
+    : statusFilter;
 
-	const { data: reports = [] } = useQuery({
-		queryKey: ['reports', effectiveFilter],
-		queryFn: () => fetchReports(effectiveFilter === 'all' ? undefined : effectiveFilter),
-	});
-	const mapReports = reports.filter(
-        (report) => report.latitude !== null && report.longitude !== null
-    );
+  const { data: reports = [] } = useQuery({
+    queryKey: ["reports", effectiveFilter],
+    queryFn: () =>
+      fetchReports(effectiveFilter === "all" ? undefined : effectiveFilter),
+  });
+  const mapReports = reports.filter(
+    (report) => report.latitude !== null && report.longitude !== null,
+  );
 
 	useEffect(() => {
 		if (!navigator.geolocation) return;
 		navigator.geolocation.getCurrentPosition(
 			({ coords }) => {
-				const nextPosition: [number, number] = [coords.latitude, coords.longitude];
+				const nextPosition: [number, number] = isInSweden(coords.latitude, coords.longitude)
+					? [coords.latitude, coords.longitude]
+					: clampToSweden(coords.latitude, coords.longitude);
 				setCurrentLocation(nextPosition);
 				setMapCenter(nextPosition);
 			},
@@ -56,7 +70,8 @@ export function HomePage() {
 
 
 	return (
-		<main className="fixed inset-0 h-dvh w-screen bg-transparent">
+		<main id="main-content" tabIndex={-1} className="fixed inset-0 h-dvh w-screen bg-transparent">
+			<h1 className="sr-only">Litter Hero — Map</h1>
 			<div className="absolute inset-0">
 				<ReportMap 
 					reports={mapReports} 

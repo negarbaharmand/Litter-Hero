@@ -4,6 +4,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useGoogleLogin } from '@react-oauth/google'
 import { loginUser, registerUser, googleSignInWithAccessToken } from '../api'
 import { useAuth } from '../hooks/useAuth'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
+import logoRaw from '../assets/litter-hero-logo.svg?raw'
 
 //divider component to separate sections of the login page, with "or" text in the middle
 const Divider = () => (
@@ -15,6 +17,7 @@ const Divider = () => (
 )
 
 export function LoginPage() {
+  useDocumentTitle('Login')
   const navigate = useNavigate()
   const location = useLocation()
   const startInRegister = (location.state as { register?: boolean } | null)?.register === true
@@ -68,9 +71,14 @@ export function LoginPage() {
   })
 
   return (
-    <div className="login-page" style={{ backgroundColor: 'var(--color-page-bg)' }}>
+    <main id="main-content" tabIndex={-1} className="login-page" style={{ backgroundColor: 'var(--color-page-bg)' }}>
       <Link to="/" aria-label="Go to home">
-        <img src="/Logo.svg" alt="LitterHero logo" className="w-32 mb-6" />
+        <span
+          className="mb-6 inline-block w-32 [&_svg]:h-auto [&_svg]:w-full"
+          role="img"
+          aria-label="Litter Hero logo"
+          dangerouslySetInnerHTML={{ __html: logoRaw }}
+        />
       </Link>
       <div className="login-page__form card">
 
@@ -260,7 +268,7 @@ export function LoginPage() {
           <button type="submit" disabled={isLoading} className="btn-primary w-full">
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="animate-spin" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24">
                   <path d="M21 12a9 9 0 1 1-6.22-8.56" />
                 </svg>
                 Please wait…
@@ -316,8 +324,8 @@ export function LoginPage() {
                   Continue as guest
                 </button>
               </div>
-              <p className="text-body-sm text-text-muted text-center">
-                As a guest you can still report trash but you can't collect points.
+              <p className="text-xs text-text-muted text-center">
+                You need to have an account to report trash and collect points.
               </p>
             </>
           ) : (
@@ -357,7 +365,7 @@ export function LoginPage() {
       >
         Learn more about Litter Hero →
       </Link>
-    </div>
+    </main>
   )
 
   function handleGuestContinue() {

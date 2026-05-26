@@ -5,6 +5,7 @@ import MarkerPopup from './MarkerPopup';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import type { Report } from '../../api';
+import { SWEDEN_BOUNDS, SWEDEN_MIN_ZOOM } from '../../utils/swedenMap';
 
 
 const DefaultIcon = L.icon({
@@ -41,10 +42,13 @@ export default function ReportMap({
   theme?: 'light' | 'dark';
 }) {
   return (
-    <div className="relative h-full w-full overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden" aria-label="Litter report map" role="application">
       <MapContainer
         center={center}
         zoom={13}
+        minZoom={SWEDEN_MIN_ZOOM}
+        maxBounds={SWEDEN_BOUNDS}
+        maxBoundsViscosity={1}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer

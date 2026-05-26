@@ -135,7 +135,7 @@ export function CleanupSubmissionCard({
       )}
 
       {submission.status === 'pending' && !cannotVoteReason && (
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3 flex flex-wrap gap-2" role="region" aria-label="Submission voting">
           <button
             type="button"
             onClick={() => handleVote('clean')}

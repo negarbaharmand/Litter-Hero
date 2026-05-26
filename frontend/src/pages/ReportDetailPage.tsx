@@ -7,6 +7,7 @@ import {
   uploadReportImage,
   type ReportDetails,
 } from '../api';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useAuthGate } from '../hooks/useAuthGate';
 import { AuthGateModal } from '../components/AuthGateModal';
 import { useAuth } from '../hooks/useAuth';
@@ -57,6 +58,8 @@ export function ReportDetailPage() {
     enabled: Number.isInteger(reportId) && reportId > 0,
   });
 
+  useDocumentTitle(report ? `Report #${report.id}` : 'Report Details');
+
   const submitCleanupMutation = useMutation({
     mutationFn: async () => {
       if (!proofFile) throw new Error('Please upload a cleanup photo.');
@@ -101,30 +104,30 @@ export function ReportDetailPage() {
 
   if (!Number.isInteger(reportId) || reportId < 1) {
     return (
-      <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--color-page-bg)' }}>
+      <main id="main-content" tabIndex={-1} className="min-h-screen p-6" style={{ backgroundColor: 'var(--color-page-bg)' }}>
         <p style={{ color: 'var(--color-danger)' }}>Invalid report id.</p>
-      </div>
+      </main>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--color-page-bg)' }}>
+      <main id="main-content" tabIndex={-1} className="min-h-screen p-6" style={{ backgroundColor: 'var(--color-page-bg)' }}>
         <p style={{ color: 'var(--color-text-body)' }}>Loading report...</p>
-      </div>
+      </main>
     );
   }
 
   if (isError || !report) {
     return (
-      <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--color-page-bg)' }}>
+      <main id="main-content" tabIndex={-1} className="min-h-screen p-6" style={{ backgroundColor: 'var(--color-page-bg)' }}>
         <p style={{ color: 'var(--color-danger)' }}>{(error as Error)?.message ?? 'Failed to load report.'}</p>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen pb-32" style={{ backgroundColor: 'var(--color-page-bg)' }}>
+    <main id="main-content" tabIndex={-1} className="min-h-screen pb-32" style={{ backgroundColor: 'var(--color-page-bg)' }}>
       <div className="mx-auto w-full max-w-3xl px-4 pt-6">
         <Link
           to="/reports"
@@ -293,6 +296,6 @@ export function ReportDetailPage() {
       </div>
 
       <AuthGateModal open={gate.open} message={gate.message} onDismiss={dismiss} />
-    </div>
+    </main>
   );
 }
