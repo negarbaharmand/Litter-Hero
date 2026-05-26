@@ -80,6 +80,13 @@ const UserProfile = () => {
       <div className="profile-actions mx-4 mt-6 mb-8 flex flex-col gap-3">
         <SettingsButton onClick={() => console.log('Settings clicked')} />
         <Button
+          variant="secondary"
+          fullWidth
+          onClick={() => navigate('/about')}
+        >
+          About us
+        </Button>
+        <Button
           variant="primary"
           fullWidth
           disabled={isLoggingOut}

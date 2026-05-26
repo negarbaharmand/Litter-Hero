@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import ReportMap from '../components/Map/ReportMap';
 import { fetchReports } from '../api';
 import { STATUS_FILTER_OPTIONS, type ReportStatusFilter } from '../utils/reportStatus';
@@ -65,7 +66,31 @@ export function HomePage() {
 				/>
 			</div>
 		<div className="fixed left-3 top-4 z-2000 flex max-w-[90vw] flex-col gap-2 md:top-24">
-			<div className="flex flex-wrap gap-2 rounded-xl bg-white/90 dark:bg-neutral-800/90 p-2 shadow">
+			<div className="flex flex-wrap items-center gap-2 rounded-xl bg-white/90 dark:bg-neutral-800/90 p-2 shadow">
+				<Link
+					to="/about"
+					aria-label="About us"
+					title="About us"
+					className="flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-neutral-700 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-600 transition hover:bg-slate-100 dark:hover:bg-neutral-600"
+				>
+					<svg
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true"
+					>
+						<circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+						<circle cx="12" cy="8" r="1.25" fill="currentColor" />
+						<path
+							d="M12 11.5v6"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+						/>
+					</svg>
+				</Link>
 				{STATUS_FILTER_OPTIONS.map((option) => (
 					<button
 						key={option.value}

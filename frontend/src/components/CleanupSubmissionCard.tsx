@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   voteOnCleanupSubmission,
@@ -37,6 +37,7 @@ export function CleanupSubmissionCard({
   const queryClient = useQueryClient();
   const { authState, refreshUser } = useAuth();
   const [voteError, setVoteError] = useState<string | null>(null);
+  const voteInFlightRef = useRef(false);
 
   const currentUserId =
     authState.status === 'authenticated' ? authState.user.id : null;
@@ -55,17 +56,24 @@ export function CleanupSubmissionCard({
       voteOnCleanupSubmission(reportId, submission.id, vote),
     onSuccess: () => {
       setVoteError(null);
+      voteInFlightRef.current = false;
       queryClient.invalidateQueries({ queryKey: ['report', reportId] });
       queryClient.invalidateQueries({ queryKey: ['reports'] });
       queryClient.invalidateQueries({ queryKey: ['vote-queue'] });
       refreshUser();
     },
     onError: (err) => {
+      voteInFlightRef.current = false;
       setVoteError(err instanceof Error ? err.message : 'Failed to submit vote.');
     },
   });
 
   function handleVote(vote: 'clean' | 'not_clean') {
+    if (voteInFlightRef.current) {
+      return;
+    }
+
+    voteInFlightRef.current = true;
     setVoteError(null);
     requireAuth('Log in to vote on cleanup proof', () => voteMutation.mutate(vote));
   }
@@ -117,8 +125,13 @@ export function CleanupSubmissionCard({
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => handleVote('clean')}
-            disabled={voteMutation.isPending}
+            onClick={() => {
+              if (voteMutation.isPending || voteInFlightRef.current) {
+                return;
+              }
+              handleVote('clean');
+            }}
+            disabled={voteMutation.isPending || voteInFlightRef.current}
             className="rounded-lg px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
             style={{ backgroundColor: 'var(--color-green-dark)' }}
           >
@@ -126,8 +139,13 @@ export function CleanupSubmissionCard({
           </button>
           <button
             type="button"
-            onClick={() => handleVote('not_clean')}
-            disabled={voteMutation.isPending}
+            onClick={() => {
+              if (voteMutation.isPending || voteInFlightRef.current) {
+                return;
+              }
+              handleVote('not_clean');
+            }}
+            disabled={voteMutation.isPending || voteInFlightRef.current}
             className="rounded-lg px-3 py-2 text-sm font-semibold disabled:opacity-60"
             style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-body)', border: '1px solid var(--color-border)' }}
           >

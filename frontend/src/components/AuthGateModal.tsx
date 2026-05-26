@@ -12,6 +12,12 @@ export function AuthGateModal({ open, message, onDismiss }: AuthGateModalProps) 
 
   useEffect(() => {
     if (!open) return
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onDismiss()
     }
@@ -30,10 +36,15 @@ export function AuthGateModal({ open, message, onDismiss }: AuthGateModalProps) 
       onClick={onDismiss}
     >
       <div
-        className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl"
+        className="w-full max-w-sm rounded-2xl p-6 shadow-xl"
+        style={{ backgroundColor: 'var(--color-surface)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 id="auth-gate-title" className="text-lg font-semibold text-gray-900 text-center">
+        <h2
+          id="auth-gate-title"
+          className="text-lg font-semibold text-center"
+          style={{ color: 'var(--color-text-primary)' }}
+        >
           {message}
         </h2>
 
@@ -41,14 +52,19 @@ export function AuthGateModal({ open, message, onDismiss }: AuthGateModalProps) 
           <button
             type="button"
             onClick={() => navigate('/login')}
-            className="w-full py-3 rounded-xl bg-green-500 text-white font-semibold hover:bg-green-600 transition-colors"
+            className="btn-primary w-full"
           >
             Login
           </button>
           <button
             type="button"
             onClick={() => navigate('/login', { state: { register: true } })}
-            className="w-full py-3 rounded-xl border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            className="w-full py-3 rounded-xl font-medium transition-colors hover:opacity-90"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              color: 'var(--color-text-body)',
+              border: '1px solid var(--color-border)',
+            }}
           >
             Register
           </button>
@@ -57,7 +73,8 @@ export function AuthGateModal({ open, message, onDismiss }: AuthGateModalProps) 
         <button
           type="button"
           onClick={onDismiss}
-          className="mt-4 w-full text-sm text-gray-500 hover:text-gray-700"
+          className="mt-4 w-full text-sm transition-colors hover:opacity-80"
+          style={{ color: 'var(--color-text-muted)' }}
         >
           Continue as guest
         </button>
