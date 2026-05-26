@@ -494,9 +494,9 @@ export function AddPicturePage() {
 				>
 					{isSubmitting ? (
 						<svg
-							className="animate-spin h-7 w-7 dark:filter-[brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
+							className="animate-spin h-7 w-7 text-white dark:text-[var(--nav-active)]"
 							fill="none"
-							stroke="#1a5c35"
+							stroke="currentColor"
 							strokeWidth="2.5"
 							strokeLinecap="round"
 							viewBox="0 0 24 24"
@@ -505,9 +505,9 @@ export function AddPicturePage() {
 						</svg>
 					) : (
 						<svg
-							className="h-7 w-7 dark:filter-[brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
+							className="h-7 w-7 text-white dark:text-[var(--nav-active)]"
 							fill="none"
-							stroke="#1a5c35"
+							stroke="currentColor"
 							strokeWidth="2.5"
 							strokeLinecap="round"
 							strokeLinejoin="round"
