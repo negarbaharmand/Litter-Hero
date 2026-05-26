@@ -457,16 +457,17 @@ export const voteOnCleanupSubmission = async (req: Request, res: Response) => {
       }
 
       try {
-        await tx.insert(cleanupSubmissionVotes).values({
-          submissionId,
-          userId,
-          vote,
-        });
+        await tx
+          .insert(cleanupSubmissionVotes)
+          .values({
+            submissionId,
+            userId,
+            vote,
+          })
+          .onConflictDoNothing({
+            target: [cleanupSubmissionVotes.submissionId, cleanupSubmissionVotes.userId],
+          });
       } catch (error) {
-        const maybePgError = error as { code?: string };
-        if (maybePgError.code === '23505') {
-          return { type: 'duplicate_vote' } as const;
-        }
         throw error;
       }
 
@@ -600,8 +601,6 @@ export const voteOnCleanupSubmission = async (req: Request, res: Response) => {
         return res.status(409).json({ error: 'Report is already cleaned' });
       case 'forbidden_self_vote':
         return res.status(403).json({ error: 'You cannot vote on your own report or cleanup' });
-      case 'duplicate_vote':
-        return res.status(409).json({ error: 'You have already voted on this submission' });
       case 'pending':
         return res.status(201).json({
           status: 'pending',

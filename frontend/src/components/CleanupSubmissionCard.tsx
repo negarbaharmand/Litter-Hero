@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   voteOnCleanupSubmission,
@@ -37,6 +37,7 @@ export function CleanupSubmissionCard({
   const queryClient = useQueryClient();
   const { authState, refreshUser } = useAuth();
   const [voteError, setVoteError] = useState<string | null>(null);
+  const voteInFlightRef = useRef(false);
 
   const currentUserId =
     authState.status === 'authenticated' ? authState.user.id : null;
@@ -57,16 +58,23 @@ export function CleanupSubmissionCard({
       voteOnCleanupSubmission(reportId, submission.id, vote),
     onSuccess: () => {
       setVoteError(null);
+      voteInFlightRef.current = false;
       queryClient.invalidateQueries({ queryKey: ['report', reportId] });
       queryClient.invalidateQueries({ queryKey: ['reports'] });
       refreshUser();
     },
     onError: (err) => {
+      voteInFlightRef.current = false;
       setVoteError(err instanceof Error ? err.message : 'Failed to submit vote.');
     },
   });
 
   function handleVote(vote: 'clean' | 'not_clean') {
+    if (voteInFlightRef.current) {
+      return;
+    }
+
+    voteInFlightRef.current = true;
     setVoteError(null);
     requireAuth('Log in to vote on cleanup proof', () => voteMutation.mutate(vote));
   }
@@ -117,16 +125,26 @@ export function CleanupSubmissionCard({
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => handleVote('clean')}
-            disabled={voteMutation.isPending}
+            onClick={() => {
+              if (voteMutation.isPending || voteInFlightRef.current) {
+                return;
+              }
+              handleVote('clean');
+            }}
+            disabled={voteMutation.isPending || voteInFlightRef.current}
             className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
           >
             Vote clean
           </button>
           <button
             type="button"
-            onClick={() => handleVote('not_clean')}
-            disabled={voteMutation.isPending}
+            onClick={() => {
+              if (voteMutation.isPending || voteInFlightRef.current) {
+                return;
+              }
+              handleVote('not_clean');
+            }}
+            disabled={voteMutation.isPending || voteInFlightRef.current}
             className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-60"
           >
             Vote not clean
