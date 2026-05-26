@@ -4,6 +4,7 @@ import { cleanupSubmissions, cleanupSubmissionVotes, reportVerificationVotes, re
 import { publicUserColumns } from '../db/userPublicColumns.js';
 import { count, desc, eq, gte, and, sql } from 'drizzle-orm';
 import { calculateWeeklyPoints } from './reportWorkflow.js';
+import { getStreakStatsForUser } from '../services/streak.js';
 
 export const listUsers = async (req: Request, res: Response) => {
   try {
@@ -115,12 +116,19 @@ export const getMe = async (req: Request, res: Response) => {
     if (reportVerifyCount >= 50) badges.push('50 Verifications');
     if (reportVerifyCount >= 100) badges.push('100 Verifications');
 
+    const { currentStreak, longestStreak, badges: streakBadges, activity } =
+      await getStreakStatsForUser(userId);
+    badges.push(...streakBadges);
+
     const totalVerificationVotes = (cleanupVotesCount?.count ?? 0) + reportVerifyCount;
 
     return res.json({
       ...userWithoutPassword,
       weeklyPoints,
       badges,
+      currentStreak,
+      longestStreak,
+      activity,
       reportsCreated: reportCount,
       cleanupsApproved: cleanupCount,
       reportVerificationVotes: reportVerifyCount,

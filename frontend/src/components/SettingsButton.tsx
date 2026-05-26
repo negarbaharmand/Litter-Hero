@@ -8,9 +8,9 @@ const SettingsButton = ({ onClick }: SettingsButtonProps) => {
   return (
     <Button
       variant="secondary"
+      fullWidth
       onClick={onClick}
-      className="mx-4 mt-4 text-left"
-      style={{ width: 'calc(100% - 2rem)' }}
+      className="text-left"
     >
       Account Settings
     </Button>

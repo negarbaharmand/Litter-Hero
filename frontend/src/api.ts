@@ -226,11 +226,30 @@ export type AuthUser = {
   createdAt: string
 }
 
+export type ActivityHeatmapData = {
+  weeks: number
+  /** 7 rows (Sun–Sat) × weeks columns, values 0–3 */
+  grid: number[][]
+}
+
+const EMPTY_ACTIVITY_GRID: ActivityHeatmapData = {
+  weeks: 9,
+  grid: Array.from({ length: 7 }, () => Array.from({ length: 9 }, () => 0)),
+}
+
+export const emptyActivityHeatmap = (): ActivityHeatmapData => ({
+  weeks: EMPTY_ACTIVITY_GRID.weeks,
+  grid: EMPTY_ACTIVITY_GRID.grid.map((row) => [...row]),
+})
+
 /** Full profile returned by GET /api/users/me */
 export type MeUser = AuthUser & {
   username: string | null
   weeklyPoints: number
   badges: string[]
+  currentStreak: number
+  longestStreak: number
+  activity: ActivityHeatmapData
   reportsCreated: number
   cleanupsApproved: number
   reportVerificationVotes: number
