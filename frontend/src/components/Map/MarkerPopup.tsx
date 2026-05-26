@@ -40,9 +40,14 @@ export default function MarkerPopup({
 				<p className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
 					{lat.toFixed(5)}, {lng.toFixed(5)}
 				</p>
+				{status === 'pending' && (
+					<p className="mt-2 text-xs font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+						🗳 Needs verification — help the community vote
+					</p>
+				)}
 				{status === 'cleanup_pending_vote' && (
 					<p className="mt-2 text-xs font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-						⚠ Verification needed — community vote open
+						⚠ Cleanup proof needs votes
 					</p>
 				)}
 				{typeof reportId === 'number' && (

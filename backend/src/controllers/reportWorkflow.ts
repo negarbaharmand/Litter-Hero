@@ -1,7 +1,12 @@
 export const CLEANUP_VOTE_THRESHOLD = 3;
+export const REPORT_VOTE_THRESHOLD = 3;
+export const REPORT_VERIFICATION_VOTER_POINTS = 3;
 
 export type CleanupVote = 'clean' | 'not_clean';
 export type CleanupResolution = 'pending' | 'approved' | 'rejected';
+
+export type ReportVerificationVote = 'legit' | 'not_trash';
+export type ReportVerificationResolution = 'pending' | 'verified' | 'rejected';
 export type TrashSize = 'small' | 'medium' | 'large';
 
 const REPORT_POINTS_BY_SIZE: Record<TrashSize, number> = {
@@ -50,6 +55,22 @@ export function resolveCleanupFromVotes(
   const { totalVotes, cleanVotes, notCleanVotes } = summarizeVotes(votes);
   if (totalVotes < threshold) return 'pending';
   return cleanVotes > notCleanVotes ? 'approved' : 'rejected';
+}
+
+export function summarizeReportVotes(votes: ReportVerificationVote[]) {
+  const legitVotes = votes.filter((v) => v === 'legit').length;
+  const notTrashVotes = votes.filter((v) => v === 'not_trash').length;
+  const totalVotes = votes.length;
+  return { totalVotes, legitVotes, notTrashVotes };
+}
+
+export function resolveReportFromVotes(
+  votes: ReportVerificationVote[],
+  threshold: number = REPORT_VOTE_THRESHOLD
+): ReportVerificationResolution {
+  const { totalVotes, legitVotes, notTrashVotes } = summarizeReportVotes(votes);
+  if (totalVotes < threshold) return 'pending';
+  return legitVotes > notTrashVotes ? 'verified' : 'rejected';
 }
 
 export function calculateWeeklyPoints({
