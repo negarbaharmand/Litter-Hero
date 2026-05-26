@@ -5,8 +5,6 @@ import reportsIcon from "../assets/reports-svgrepo-com.svg";
 import ranksIcon from "../assets/ranks.svg";
 import profileIcon from "../assets/profile.svg";
 import logoRaw from "../assets/litter-hero-logo.svg?raw";
-import { AuthGateModal } from "./AuthGateModal";
-import { useAuthGate } from "../hooks/useAuthGate";
 import { useAuth } from "../hooks/useAuth";
 
 type NavItemProps = {
@@ -84,13 +82,7 @@ function DesktopNavLink({
 
 export function NavBar() {
     const navigate = useNavigate();
-    const { gate, dismiss, requireAuth } = useAuthGate();
     const { authState } = useAuth();
-
-    const onCameraClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-        e.preventDefault();
-        requireAuth('Create an account to submit a report', () => navigate('/add-picture'));
-    };
 
     const onProfileClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
@@ -116,7 +108,6 @@ export function NavBar() {
                     <NavLink
                         to="/add-picture"
                         aria-label="Add Report"
-                        onClick={onCameraClick}
                         className="flex h-18 w-18 -translate-y-[1px] items-center justify-center rounded-full bg-[var(--nav-camera-bg)] transition-colors"
                     >
                         <img
@@ -146,14 +137,12 @@ export function NavBar() {
                     <div className="flex items-center gap-8">
                         <DesktopNavLink to="/" label="Map" end />
                         <DesktopNavLink to="/reports" label="Reports" />
-                        <DesktopNavLink to="/add-picture" label="Add Report" onClick={onCameraClick} />
+                        <DesktopNavLink to="/add-picture" label="Add Report" />
                         <DesktopNavLink to="/leaderboard" label="Ranks" />
                         <DesktopNavLink to="/profile" label="Profile" onClick={onProfileClick} />
                     </div>
                 </nav>
             </header>
-
-            <AuthGateModal open={gate.open} message={gate.message} onDismiss={dismiss} />
         </>
     );
 }
