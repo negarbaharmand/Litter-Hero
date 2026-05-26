@@ -1,16 +1,22 @@
 // Det här är en komponent som visar nästa poängmilstolpe och progress mot den
+import { PiPlant } from "react-icons/pi"
+import { GiMagicBroom, GiNinjaHeroicStance, GiPlanetConquest } from "react-icons/gi"
+import { LuSwords } from "react-icons/lu"
+import { TbBeach } from "react-icons/tb"
+import type { IconType } from "react-icons"
+
 interface MilestoneCardProps {
   currentPoints: number
 }
 
-// Milstolpar med emojis. Dessa beräknas enbart från user.points, ingen backend-koppling
-const MILESTONES = [
-  { points: 100, badge: '🌱|Litter Spotter' },
-  { points: 250, badge: '🧹|Street Cleaner' },
-  { points: 500, badge: '⚔️|Eco Warrior' },
-  { points: 1000, badge: '🦸|Green Hero' },
-  { points: 2500, badge: '🏖️|Beach Hero' },
-  { points: 5000, badge: '🌍|Planet Guardian' },
+// Milstolpar med react-icons — beräknas enbart från user.points, ingen backend-koppling
+const MILESTONES: { points: number; label: string; icon: IconType; color: string }[] = [
+  { points: 100,  label: 'Litter Spotter', icon: PiPlant,             color: 'var(--color-green-normal)' },
+  { points: 250,  label: 'Street Cleaner', icon: GiMagicBroom,        color: 'var(--color-green-dark)' },
+  { points: 500,  label: 'Eco Warrior',    icon: LuSwords,            color: 'var(--color-green-darker)' },
+  { points: 1000, label: 'Green Hero',     icon: GiNinjaHeroicStance, color: 'var(--color-green-dark)' },
+  { points: 2500, label: 'Beach Hero',     icon: TbBeach,             color: '#0ea5e9' },
+  { points: 5000, label: 'Planet Guardian',icon: GiPlanetConquest,    color: '#7c3aed' },
 ]
 
 const MilestoneCard = ({ currentPoints }: MilestoneCardProps) => {
@@ -37,23 +43,24 @@ const MilestoneCard = ({ currentPoints }: MilestoneCardProps) => {
   const progress = currentPoints - prevPoints
   const percentage = Math.round((progress / range) * 100)
   const remaining = next.points - currentPoints
-  const [icon, label] = next.badge.split('|')
+  const IconComponent = next.icon
 
   return (
     <div className="mx-4 mt-6">
       <h3 className="mb-3!">Motivation</h3>
       <div className="card flex flex-col gap-3">
 
-        {/* Rubrik + badge-pill */}
+        {/* Rubrik + badge-pill med ikon */}
         <div className="flex items-center justify-between">
           <span className="font-semibold text-sm" style={{ color: 'var(--color-text-primary)' }}>
             Next Milestone
           </span>
           <span
-            className="text-xs font-semibold rounded-full px-3 py-1"
+            className="flex items-center gap-1 text-xs font-semibold rounded-full px-3 py-1"
             style={{ backgroundColor: 'var(--color-green-normal)', color: '#fff' }}
           >
-            {icon} {label}
+            <IconComponent size={14} color="#fff" />
+            {next.label}
           </span>
         </div>
 
@@ -65,19 +72,19 @@ const MilestoneCard = ({ currentPoints }: MilestoneCardProps) => {
           />
         </div>
 
-        {/* Progress text + remaining */}
+        {/* Progress text + remaining med ikon */}
         <div className="flex items-center justify-between">
           <span className="text-xs" style={{ color: 'var(--color-text-primary)' }}>
             {currentPoints} / {next.points} points
           </span>
-          <span className="text-xs font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-            {remaining} to go! {icon}
+          <span className="flex items-center gap-1 text-xs font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+            {remaining} to go! <IconComponent size={14} color={next.color} />
           </span>
         </div>
 
         {/* Unlock text */}
         <p className="text-xs text-center" style={{ color: 'var(--color-text-primary)' }}>
-          Unlock "{label}" badge at {next.points} points
+          Unlock "{next.label}" badge at {next.points} points
         </p>
 
       </div>

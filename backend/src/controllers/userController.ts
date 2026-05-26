@@ -106,18 +106,18 @@ export const getMe = async (req: Request, res: Response) => {
     const cleanupCount = cleanupsApprovedCount?.count ?? 0;
     const reportVerifyCount = reportVerificationVotesCount?.count ?? 0;
 
-    if (reportCount >= 1) badges.push('🏅|First Report');
-    if (reportCount >= 5) badges.push('🗺️|5 Reports');
-    if (reportCount >= 10) badges.push('🌟|10 Reports');
-    if (reportCount >= 50) badges.push('🚀|50 Reports');
-    if (cleanupCount >= 1) badges.push('🧹|First Cleanup');
-    if (cleanupCount >= 5) badges.push('♻️|5 Cleanups');
-    if (cleanupCount >= 10) badges.push('🏆|10 Cleanups');
-    if (cleanupCount >= 50) badges.push('⭐|50 Cleanups');
-    if (reportVerifyCount >= 1) badges.push('✅|First Verify');
-    if (reportVerifyCount >= 10) badges.push('🔍|10 Verifications');
-    if (reportVerifyCount >= 50) badges.push('🧐|50 Verifications');
-    if (reportVerifyCount >= 100) badges.push('🏛️|100 Verifications');
+    if (reportCount >= 1) badges.push('First Report');
+    if (reportCount >= 5) badges.push('5 Reports');
+    if (reportCount >= 10) badges.push('10 Reports');
+    if (reportCount >= 50) badges.push('50 Reports');
+    if (cleanupCount >= 1) badges.push('First Cleanup');
+    if (cleanupCount >= 5) badges.push('5 Cleanups');
+    if (cleanupCount >= 10) badges.push('10 Cleanups');
+    if (cleanupCount >= 50) badges.push('50 Cleanups');
+    if (reportVerifyCount >= 1) badges.push('First Verify');
+    if (reportVerifyCount >= 10) badges.push('10 Verifications');
+    if (reportVerifyCount >= 50) badges.push('50 Verifications');
+    if (reportVerifyCount >= 100) badges.push('100 Verifications');
 
   const { currentStreak, longestStreak, badges: streakBadges, activity } =
   await getStreakStatsForUser(userId);
