@@ -87,25 +87,25 @@ const UserProfile = () => {
           label
         }))
       ]} />
-      <SettingsButton onClick={() => console.log('Settings clicked')} />
-      <Button
-        variant="secondary"
-        className="mx-4 mt-3 text-left"
-        style={{ width: 'calc(100% - 2rem)' }}
-        onClick={() => navigate('/about')}
-      >
-        About us
-      </Button>
-      <Button
-        variant="primary"
-        fullWidth
-        disabled={isLoggingOut}
-        onClick={handleLogout}
-        className="mx-4 mt-3"
-        style={{ width: 'calc(100% - 2rem)' }}
-      >
-        {isLoggingOut ? 'Logging out...' : 'Log out'}
-      </Button>
+      <div className="mx-4 mt-6 mb-8 flex flex-col gap-3">
+        <SettingsButton onClick={() => console.log('Settings clicked')} />
+        <Button
+          variant="secondary"
+          fullWidth
+          className="text-left"
+          onClick={() => navigate('/about')}
+        >
+          About us
+        </Button>
+        <Button
+          variant="primary"
+          fullWidth
+          disabled={isLoggingOut}
+          onClick={handleLogout}
+        >
+          {isLoggingOut ? 'Logging out...' : 'Log out'}
+        </Button>
+      </div>
     </PageShell>
   )
 }
