@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useGoogleLogin } from '@react-oauth/google'
 import { loginUser, registerUser, googleSignInWithAccessToken } from '../api'
 import { useAuth } from '../hooks/useAuth'
+import logoRaw from '../assets/litter-hero-logo.svg?raw'
 
 //divider component to separate sections of the login page, with "or" text in the middle
 const Divider = () => (
@@ -70,7 +71,12 @@ export function LoginPage() {
   return (
     <div className="login-page" style={{ backgroundColor: 'var(--color-page-bg)' }}>
       <Link to="/" aria-label="Go to home">
-        <img src="/Logo.svg" alt="LitterHero logo" className="w-32 mb-6" />
+        <span
+          className="mb-6 inline-block w-32 [&_svg]:h-auto [&_svg]:w-full"
+          role="img"
+          aria-label="Litter Hero logo"
+          dangerouslySetInnerHTML={{ __html: logoRaw }}
+        />
       </Link>
       <div className="login-page__form card">
 
