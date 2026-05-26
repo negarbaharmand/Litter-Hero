@@ -1,25 +1,27 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import ProfileHeader from '../components/ProfileHeader'
-import ActivityHeatmap from '../components/ActivityHeatmap'
-import PointsCard from '../components/PointsCard'
-import BadgeList from '../components/BadgeList'
-import SettingsButton from '../components/SettingsButton'
-import { PageShell } from '../components/PageShell'
-import { Button } from '../components/ui'
-import { logoutUser } from '../api'
-import { useAuth } from '../hooks/useAuth'
+import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import ProfileHeader from "../components/ProfileHeader";
+import ActivityHeatmap from "../components/ActivityHeatmap";
+import PointsCard from "../components/PointsCard";
+import BadgeList from "../components/BadgeList";
+import SettingsButton from "../components/SettingsButton";
+import { PageShell } from "../components/PageShell";
+import { Button } from "../components/ui";
+import { logoutUser } from "../api";
+import { useAuth } from "../hooks/useAuth";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 const UserProfile = () => {
-  const navigate = useNavigate()
-  const { authState, clearAuth, refreshUser } = useAuth()
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const navigate = useNavigate();
+  const { authState, clearAuth, refreshUser } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const user = authState.status === 'authenticated' ? authState.user : null
+  const user = authState.status === "authenticated" ? authState.user : null;
+  useDocumentTitle(user?.username ?? "Profile");
 
   useEffect(() => {
-    refreshUser()
-  }, [refreshUser])
+    refreshUser();
+  }, [refreshUser]);
 
   async function handleLogout() {
     setIsLoggingOut(true);
@@ -31,7 +33,7 @@ const UserProfile = () => {
     }
   }
 
-  if (!user) return null
+  if (!user) return null;
 
   const display = {
     points: user?.points ?? 0,
@@ -40,10 +42,11 @@ const UserProfile = () => {
     cleanupsApproved: user?.cleanupsApproved ?? 0,
     verificationVotes: user?.verificationVotes ?? 0,
     badges: user?.badges ?? [],
-  }
+  };
 
   return (
     <PageShell>
+      <h1 className="sr-only">{user?.username ?? "Profile"}</h1>
       <ProfileHeader
         username={user?.username}
         level={12}
@@ -98,20 +101,22 @@ const UserProfile = () => {
         </div>
       </div>
 
-      <BadgeList badges={[
-        { id: 0, label: "🔥|3 day streak" }, // TODO: implement streak logic
-        ...display.badges.map((label: string, index: number) => ({
-          id: index + 1,
-          label
-        }))
-      ]} />
+      <BadgeList
+        badges={[
+          { id: 0, label: "🔥|3 day streak" }, // TODO: implement streak logic
+          ...display.badges.map((label: string, index: number) => ({
+            id: index + 1,
+            label,
+          })),
+        ]}
+      />
       <div className="mx-4 mt-6 mb-8 flex flex-col gap-3">
-        <SettingsButton onClick={() => console.log('Settings clicked')} />
+        <SettingsButton onClick={() => console.log("Settings clicked")} />
         <Button
           variant="secondary"
           fullWidth
           className="text-left"
-          onClick={() => navigate('/about')}
+          onClick={() => navigate("/about")}
         >
           About us
         </Button>
@@ -121,7 +126,7 @@ const UserProfile = () => {
           disabled={isLoggingOut}
           onClick={handleLogout}
         >
-          {isLoggingOut ? 'Logging out...' : 'Log out'}
+          {isLoggingOut ? "Logging out..." : "Log out"}
         </Button>
       </div>
     </PageShell>

@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useLeaderboard, type TimePeriod } from '../../hooks/useLeaderboard';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { LeaderboardTable } from './LeaderboardTable';
 import { TimePeriodFilter } from './TimePeriodFilter';
 import { PageShell } from '../PageShell';
 
 export function Leaderboard() {
+  useDocumentTitle('Leaderboard')
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('allTime');
   const [sortBy, setSortBy] = useState<'rank' | 'points' | 'username'>('rank');
   const { data, isLoading, isError, error } = useLeaderboard(selectedPeriod);
@@ -29,7 +31,7 @@ export function Leaderboard() {
 
   return (
     <PageShell>
-      <h2 style={{ marginBottom: '1rem' }}>Leaderboard</h2>
+      <h1 style={{ marginBottom: '1rem' }}>Leaderboard</h1>
       <TimePeriodFilter selectedPeriod={selectedPeriod} onPeriodChange={setSelectedPeriod} />
       {data && data.entries.length > 0 ? (
         <LeaderboardTable entries={data.entries} sortBy={sortBy} onSortChange={setSortBy} />

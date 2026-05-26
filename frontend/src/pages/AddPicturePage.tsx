@@ -1,14 +1,15 @@
-import { useState, useRef, useEffect} from 'react'
-import { useNavigate } from 'react-router-dom'
-import { CameraCapture } from '../components/CameraCapture'
-import { LocationPicker } from '../components/LocationPicker'
-import { createReport, uploadReportImage } from '../api'
-import { useAuth } from '../hooks/useAuth'
-import { AuthGateModal } from '../components/AuthGateModal'
-import { useAuthGate } from '../hooks/useAuthGate'
-import exifr from 'exifr'
-import { reverseGeocode } from '../utils/geocoding'
-import { clampToSweden, isInSweden } from '../utils/swedenMap'
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { CameraCapture } from "../components/CameraCapture";
+import { LocationPicker } from "../components/LocationPicker";
+import { createReport, uploadReportImage } from "../api";
+import { useAuth } from "../hooks/useAuth";
+import { AuthGateModal } from "../components/AuthGateModal";
+import { useAuthGate } from "../hooks/useAuthGate";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
+import exifr from "exifr";
+import { reverseGeocode } from "../utils/geocoding";
+import { clampToSweden, isInSweden } from "../utils/swedenMap";
 
 const CATEGORIES = [
   "Mixed",
@@ -22,6 +23,7 @@ const SIZES = ["Small", "Medium", "Large"] as const;
 type Size = (typeof SIZES)[number];
 
 export function AddPicturePage() {
+  useDocumentTitle('Add Report')
   const navigate = useNavigate();
   const { refreshUser } = useAuth();
   const { gate, dismiss, requireAuth } = useAuthGate();
@@ -62,22 +64,22 @@ export function AddPicturePage() {
       // Step A: Attempt to fetch GPS from EXIF metadata
       const gps = await exifr.gps(file);
 
-            if (gps && gps.latitude && gps.longitude) {
-                const lat = gps.latitude
-                const lng = gps.longitude
-                const [clampedLat, clampedLng] = isInSweden(lat, lng)
-                    ? [lat, lng]
-                    : clampToSweden(lat, lng)
-                const address = await reverseGeocode(clampedLat, clampedLng)
-                setLocation(address)
-                setLatitude(clampedLat)
-                setLongitude(clampedLng)
-                setIsLocating(false)
-                return
-            }
-        } catch (err) {
-            console.warn("EXIF processing bypassed or failed:", err)
-        }
+      if (gps && gps.latitude && gps.longitude) {
+        const lat = gps.latitude;
+        const lng = gps.longitude;
+        const [clampedLat, clampedLng] = isInSweden(lat, lng)
+          ? [lat, lng]
+          : clampToSweden(lat, lng);
+        const address = await reverseGeocode(clampedLat, clampedLng);
+        setLocation(address);
+        setLatitude(clampedLat);
+        setLongitude(clampedLng);
+        setIsLocating(false);
+        return;
+      }
+    } catch (err) {
+      console.warn("EXIF processing bypassed or failed:", err);
+    }
 
     // Step B: Fallback to Browser Geolocation API
     if (!navigator.geolocation) {
@@ -85,36 +87,38 @@ export function AddPicturePage() {
       return;
     }
 
-        navigator.geolocation.getCurrentPosition(
-            async ({ coords: { latitude, longitude } }) => {
-                const [clampedLat, clampedLng] = isInSweden(latitude, longitude)
-                    ? [latitude, longitude]
-                    : clampToSweden(latitude, longitude)
-                try {
-                    const address = await reverseGeocode(clampedLat, clampedLng)
-                    setLocation(address)
-                    setLatitude(clampedLat)
-                    setLongitude(clampedLng)
-                } catch {
-                    setLocation(`${clampedLat.toFixed(5)}, ${clampedLng.toFixed(5)}`)
-                    setLatitude(clampedLat)
-                    setLongitude(clampedLng)
-                }
-                setIsLocating(false)
-            },
-            () => {
-                triggerManualFallback("Location could not be detected — please enter it manually.")
-            },
-            { timeout: 10000 }
-        )
-    }
-	function triggerManualFallback(message: string) {
-        setLocation(message)
-        setLatitude(null)
-        setLongitude(null)
-        setLocationRequired(true)
-        setIsLocating(false)
-    }
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords: { latitude, longitude } }) => {
+        const [clampedLat, clampedLng] = isInSweden(latitude, longitude)
+          ? [latitude, longitude]
+          : clampToSweden(latitude, longitude);
+        try {
+          const address = await reverseGeocode(clampedLat, clampedLng);
+          setLocation(address);
+          setLatitude(clampedLat);
+          setLongitude(clampedLng);
+        } catch {
+          setLocation(`${clampedLat.toFixed(5)}, ${clampedLng.toFixed(5)}`);
+          setLatitude(clampedLat);
+          setLongitude(clampedLng);
+        }
+        setIsLocating(false);
+      },
+      () => {
+        triggerManualFallback(
+          "Location could not be detected — please enter it manually.",
+        );
+      },
+      { timeout: 10000 },
+    );
+  }
+  function triggerManualFallback(message: string) {
+    setLocation(message);
+    setLatitude(null);
+    setLongitude(null);
+    setLocationRequired(true);
+    setIsLocating(false);
+  }
 
   function handleCameraCapture(imageDataUrl: string) {
     setCapturedImage(imageDataUrl);
@@ -241,22 +245,26 @@ export function AddPicturePage() {
     ? CATEGORIES
     : CATEGORIES.slice(0, 3);
 
-	return (
-		<div className="min-h-screen pb-36" style={{ backgroundColor: 'var(--color-page-bg)' }}>
-
-			{/* Success modal */}
-			{submitSuccess && (
-				<SubmitSuccessModal onDismiss={() => navigate('/reports')} />
-			)}
+  return (
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="min-h-screen pb-36"
+      style={{ backgroundColor: "var(--color-page-bg)" }}
+    >
+      {/* Success modal */}
+      {submitSuccess && (
+        <SubmitSuccessModal onDismiss={() => navigate("/reports")} />
+      )}
 
       <div className="max-w-lg mx-auto px-4 pt-6">
         {/* Page title */}
-        <h2
+        <h1
           className="font-semibold text-2xl mb-5"
           style={{ color: "var(--color-text-primary)", margin: "0 0 20px" }}
         >
           Add new report
-        </h2>
+        </h1>
 
         {/* ── Photo section ── */}
         <div
@@ -387,27 +395,27 @@ export function AddPicturePage() {
           </label>
           <div className="flex flex-wrap gap-2 items-center">
             {visibleCategories.map((cat) => (
-<button
-                  key={cat}
-                  onClick={() => setCategory(cat)}
-                  aria-pressed={category === cat}
-                  className="px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
-                  style={
-                    category === cat
-                      ? {
+              <button
+                key={cat}
+                onClick={() => setCategory(cat)}
+                aria-pressed={category === cat}
+                className="px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
+                style={
+                  category === cat
+                    ? {
                         backgroundColor: "var(--color-green-normal)",
                         color: "black",
                         border: "none",
                       }
-                      : {
+                    : {
                         backgroundColor: "var(--color-surface)",
                         color: "var(--color-text-body)",
                         border: "1px solid var(--color-border)",
                       }
-                  }
-                >
-                  {cat}
-                </button>
+                }
+              >
+                {cat}
+              </button>
             ))}
 
             <button
@@ -480,27 +488,27 @@ export function AddPicturePage() {
 
           <div className="flex gap-2">
             {SIZES.map((s) => (
-<button
-                  key={s}
-                  onClick={() => setSize(s)}
-                  aria-pressed={size === s}
-                  className="px-5 py-1.5 rounded-full text-sm font-medium transition-colors"
-                  style={
-                    size === s
-                      ? {
+              <button
+                key={s}
+                onClick={() => setSize(s)}
+                aria-pressed={size === s}
+                className="px-5 py-1.5 rounded-full text-sm font-medium transition-colors"
+                style={
+                  size === s
+                    ? {
                         backgroundColor: "var(--color-green-normal)",
                         color: "black",
                         border: "none",
                       }
-                      : {
+                    : {
                         backgroundColor: "var(--color-surface)",
                         color: "var(--color-text-body)",
                         border: "1px solid var(--color-border)",
                       }
-                  }
-                >
-                  {s}
-                </button>
+                }
+              >
+                {s}
+              </button>
             ))}
           </div>
         </div>
@@ -574,116 +582,158 @@ export function AddPicturePage() {
         aria-hidden="true"
       />
 
-			{/* Floating submit button — sits in the bottom navbar's center notch */}
-			<div className="fixed inset-x-0 bottom-0 z-40 h-24 flex items-start justify-center pointer-events-none md:hidden">
-				<button
-					onClick={handleSubmit}
-					disabled={isSubmitting}
-					aria-label="Submit report"
-					className="h-18 w-18 -mt-3.5 -translate-y-px rounded-full flex items-center justify-center bg-(--nav-camera-bg) pointer-events-auto disabled:opacity-60 active:scale-95 transition-transform"
-				>
-					{isSubmitting ? (
-						<svg
-							className="animate-spin h-7 w-7 text-white dark:text-[var(--nav-active)]"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2.5"
-							strokeLinecap="round"
-							viewBox="0 0 24 24"
-						>
-							<path d="M21 12a9 9 0 1 1-6.22-8.56" />
-						</svg>
-					) : (
-						<svg
-							className="h-7 w-7 text-white dark:text-[var(--nav-active)]"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2.5"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							viewBox="0 0 24 24"
-						>
-							<path d="M20 6L9 17l-5-5" />
-						</svg>
-					)}
-				</button>
-			</div>
+      {/* Floating submit button — sits in the bottom navbar's center notch */}
+      <div className="fixed inset-x-0 bottom-0 z-40 h-24 flex items-start justify-center pointer-events-none md:hidden">
+        <button
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          aria-label="Submit report"
+          className="h-18 w-18 -mt-3.5 -translate-y-px rounded-full flex items-center justify-center bg-(--nav-camera-bg) pointer-events-auto disabled:opacity-60 active:scale-95 transition-transform"
+        >
+          {isSubmitting ? (
+            <svg
+              className="animate-spin h-7 w-7 text-white dark:text-[var(--nav-active)]"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              viewBox="0 0 24 24"
+            >
+              <path d="M21 12a9 9 0 1 1-6.22-8.56" />
+            </svg>
+          ) : (
+            <svg
+              className="h-7 w-7 text-white dark:text-[var(--nav-active)]"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+          )}
+        </button>
+      </div>
 
-			<AuthGateModal open={gate.open} message={gate.message} onDismiss={dismiss} />
-		</div>
-	)
+      <AuthGateModal
+        open={gate.open}
+        message={gate.message}
+        onDismiss={dismiss}
+      />
+    </main>
+  );
 }
 
 function SubmitSuccessModal({ onDismiss }: { onDismiss: () => void }) {
-	useEffect(() => {
-		document.body.style.overflow = 'hidden'
-		return () => { document.body.style.overflow = '' }
-	}, [])
+  const dialogRef = useRef<HTMLDivElement>(null);
 
-	useEffect(() => {
-		function onKey(e: KeyboardEvent) {
-			if (e.key === 'Escape') onDismiss()
-		}
-		window.addEventListener('keydown', onKey)
-		return () => window.removeEventListener('keydown', onKey)
-	}, [onDismiss])
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    const prev = document.activeElement as HTMLElement | null;
+    const focusable = dialogRef.current?.querySelector<HTMLElement>('button');
+    focusable?.focus();
+    return () => {
+      document.body.style.overflow = "";
+      prev?.focus();
+    };
+  }, []);
 
-	return (
-		<div
-			className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/50 px-6"
-			role="dialog"
-			aria-modal="true"
-			aria-labelledby="submit-success-title"
-			onClick={onDismiss}
-		>
-			<div
-				className="w-full max-w-sm rounded-2xl p-6 shadow-xl text-center relative"
-				style={{
-					backgroundColor: 'var(--color-surface)',
-					border: '1px solid var(--color-border)',
-				}}
-				onClick={(e) => e.stopPropagation()}
-			>
-				<button
-					onClick={onDismiss}
-					aria-label="Close"
-					className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:opacity-80"
-					style={{
-						backgroundColor: 'var(--color-page-bg)',
-						color: 'var(--color-text-primary)',
-					}}
-				>
-					<svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-						<path d="M11 3L3 11M3 3l8 8" />
-					</svg>
-				</button>
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onDismiss();
+      if (e.key === 'Tab') {
+        const focusable = dialogRef.current?.querySelectorAll<HTMLElement>('button')
+        if (!focusable || focusable.length === 0) return
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault()
+          last.focus()
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onDismiss]);
 
-				<div
-					className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
-					style={{ backgroundColor: 'var(--color-green-dark)' }}
-					aria-hidden="true"
-				>
-					<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-						<path d="M20 6L9 17l-5-5" />
-					</svg>
-				</div>
+  return (
+    <div
+      ref={dialogRef}
+      className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/50 px-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="submit-success-title"
+      onClick={onDismiss}
+    >
+      <div
+        className="w-full max-w-sm rounded-2xl p-6 shadow-xl text-center relative"
+        style={{
+          backgroundColor: "var(--color-surface)",
+          border: "1px solid var(--color-border)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onDismiss}
+          aria-label="Close"
+          className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:opacity-80"
+          style={{
+            backgroundColor: "var(--color-page-bg)",
+            color: "var(--color-text-primary)",
+          }}
+        >
+          <svg
+            width="14"
+            height="14"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          >
+            <path d="M11 3L3 11M3 3l8 8" />
+          </svg>
+        </button>
 
-				<h3
-					id="submit-success-title"
-					style={{ color: 'var(--color-green-dark)', marginBottom: '0.5rem' }}
-				>
-					Report submitted!
-				</h3>
-				<p className="text-body-sm mb-6!" style={{ color: 'var(--color-text-muted)' }}>
-					+10 points earned 🎉
-				</p>
-				<button
-					onClick={onDismiss}
-					className="btn-primary w-full"
-				>
-					View reports
-				</button>
-			</div>
-		</div>
-	)
+        <div
+          className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
+          style={{ backgroundColor: "var(--color-green-dark)" }}
+          aria-hidden="true"
+        >
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+        </div>
+
+        <h3
+          id="submit-success-title"
+          style={{ color: "var(--color-green-dark)", marginBottom: "0.5rem" }}
+        >
+          Report submitted!
+        </h3>
+        <p
+          className="text-body-sm mb-6!"
+          style={{ color: "var(--color-text-muted)" }}
+        >
+          +10 points earned 🎉
+        </p>
+        <button onClick={onDismiss} className="btn-primary w-full">
+          View reports
+        </button>
+      </div>
+    </div>
+  );
 }

@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useGoogleLogin } from '@react-oauth/google'
 import { loginUser, registerUser, googleSignInWithAccessToken } from '../api'
 import { useAuth } from '../hooks/useAuth'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import logoRaw from '../assets/litter-hero-logo.svg?raw'
 
 //divider component to separate sections of the login page, with "or" text in the middle
@@ -16,6 +17,7 @@ const Divider = () => (
 )
 
 export function LoginPage() {
+  useDocumentTitle('Login')
   const navigate = useNavigate()
   const location = useLocation()
   const startInRegister = (location.state as { register?: boolean } | null)?.register === true
@@ -69,7 +71,7 @@ export function LoginPage() {
   })
 
   return (
-    <div className="login-page" style={{ backgroundColor: 'var(--color-page-bg)' }}>
+    <main id="main-content" tabIndex={-1} className="login-page" style={{ backgroundColor: 'var(--color-page-bg)' }}>
       <Link to="/" aria-label="Go to home">
         <span
           className="mb-6 inline-block w-32 [&_svg]:h-auto [&_svg]:w-full"
@@ -363,7 +365,7 @@ export function LoginPage() {
       >
         Learn more about Litter Hero →
       </Link>
-    </div>
+    </main>
   )
 
   function handleGuestContinue() {

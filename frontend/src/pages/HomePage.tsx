@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import ReportMap from '../components/Map/ReportMap';
 import { fetchReports } from '../api';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { STATUS_FILTER_OPTIONS, type ReportStatusFilter } from '../utils/reportStatus';
 import { SWEDEN_DEFAULT_CENTER, clampToSweden, isInSweden } from '../utils/swedenMap';
 
@@ -22,6 +23,7 @@ function getInitialTheme(): "light" | "dark" {
 }
 
 export function HomePage() {
+	useDocumentTitle('Map')
 	const [mapCenter, setMapCenter] = useState<[number, number]>(SWEDEN_DEFAULT_CENTER);
 	const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
 	const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
@@ -68,7 +70,8 @@ export function HomePage() {
 
 
 	return (
-		<main className="fixed inset-0 h-dvh w-screen bg-transparent">
+		<main id="main-content" tabIndex={-1} className="fixed inset-0 h-dvh w-screen bg-transparent">
+			<h1 className="sr-only">Litter Hero — Map</h1>
 			<div className="absolute inset-0">
 				<ReportMap 
 					reports={mapReports} 

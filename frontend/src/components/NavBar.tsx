@@ -104,7 +104,7 @@ export function NavBar() {
           aria-hidden="true"
           className="absolute inset-0 bg-[image:var(--nav-gradient)] shadow-lg [mask-image:radial-gradient(circle_40px_at_calc(50%_-_0px)_22px,transparent_98%,black_100%)] [-webkit-mask-image:radial-gradient(circle_40px_at_calc(50%_-_0px)_22px,transparent_98%,black_100%)]"
         />
-        <nav className="relative mx-auto flex h-full max-w-2xl items-end justify-around px-4 pb-9">
+        <nav aria-label="Main navigation" className="relative mx-auto flex h-full max-w-2xl items-end justify-around px-4 pb-9">
           <MobileNavItem to="/" icon={mapIcon} label="Map" end />
           <MobileNavItem to="/reports" icon={reportsIcon} label="Reports" />
 
@@ -133,7 +133,7 @@ export function NavBar() {
 
             {/* Desktop top navbar (md+) */}
             <header className="sticky top-0 z-30 hidden h-20 border-b border-[var(--color-border)] bg-[var(--color-surface)] md:block">
-                <nav className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
+                <nav aria-label="Main navigation" className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
                     <NavLink
                         to="/"
                         end

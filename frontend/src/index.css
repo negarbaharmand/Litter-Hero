@@ -161,11 +161,11 @@ p {
   justify-content: center;
   gap: 8px;
   background-color: transparent;
-  color: var(--color-green-dark);
+  color: var(--color-text-primary);
   font-family: inherit;
   font-size: 16px;
   font-weight: 600;
-  border: 2px solid var(--color-green-dark);
+  border: 2px solid var(--color-text-primary);
   border-radius: var(--radius-btn);
   padding: 12px 24px;
   cursor: pointer;
@@ -234,6 +234,30 @@ p {
   max-width: 640px;
   margin: 0 auto;
   padding: 0 16px;
+}
+
+/* Skip-to-content link (visually hidden until focused) */
+.skip-link {
+  position: fixed;
+  top: -100%;
+  left: 8px;
+  z-index: 9999;
+  padding: 8px 16px;
+  background: white;
+  color: black;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: top 0.1s ease;
+}
+.skip-link:focus {
+  top: 8px;
+}
+
+/* Remove focus ring from <main> when programmatically focused */
+#main-content:focus {
+  outline: none;
 }
 
 /* Field error text */
