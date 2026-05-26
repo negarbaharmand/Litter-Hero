@@ -75,13 +75,6 @@ const UserProfile = () => {
             </div>
             <div className="flex flex-col gap-1 shrink-0">
               <Link
-                to="/reports?filter=cleanup_pending_vote"
-                className="rounded-full px-4 py-2 text-sm font-semibold transition-colors text-center"
-                style={{ backgroundColor: 'var(--color-green-normal)', color: '#ffffff' }}
-              >
-                Needs votes
-              </Link>
-              <Link
                 to="/reports?tab=vote-queue"
                 className="rounded-full px-4 py-2 text-sm font-semibold transition-colors text-center"
                 style={{ backgroundColor: 'var(--color-green-normal)', color: '#ffffff' }}
