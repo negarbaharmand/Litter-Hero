@@ -62,7 +62,9 @@ export function LoginPage() {
 
   return (
     <div className="login-page" style={{ backgroundColor: 'var(--color-page-bg)' }}>
-      <img src="/Logo.svg" alt="LitterHero logo" className="w-32 mb-6" />
+      <Link to="/" aria-label="Go to home">
+        <img src="/Logo.svg" alt="LitterHero logo" className="w-32 mb-6" />
+      </Link>
       <div className="login-page__form card">
 
         {/* Rubrik */}

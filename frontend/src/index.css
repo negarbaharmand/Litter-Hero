@@ -231,3 +231,9 @@ p {
   flex-direction: column;
   gap: 16px;
 }
+
+@media (max-width: 767px) {
+  .leaflet-control-zoom {
+    display: none;
+  }
+}
