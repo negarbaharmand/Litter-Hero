@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import ProfileHeader from '../components/ProfileHeader'
+import ActivityHeatmap from '../components/ActivityHeatmap'
 import PointsCard from '../components/PointsCard'
 import MilestoneCard from '../components/MilestoneCard'
 import BadgeList from '../components/BadgeList'
@@ -13,7 +14,7 @@ import { useLeaderboard } from '../hooks/useLeaderboard'
 
 const UserProfile = () => {
   const navigate = useNavigate()
-  const { authState, clearAuth } = useAuth()
+  const { authState, clearAuth, refreshUser } = useAuth()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const user = authState.status === 'authenticated' ? authState.user : null
@@ -21,6 +22,11 @@ const UserProfile = () => {
   // Hämtar leaderboard och letar upp inloggad användares rank via id
   const { data: leaderboardData } = useLeaderboard('allTime')
   const rank = leaderboardData?.entries.find((e) => e.id === user?.id)?.rank ?? null
+
+  // Uppdaterar användarprofilen när sidan laddas
+  useEffect(() => {
+    refreshUser()
+  }, [refreshUser])
 
   async function handleLogout() {
     setIsLoggingOut(true)
@@ -48,6 +54,11 @@ const UserProfile = () => {
           verificationVotes={user?.verificationVotes ?? 0}
           rank={rank}
         />
+        {/* ActivityHeatmap visar streak och daglig aktivitet */}
+        <ActivityHeatmap
+          activity={user.activity}
+          currentStreak={user.currentStreak ?? 0}
+        />
         <div className="mx-4 mt-6">
           <h3 className="mb-3!">Verification activity</h3>
           <div className="card flex items-center justify-between gap-4">
@@ -62,23 +73,32 @@ const UserProfile = () => {
                 <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>votes cast</p>
               </div>
             </div>
-            <Link
-              to="/reports?filter=cleanup_pending_vote"
-              className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-              style={{ backgroundColor: 'var(--color-green-normal)', color: '#ffffff' }}
-            >
-              Needs votes
-            </Link>
+            <div className="flex flex-col gap-1 shrink-0">
+              <Link
+                to="/reports?filter=cleanup_pending_vote"
+                className="rounded-full px-4 py-2 text-sm font-semibold transition-colors text-center"
+                style={{ backgroundColor: 'var(--color-green-normal)', color: '#ffffff' }}
+              >
+                Needs votes
+              </Link>
+              <Link
+                to="/reports?tab=vote-queue"
+                className="rounded-full px-4 py-2 text-sm font-semibold transition-colors text-center"
+                style={{ backgroundColor: 'var(--color-green-normal)', color: '#ffffff' }}
+              >
+                Help verify
+              </Link>
+            </div>
           </div>
         </div>
 
-        <BadgeList badges={[
-          { id: 0, label: "🔥|3 day streak" }, // TODO: implement streak logic
-          ...(user?.badges?.map((label: string, index: number) => ({
-            id: index + 1,
-            label
-          })) ?? [])
-        ]} />
+        {/* Badges från backend — streak-badge är inte längre hårdkodad */}
+        <BadgeList badges={
+          user?.badges?.map((label: string, index: number) => ({
+            id: index,
+            label,
+          })) ?? []
+        } />
         <MilestoneCard currentPoints={user?.points ?? 0} />
 
         {/* About och Privacy finns inuti SettingsButton-kortet */}

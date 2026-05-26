@@ -8,6 +8,7 @@ import { AuthGateModal } from '../components/AuthGateModal'
 import { useAuthGate } from '../hooks/useAuthGate'
 import exifr from 'exifr'
 import { reverseGeocode } from '../utils/geocoding'
+import { getReportPointsForSize } from '../constants'
 
 const CATEGORIES = ['Mixed', 'Plastic', 'Cardboard', 'Metal', 'Glass', 'Organic']
 const SIZES = ['Small', 'Medium', 'Large'] as const
@@ -227,7 +228,6 @@ export function AddPicturePage() {
 			{submitSuccess && (
 				<div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
 					<div className="card mx-4 text-center p-8 relative">
-						{/* Kryss */}
 						<button
 							onClick={() => navigate('/reports')}
 							className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center"
@@ -239,18 +239,28 @@ export function AddPicturePage() {
 							</svg>
 						</button>
 
-						<p className="text-4xl mb-4!">✅</p>
+						<p className="text-4xl mb-4!">🗳️</p>
 						<h3 style={{ color: 'var(--color-green-dark)', marginBottom: '0.5rem' }}>
 							Report submitted!
 						</h3>
+						<p className="text-body-sm mb-1!" style={{ color: 'var(--color-text-body)' }}>
+							Pending community verification
+						</p>
 						<p className="text-body-sm mb-6!" style={{ color: 'var(--color-text-muted)' }}>
-							+10 points earned 🎉
+							Up to <span className="font-semibold text-emerald-700">+{getReportPointsForSize(size)} points</span> once the community confirms it's trash 🎉
 						</p>
 						<button
-							onClick={() => navigate('/reports')}
-							className="btn-primary w-full"
+							onClick={() => navigate('/reports?tab=vote-queue')}
+							className="btn-primary w-full mb-3"
 						>
-							View reports
+							Help verify reports
+						</button>
+						<button
+							onClick={() => navigate('/reports')}
+							className="w-full text-sm font-medium"
+							style={{ color: 'var(--color-text-muted)' }}
+						>
+							View all reports
 						</button>
 					</div>
 				</div>

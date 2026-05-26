@@ -1,16 +1,20 @@
 import type { Request, Response } from 'express';
 import { db } from '../db/index.js';
-import { and, eq, gt, ne, sql } from 'drizzle-orm';
-import { cleanupSubmissions, cleanupSubmissionVotes, reports, users } from '../db/schema.js';
+import { and, eq, gt, inArray, ne, notExists, sql } from 'drizzle-orm';
+import { cleanupSubmissions, cleanupSubmissionVotes, reportVerificationVotes, reports, users } from '../db/schema.js';
 import {
   CLEANUP_VOTE_THRESHOLD,
   getCleanupPointsForSize,
   getReportPointsForSize,
+  REPORT_VERIFICATION_VOTER_POINTS,
+  REPORT_VOTE_THRESHOLD,
   resolveCleanupFromVotes,
+  resolveReportFromVotes,
+  summarizeReportVotes,
   summarizeVotes,
 } from './reportWorkflow.js';
 
-const REPORT_STATUSES = new Set([
+const DB_REPORT_STATUSES = new Set([
   'pending',
   'verified',
   'disputed',
@@ -19,6 +23,11 @@ const REPORT_STATUSES = new Set([
   'open',
   'cleanup_pending_vote',
 ]);
+
+// Virtual filter combining pending + cleanup_pending_vote — not a real DB status
+const VIRTUAL_STATUS_FILTERS = new Set(['needs_votes']);
+
+const REPORT_STATUSES = new Set([...DB_REPORT_STATUSES, ...VIRTUAL_STATUS_FILTERS]);
 
 function parsePositiveId(value: unknown): number | null {
   if (typeof value !== 'string') return null;
@@ -36,8 +45,7 @@ async function getVoteSummary(submissionId: number, currentUserId?: number) {
     .from(cleanupSubmissionVotes)
     .where(eq(cleanupSubmissionVotes.submissionId, submissionId));
 
-  const cleanVotes = votes.filter((vote) => vote.vote === 'clean').length;
-  const notCleanVotes = votes.filter((vote) => vote.vote === 'not_clean').length;
+  const { cleanVotes, notCleanVotes } = summarizeVotes(votes.map((v) => v.vote));
 
   return {
     totalVotes: votes.length,
@@ -46,7 +54,29 @@ async function getVoteSummary(submissionId: number, currentUserId?: number) {
     myVote:
       currentUserId === undefined
         ? null
-        : votes.find((vote) => vote.userId === currentUserId)?.vote ?? null,
+        : votes.find((v) => v.userId === currentUserId)?.vote ?? null,
+  };
+}
+
+async function getReportVerificationVoteSummary(reportId: number, currentUserId?: number) {
+  const votes = await db
+    .select({
+      vote: reportVerificationVotes.vote,
+      userId: reportVerificationVotes.userId,
+    })
+    .from(reportVerificationVotes)
+    .where(eq(reportVerificationVotes.reportId, reportId));
+
+  const { legitVotes, notTrashVotes } = summarizeReportVotes(votes.map((v) => v.vote));
+
+  return {
+    totalVotes: votes.length,
+    legitVotes,
+    notTrashVotes,
+    myVote:
+      currentUserId === undefined
+        ? null
+        : votes.find((v) => v.userId === currentUserId)?.vote ?? null,
   };
 }
 
@@ -94,12 +124,19 @@ export const getAllReports = async (req: Request, res: Response) => {
             GROUP BY csv.submission_id
           ) AS vote_counts
         )`,
+        reportVerificationVoteCount: sql<number>`(
+          SELECT COUNT(*)::int
+          FROM report_verification_votes rvv
+          WHERE rvv.report_id = ${sql.raw('"reports"."id"')}
+        )`,
       })
       .from(reports);
 
-    const allReports = statusFilter
-      ? await query.where(eq(reports.status, statusFilter as (typeof reports.$inferSelect)['status']))
-      : await query;
+    const allReports = statusFilter === 'needs_votes'
+      ? await query.where(inArray(reports.status, ['pending', 'cleanup_pending_vote']))
+      : statusFilter
+        ? await query.where(eq(reports.status, statusFilter as (typeof reports.$inferSelect)['status']))
+        : await query;
 
     return res.json(allReports);
   } catch (error) {
@@ -158,8 +195,11 @@ export const getReportById = async (req: Request, res: Response) => {
     const winningSubmission =
       cleanupSubmissionsWithVotes.find((submission) => submission.status === 'approved') ?? null;
 
+    const verificationVoteSummary = await getReportVerificationVoteSummary(reportId, req.user?.id);
+
     return res.json({
       ...report,
+      verificationVoteSummary,
       winningSubmission,
       cleanupSubmissions: cleanupSubmissionsWithVotes,
     });
@@ -279,19 +319,10 @@ export const createReport = async (req: Request, res: Response) => {
         description,
         size,
         imageSizeBytes: parsedImageSizeBytes ?? null,
-        status: autoRejected ? 'rejected' : 'open',
+        status: autoRejected ? 'rejected' : 'pending',
         rejectionReason: autoRejected ? rejectionReasons.join('; ') : null,
       })
       .returning();
-
-    if (!autoRejected) {
-      await db
-        .update(users)
-        .set({
-          points: sql`${users.points} + ${getReportPointsForSize(size)}`,
-        })
-        .where(eq(users.id, userId));
-    }
 
     return res.status(201).json(newReport);
   } catch (error) {
@@ -325,6 +356,9 @@ export const createCleanupSubmission = async (req: Request, res: Response) => {
     if (report.status === 'cleaned') {
       return res.status(409).json({ error: 'Report is already cleaned' });
     }
+    if (report.status === 'rejected') {
+      return res.status(409).json({ error: 'Report has been rejected' });
+    }
 
     const [createdSubmission] = await db
       .insert(cleanupSubmissions)
@@ -345,11 +379,13 @@ export const createCleanupSubmission = async (req: Request, res: Response) => {
         resolvedAt: cleanupSubmissions.resolvedAt,
       });
 
-    if (report.status === 'open') {
+    // Cleanup proof on a pending report bypasses verification — the physical
+    // act of cleaning is stronger evidence than 3 remote votes.
+    if (report.status === 'pending' || report.status === 'verified' || report.status === 'open') {
       await db
         .update(reports)
         .set({ status: 'cleanup_pending_vote' })
-        .where(and(eq(reports.id, reportId), eq(reports.status, 'open')));
+        .where(and(eq(reports.id, reportId), eq(reports.status, report.status)));
     }
 
     return res.status(201).json({
@@ -449,10 +485,7 @@ export const voteOnCleanupSubmission = async (req: Request, res: Response) => {
         return { type: 'already_cleaned' } as const;
       }
 
-      if (
-        userId === submissionWithReport.submitterUserId ||
-        userId === submissionWithReport.reportOwnerUserId
-      ) {
+      if (userId === submissionWithReport.submitterUserId) {
         return { type: 'forbidden_self_vote' } as const;
       }
 
@@ -575,7 +608,7 @@ export const voteOnCleanupSubmission = async (req: Request, res: Response) => {
         if ((pendingSubmissionCount?.count ?? 0) === 0) {
           await tx
             .update(reports)
-            .set({ status: 'open' })
+            .set({ status: 'verified' })
             .where(and(eq(reports.id, reportId), eq(reports.status, 'cleanup_pending_vote')));
         }
       }
@@ -616,6 +649,242 @@ export const voteOnCleanupSubmission = async (req: Request, res: Response) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
   } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const voteOnReportVerification = async (req: Request, res: Response) => {
+  try {
+    const reportId = parsePositiveId(req.params.id);
+    if (!reportId) return res.status(400).json({ error: 'Invalid report id' });
+
+    const userId = req.user!.id;
+    const vote = req.body?.vote;
+    if (vote !== 'legit' && vote !== 'not_trash') {
+      return res.status(400).json({ error: "vote must be either 'legit' or 'not_trash'" });
+    }
+
+    const outcome = await db.transaction(async (tx) => {
+      const [report] = await tx
+        .select({
+          id: reports.id,
+          status: reports.status,
+          userId: reports.userId,
+          size: reports.size,
+        })
+        .from(reports)
+        .where(eq(reports.id, reportId))
+        .limit(1);
+
+      if (!report) return { type: 'not_found' } as const;
+      if (report.status !== 'pending') return { type: 'not_pending' } as const;
+      if (report.userId === userId) return { type: 'forbidden_self_vote' } as const;
+
+      try {
+        await tx.insert(reportVerificationVotes).values({ reportId, userId, vote });
+      } catch (error) {
+        const maybePgError = error as { code?: string };
+        if (maybePgError.code === '23505') return { type: 'duplicate_vote' } as const;
+        throw error;
+      }
+
+      await tx
+        .update(users)
+        .set({ points: sql`${users.points} + ${REPORT_VERIFICATION_VOTER_POINTS}` })
+        .where(eq(users.id, userId));
+
+      const allVotes = await tx
+        .select({ vote: reportVerificationVotes.vote })
+        .from(reportVerificationVotes)
+        .where(eq(reportVerificationVotes.reportId, reportId));
+
+      const { totalVotes, legitVotes, notTrashVotes } = summarizeReportVotes(allVotes.map((v) => v.vote));
+
+      if (totalVotes < REPORT_VOTE_THRESHOLD) {
+        return {
+          type: 'pending',
+          voteSummary: { totalVotes, legitVotes, notTrashVotes, myVote: vote },
+        } as const;
+      }
+
+      const resolution = resolveReportFromVotes(allVotes.map((v) => v.vote));
+      if (resolution === 'pending') {
+        return {
+          type: 'pending',
+          voteSummary: { totalVotes, legitVotes, notTrashVotes, myVote: vote },
+        } as const;
+      }
+
+      await tx
+        .update(reports)
+        .set({
+          status: resolution,
+          rejectionReason: resolution === 'rejected' ? 'Community verification failed' : null,
+        })
+        .where(and(eq(reports.id, reportId), eq(reports.status, 'pending')));
+
+      if (resolution === 'verified') {
+        await tx
+          .update(users)
+          .set({ points: sql`${users.points} + ${getReportPointsForSize(report.size)}` })
+          .where(eq(users.id, report.userId));
+      }
+
+      return {
+        type: 'resolved',
+        resolution,
+        voteSummary: { totalVotes, legitVotes, notTrashVotes, myVote: vote },
+      } as const;
+    });
+
+    switch (outcome.type) {
+      case 'not_found':
+        return res.status(404).json({ error: 'Report not found' });
+      case 'not_pending':
+        return res.status(409).json({ error: 'Report is not pending verification' });
+      case 'forbidden_self_vote':
+        return res.status(403).json({ error: 'You cannot vote on your own report' });
+      case 'duplicate_vote':
+        return res.status(409).json({ error: 'You have already voted on this report' });
+      case 'pending':
+        return res.status(201).json({ status: 'pending', voteSummary: outcome.voteSummary });
+      case 'resolved':
+        return res.status(201).json({ status: outcome.resolution, voteSummary: outcome.voteSummary });
+      default:
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const getVoteQueue = async (req: Request, res: Response) => {
+  try {
+    const currentUserId = req.user?.id;
+
+    // --- Trash verifications: pending reports user can still vote on ---
+    const trashConditions = [eq(reports.status, 'pending')];
+    if (currentUserId) {
+      trashConditions.push(ne(reports.userId, currentUserId));
+      trashConditions.push(
+        notExists(
+          db.select({ _: sql`1` })
+            .from(reportVerificationVotes)
+            .where(
+              and(
+                eq(reportVerificationVotes.reportId, reports.id),
+                eq(reportVerificationVotes.userId, currentUserId)
+              )
+            )
+        )
+      );
+    }
+
+    const trashRows = await db
+      .select({
+        reportId: reports.id,
+        location: reports.location,
+        description: reports.description,
+        imageUrl: reports.imageUrl,
+        ownerUserId: reports.userId,
+        size: reports.size,
+        createdAt: reports.createdAt,
+        totalVotes: sql<number>`(SELECT COUNT(*)::int FROM report_verification_votes rvv WHERE rvv.report_id = ${sql.raw('"reports"."id"')})`,
+        legitVotes: sql<number>`(SELECT COUNT(*)::int FROM report_verification_votes rvv WHERE rvv.report_id = ${sql.raw('"reports"."id"')} AND rvv.vote = 'legit')`,
+        notTrashVotes: sql<number>`(SELECT COUNT(*)::int FROM report_verification_votes rvv WHERE rvv.report_id = ${sql.raw('"reports"."id"')} AND rvv.vote = 'not_trash')`,
+        myVote: currentUserId
+          ? sql<'legit' | 'not_trash' | null>`(SELECT rvv.vote FROM report_verification_votes rvv WHERE rvv.report_id = ${sql.raw('"reports"."id"')} AND rvv.user_id = ${currentUserId} LIMIT 1)`
+          : sql<null>`NULL`,
+      })
+      .from(reports)
+      .where(and(...trashConditions))
+      .orderBy(reports.createdAt);
+
+    // --- Cleanup verifications: pending submissions on cleanup_pending_vote reports ---
+    const cleanupConditions = [
+      eq(cleanupSubmissions.status, 'pending'),
+      eq(reports.status, 'cleanup_pending_vote'),
+    ];
+    if (currentUserId) {
+      cleanupConditions.push(ne(cleanupSubmissions.userId, currentUserId));
+      cleanupConditions.push(
+        notExists(
+          db.select({ _: sql`1` })
+            .from(cleanupSubmissionVotes)
+            .where(
+              and(
+                eq(cleanupSubmissionVotes.submissionId, cleanupSubmissions.id),
+                eq(cleanupSubmissionVotes.userId, currentUserId)
+              )
+            )
+        )
+      );
+    }
+
+    const cleanupRows = await db
+      .select({
+        reportId: reports.id,
+        reportLocation: reports.location,
+        reportOwnerUserId: reports.userId,
+        submissionId: cleanupSubmissions.id,
+        submissionUserId: cleanupSubmissions.userId,
+        imageUrl: cleanupSubmissions.imageUrl,
+        note: cleanupSubmissions.note,
+        submissionStatus: cleanupSubmissions.status,
+        submissionCreatedAt: cleanupSubmissions.createdAt,
+        submissionResolvedAt: cleanupSubmissions.resolvedAt,
+        totalVotes: sql<number>`(SELECT COUNT(*)::int FROM cleanup_submission_votes csv WHERE csv.submission_id = ${sql.raw('"cleanup_submissions"."id"')})`,
+        cleanVotes: sql<number>`(SELECT COUNT(*)::int FROM cleanup_submission_votes csv WHERE csv.submission_id = ${sql.raw('"cleanup_submissions"."id"')} AND csv.vote = 'clean')`,
+        notCleanVotes: sql<number>`(SELECT COUNT(*)::int FROM cleanup_submission_votes csv WHERE csv.submission_id = ${sql.raw('"cleanup_submissions"."id"')} AND csv.vote = 'not_clean')`,
+        myVote: currentUserId
+          ? sql<'clean' | 'not_clean' | null>`(SELECT csv.vote FROM cleanup_submission_votes csv WHERE csv.submission_id = ${sql.raw('"cleanup_submissions"."id"')} AND csv.user_id = ${currentUserId} LIMIT 1)`
+          : sql<null>`NULL`,
+      })
+      .from(cleanupSubmissions)
+      .innerJoin(reports, eq(cleanupSubmissions.reportId, reports.id))
+      .where(and(...cleanupConditions))
+      .orderBy(cleanupSubmissions.createdAt);
+
+    return res.json({
+      trashVerifications: trashRows.map((r) => ({
+        reportId: r.reportId,
+        location: r.location,
+        description: r.description,
+        imageUrl: r.imageUrl,
+        ownerUserId: r.ownerUserId,
+        size: r.size,
+        createdAt: r.createdAt,
+        voteSummary: {
+          totalVotes: r.totalVotes,
+          legitVotes: r.legitVotes,
+          notTrashVotes: r.notTrashVotes,
+          myVote: r.myVote ?? null,
+        },
+      })),
+      cleanupVerifications: cleanupRows.map((c) => ({
+        reportId: c.reportId,
+        reportLocation: c.reportLocation,
+        reportOwnerUserId: c.reportOwnerUserId,
+        submission: {
+          id: c.submissionId,
+          reportId: c.reportId,
+          userId: c.submissionUserId,
+          imageUrl: c.imageUrl,
+          note: c.note,
+          status: c.submissionStatus,
+          createdAt: c.submissionCreatedAt,
+          resolvedAt: c.submissionResolvedAt,
+          voteSummary: {
+            totalVotes: c.totalVotes,
+            cleanVotes: c.cleanVotes,
+            notCleanVotes: c.notCleanVotes,
+            myVote: c.myVote ?? null,
+          },
+        },
+      })),
+    });
+  } catch (error) {
+    console.error('getVoteQueue error:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };

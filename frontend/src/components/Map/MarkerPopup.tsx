@@ -40,11 +40,16 @@ export default function MarkerPopup({
 				<p className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
 					{lat.toFixed(5)}, {lng.toFixed(5)}
 				</p>
-				{status === 'cleanup_pending_vote' && (
-					<p className="mt-2 text-xs font-semibold text-amber-600">
-						⚠ Verification needed — community vote open
-					</p>
-				)}
+			{status === 'pending' && (
+				<p className="mt-2 text-xs font-semibold text-amber-600">
+					🗳 Needs verification — help the community vote
+				</p>
+			)}
+			{status === 'cleanup_pending_vote' && (
+				<p className="mt-2 text-xs font-semibold text-amber-600">
+					⚠ Cleanup proof needs votes
+				</p>
+			)}
 				{typeof reportId === 'number' && (
 					<Link
 						to={`/reports/${reportId}`}

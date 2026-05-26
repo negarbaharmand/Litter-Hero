@@ -6,7 +6,7 @@ import { fetchReports } from '../api'
 import type { Report } from '../api'
 import { getStatusPresentation, STATUS_FILTER_OPTIONS, type ReportStatusFilter } from '../utils/reportStatus'
 
-const VOTE_THRESHOLD = 3
+import { VOTE_THRESHOLD } from '../constants'
 
 function isValidFilter(value: string | null): value is ReportStatusFilter {
   return STATUS_FILTER_OPTIONS.some((opt) => opt.value === value)
@@ -101,7 +101,12 @@ export function ReportList() {
                 </span>
                 {report.status === 'cleanup_pending_vote' && report.pendingSubmissionsCount > 0 && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
-                    <span>{report.topPendingVoteCount}/{VOTE_THRESHOLD} votes</span>
+                    <span>{report.topPendingVoteCount}/{VOTE_THRESHOLD} cleanup votes</span>
+                  </span>
+                )}
+                {report.status === 'pending' && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
+                    <span>{report.reportVerificationVoteCount}/{VOTE_THRESHOLD} verify votes</span>
                   </span>
                 )}
               </div>
