@@ -8,6 +8,7 @@ import { AuthGateModal } from '../components/AuthGateModal'
 import { useAuthGate } from '../hooks/useAuthGate'
 import exifr from 'exifr'
 import { reverseGeocode } from '../utils/geocoding'
+import { clampToSweden, isInSweden } from '../utils/swedenMap'
 
 const CATEGORIES = ['Mixed', 'Plastic', 'Cardboard', 'Metal', 'Glass', 'Organic']
 const SIZES = ['Small', 'Medium', 'Large'] as const
@@ -56,10 +57,15 @@ export function AddPicturePage() {
             const gps = await exifr.gps(file)
 
             if (gps && gps.latitude && gps.longitude) {
-                const address = await reverseGeocode(gps.latitude, gps.longitude)
+                const lat = gps.latitude
+                const lng = gps.longitude
+                const [clampedLat, clampedLng] = isInSweden(lat, lng)
+                    ? [lat, lng]
+                    : clampToSweden(lat, lng)
+                const address = await reverseGeocode(clampedLat, clampedLng)
                 setLocation(address)
-                setLatitude(gps.latitude)
-                setLongitude(gps.longitude)
+                setLatitude(clampedLat)
+                setLongitude(clampedLng)
                 setIsLocating(false)
                 return
             }
@@ -75,15 +81,18 @@ export function AddPicturePage() {
 
         navigator.geolocation.getCurrentPosition(
             async ({ coords: { latitude, longitude } }) => {
+                const [clampedLat, clampedLng] = isInSweden(latitude, longitude)
+                    ? [latitude, longitude]
+                    : clampToSweden(latitude, longitude)
                 try {
-                    const address = await reverseGeocode(latitude, longitude)
+                    const address = await reverseGeocode(clampedLat, clampedLng)
                     setLocation(address)
-                    setLatitude(latitude)
-                    setLongitude(longitude)
+                    setLatitude(clampedLat)
+                    setLongitude(clampedLng)
                 } catch {
-                    setLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`)
-                    setLatitude(latitude)
-                    setLongitude(longitude)
+                    setLocation(`${clampedLat.toFixed(5)}, ${clampedLng.toFixed(5)}`)
+                    setLatitude(clampedLat)
+                    setLongitude(clampedLng)
                 }
                 setIsLocating(false)
             },
