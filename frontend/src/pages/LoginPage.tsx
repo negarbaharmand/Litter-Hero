@@ -322,8 +322,8 @@ export function LoginPage() {
                   Continue as guest
                 </button>
               </div>
-              <p className="text-body-sm text-text-muted text-center">
-                As a guest you can still report trash but you can't collect points.
+              <p className="text-xs text-text-muted text-center">
+                You need to have an account to report trash and collect points.
               </p>
             </>
           ) : (
