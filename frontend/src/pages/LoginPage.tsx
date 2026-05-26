@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from '@tanstack/react-form'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { loginUser, registerUser, googleSignIn } from '../api'
 import { useAuth } from '../hooks/useAuth'
@@ -338,6 +338,14 @@ export function LoginPage() {
         </form.Subscribe>
 
       </div>
+
+      <Link
+        to="/about"
+        className="mt-6 text-body-sm hover:underline"
+        style={{ color: 'var(--color-text-muted)' }}
+      >
+        Learn more about Litter Hero →
+      </Link>
     </div>
   )
 

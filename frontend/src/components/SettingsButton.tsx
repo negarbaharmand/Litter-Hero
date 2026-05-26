@@ -7,7 +7,7 @@ const SettingsButton = () => {
       <h3 className="mb-3!">Account Settings</h3>
       <div className="card flex flex-col">
 
-        {/* Edit Profile — placeholder */}
+        {/* Edit Profile placeholder */}
         <button
           type="button"
           onClick={() => console.log('Edit profile — not implemented')}
@@ -28,7 +28,7 @@ const SettingsButton = () => {
           <span style={{ color: 'var(--color-text-muted)' }}>›</span>
         </Link>
 
-        {/* About — kommer när branchen mergeas */}
+        {/* About */}
         <Link
           to="/about"
           className="flex items-center justify-between py-3"

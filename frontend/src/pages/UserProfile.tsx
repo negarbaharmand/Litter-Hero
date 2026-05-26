@@ -36,60 +36,64 @@ const UserProfile = () => {
 
   return (
     <PageShell>
-      <ProfileHeader username={user?.username} createdAt={user?.createdAt} />
-      {/* rank skickas till PointsCard för att visas i kortet */}
-      <PointsCard
-        totalPoints={user?.points ?? 0}
-        weeklyPoints={user?.weeklyPoints ?? 0}
-        reportsCreated={user?.reportsCreated ?? 0}
-        cleanupsApproved={user?.cleanupsApproved ?? 0}
-        verificationVotes={user?.verificationVotes ?? 0}
-        rank={rank}
-      />
-      <div className="mx-4 mt-6">
-        <h3 className="mb-3!">Verification activity</h3>
-        <div className="card flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--color-page-bg)' }}>
-              <span className="text-xl">🗳️</span>
+      {/* pb-32 ger tillräckligt utrymme så log out-knappen inte döljs bakom navbaren */}
+      <div className="pb-32">
+        <ProfileHeader username={user?.username} createdAt={user?.createdAt} />
+        {/* rank skickas till PointsCard för att visas i kortet */}
+        <PointsCard
+          totalPoints={user?.points ?? 0}
+          weeklyPoints={user?.weeklyPoints ?? 0}
+          reportsCreated={user?.reportsCreated ?? 0}
+          cleanupsApproved={user?.cleanupsApproved ?? 0}
+          verificationVotes={user?.verificationVotes ?? 0}
+          rank={rank}
+        />
+        <div className="mx-4 mt-6">
+          <h3 className="mb-3!">Verification activity</h3>
+          <div className="card flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--color-page-bg)' }}>
+                <span className="text-xl">🗳️</span>
+              </div>
+              <div>
+                <p className="font-bold text-lg" style={{ color: 'var(--color-text-primary)' }}>
+                  {user?.verificationVotes ?? 0}
+                </p>
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>votes cast</p>
+              </div>
             </div>
-            <div>
-              <p className="font-bold text-lg" style={{ color: 'var(--color-text-primary)' }}>
-                {user?.verificationVotes ?? 0}
-              </p>
-              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>votes cast</p>
-            </div>
+            <Link
+              to="/reports?filter=cleanup_pending_vote"
+              className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+              style={{ backgroundColor: 'var(--color-green-normal)', color: '#ffffff' }}
+            >
+              Needs votes
+            </Link>
           </div>
-          <Link
-            to="/reports?filter=cleanup_pending_vote"
-            className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-            style={{ backgroundColor: 'var(--color-green-normal)', color: '#ffffff' }}
-          >
-            Needs votes
-          </Link>
         </div>
-      </div>
 
-      <BadgeList badges={[
-        { id: 0, label: "🔥|3 day streak" }, // TODO: implement streak logic
-        ...(user?.badges?.map((label: string, index: number) => ({
-          id: index + 1,
-          label
-        })) ?? [])
-      ]} />
-      <MilestoneCard currentPoints={user?.points ?? 0} />
-      
-      <SettingsButton onClick={() => console.log('Settings clicked')} />
-      <Button
-        variant="primary"
-        fullWidth
-        disabled={isLoggingOut}
-        onClick={handleLogout}
-        className="mx-4 mt-3"
-        style={{ width: 'calc(100% - 2rem)' }}
-      >
-        {isLoggingOut ? 'Logging out...' : 'Log out'}
-      </Button>
+        <BadgeList badges={[
+          { id: 0, label: "🔥|3 day streak" }, // TODO: implement streak logic
+          ...(user?.badges?.map((label: string, index: number) => ({
+            id: index + 1,
+            label
+          })) ?? [])
+        ]} />
+        <MilestoneCard currentPoints={user?.points ?? 0} />
+
+        {/* About och Privacy finns inuti SettingsButton-kortet */}
+        <SettingsButton />
+        <Button
+          variant="primary"
+          fullWidth
+          disabled={isLoggingOut}
+          onClick={handleLogout}
+          className="mx-4 mt-3"
+          style={{ width: 'calc(100% - 2rem)' }}
+        >
+          {isLoggingOut ? 'Logging out...' : 'Log out'}
+        </Button>
+      </div>
     </PageShell>
   )
 }

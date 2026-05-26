@@ -11,13 +11,12 @@ const PrivacyPage = () => {
 
         {/* Tillbaka-knapp */}
         <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-1 w-fit"
-          style={{ color: 'var(--color-green-dark)' }}
+        type="button"
+        onClick={() => navigate(-1)}
+        className="self-start text-base font-medium transition-colors hover:opacity-80"
+        style={{ color: 'var(--color-text-body)' }}
         >
-          <span>‹</span>
-          <span className="text-sm font-medium">Back</span>
+        ← Back
         </button>
 
         <div>
@@ -36,7 +35,7 @@ const PrivacyPage = () => {
             Litter Hero är ansvarig för behandlingen av de personuppgifter som samlas in via appen.
           </p>
           <p className="text-sm mt-2" style={{ color: 'var(--color-text-body)' }}>
-            Chas Challange 2026, Chas Academy · Projektgrupp 2: Litter Hero · maria.gileborn@chasacademy.se
+            Chas Challange 2026, Chas Academy · Projektgrupp 2: Litter Hero · litterheroapp@gmail.com
           </p>
         </div>
 
@@ -95,8 +94,8 @@ const PrivacyPage = () => {
           <h3>Kontakt</h3>
           <p className="text-sm mt-2" style={{ color: 'var(--color-text-body)' }}>
             För frågor om dina data, kontakta oss på:{' '}
-            <a href="mailto:maria.gileborn@chasacademy.se" style={{ color: 'var(--color-green-dark)' }}>
-              maria.gileborn@chasacademy.se
+            <a href="mailto:litterheroapp@gmail.com" style={{ color: 'var(--color-green-dark)' }}>
+              litterheroapp@gmail.com
             </a>
           </p>
         </div>
