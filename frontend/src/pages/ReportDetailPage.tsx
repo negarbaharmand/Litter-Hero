@@ -11,6 +11,7 @@ import { useAuthGate } from '../hooks/useAuthGate';
 import { AuthGateModal } from '../components/AuthGateModal';
 import { useAuth } from '../hooks/useAuth';
 import { CleanupSubmissionCard } from '../components/CleanupSubmissionCard';
+import { ReportVerificationCard } from '../components/ReportVerificationCard';
 
 function formatStatus(status: ReportDetails['status']) {
   switch (status) {
@@ -83,7 +84,7 @@ export function ReportDetailPage() {
 
   const canSubmitCleanup = useMemo(() => {
     if (!report) return false;
-    return report.status !== 'cleaned';
+    return report.status !== 'cleaned' && report.status !== 'rejected';
   }, [report]);
 
   function handleSubmitCleanup() {
@@ -149,9 +150,20 @@ export function ReportDetailPage() {
           </div>
         </div>
 
+        {report.status === 'pending' && report.verificationVoteSummary && (
+          <div className="mt-6">
+            <ReportVerificationCard
+              reportId={report.id}
+              reportOwnerUserId={report.userId}
+              voteSummary={report.verificationVoteSummary}
+              requireAuth={requireAuth}
+            />
+          </div>
+        )}
+
         {(report.cleanupSubmissions ?? []).length > 0 && (
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Community verification</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Cleanup verification</h2>
             <p className="mt-1 text-sm text-slate-600">
               Vote on cleanup proof submissions. Three votes with a majority decide the outcome.
             </p>
@@ -230,7 +242,9 @@ export function ReportDetailPage() {
 
           {!canSubmitCleanup && (
             <p className="mt-3 text-sm text-slate-600">
-              This report is already cleaned and no longer accepts cleanup submissions.
+              {report.status === 'rejected'
+                ? 'This report was rejected and does not accept cleanup submissions.'
+                : 'This report is already cleaned and no longer accepts cleanup submissions.'}
             </p>
           )}
         </div>

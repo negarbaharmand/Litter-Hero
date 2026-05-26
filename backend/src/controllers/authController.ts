@@ -24,9 +24,13 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
-const googleSchema = z.object({
-  idToken: z.string().min(1, 'idToken is required'),
-});
+const googleSchema = z.union([
+  z.object({ idToken: z.string().min(1), accessToken: z.undefined().optional() }),
+  z.object({ accessToken: z.string().min(1), idToken: z.undefined().optional() }),
+]).refine(
+  (val) => val.idToken || val.accessToken,
+  { message: 'Either idToken or accessToken is required' }
+);
 
 type PgErrorLike = { code?: string; constraint_name?: string };
 
@@ -142,23 +146,42 @@ export const googleSignIn = async (req: Request, res: Response) => {
   }
 
   try {
-    const ticket = await googleClient.verifyIdToken({
-      idToken: parsed.data.idToken,
-      audience: GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
+    let email: string;
+    let name: string | undefined;
 
-    if (!payload?.email || !payload.email_verified) {
-      return res.status(401).json({ error: 'Invalid Google token' });
+    if (parsed.data.idToken) {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: parsed.data.idToken,
+        audience: GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      if (!payload?.email || !payload.email_verified) {
+        return res.status(401).json({ error: 'Invalid Google token' });
+      }
+      email = payload.email;
+      name = payload.name;
+    } else {
+      const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${parsed.data.accessToken}` },
+      });
+      if (!userInfoRes.ok) {
+        return res.status(401).json({ error: 'Invalid Google token' });
+      }
+      const userInfo = await userInfoRes.json() as { email?: string; email_verified?: boolean; name?: string };
+      if (!userInfo.email || !userInfo.email_verified) {
+        return res.status(401).json({ error: 'Invalid Google token' });
+      }
+      email = userInfo.email;
+      name = userInfo.name;
     }
 
-    let [foundUser] = await db.select().from(users).where(eq(users.email, payload.email)).limit(1);
+    let [foundUser] = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
     if (!foundUser) {
       [foundUser] = await db.insert(users).values({
-        email: payload.email,
-        name: payload.name ?? null,
-        username: payload.email.split('@')[0],
+        email,
+        name: name ?? null,
+        username: email.split('@')[0],
         password: null,
       }).returning();
     }
