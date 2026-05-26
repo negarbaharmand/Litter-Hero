@@ -4,16 +4,21 @@ metadata:
   name: backend-migrate-${CI_COMMIT_REF_SLUG}
 spec:
   backoffLimit: 2
-  ttlSecondsAfterFinished: 300
+  ttlSecondsAfterFinished: 3600
   template:
     spec:
-      restartPolicy: OnFailure
+      restartPolicy: Never
       imagePullSecrets:
         - name: gitlab-registry
       containers:
         - name: migrate
           image: ${CI_REGISTRY_IMAGE}/backend:${CI_COMMIT_SHA}
-          command: ["npm", "run", "db:migrate"]
+          command: ["npm", "run", "db:migrate:prod"]
+          env:
+            - name: NO_COLOR
+              value: "1"
+            - name: CI
+              value: "true"
           envFrom:
             - secretRef:
                 name: cc-secrets

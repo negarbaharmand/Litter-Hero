@@ -5,3 +5,6 @@ metadata:
 data:
   DB_HOST: litter-hero_db
   DB_PORT: "5432"
+  S3_URL: https://group-2-chas-challenge-2026.hel1.your-objectstorage.com
+  S3_BUCKET: group-2-chas-challenge-2026
+  S3_REGION: garage

@@ -9,12 +9,12 @@ const getInitial = (username: string) => username.charAt(0).toUpperCase()
 
 const getAvatarColor = (username: string) => {
   const colors = [
-    'var(--color-green-darker)',
-    'var(--color-green-dark)',
+    '#1d4e2f',
+    '#3ea865',
     '#3b82f6',
     '#eab308',
     '#a855f7',
-    '#ec4899'
+    '#ec4899',
   ]
   const hash = username.charCodeAt(0)
   return colors[hash % colors.length]
