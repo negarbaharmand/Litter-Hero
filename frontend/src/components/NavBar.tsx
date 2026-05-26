@@ -114,7 +114,7 @@ export function NavBar() {
                             src={cameraIcon}
                             alt=""
                             aria-hidden="true"
-                            className="h-7 w-7 dark:[filter:brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
+                            className="h-7 w-7 [filter:brightness(0)_invert(1)] dark:[filter:brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
                         />
                     </NavLink>
 

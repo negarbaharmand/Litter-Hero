@@ -101,52 +101,66 @@ export function ReportDetailPage() {
 
   if (!Number.isInteger(reportId) || reportId < 1) {
     return (
-      <div className="min-h-screen p-6" style={{ backgroundColor: '#EEFCF3' }}>
-        <p className="text-red-600">Invalid report id.</p>
+      <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--color-page-bg)' }}>
+        <p style={{ color: 'var(--color-danger)' }}>Invalid report id.</p>
       </div>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen p-6" style={{ backgroundColor: '#EEFCF3' }}>
-        <p className="text-slate-700">Loading report...</p>
+      <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--color-page-bg)' }}>
+        <p style={{ color: 'var(--color-text-body)' }}>Loading report...</p>
       </div>
     );
   }
 
   if (isError || !report) {
     return (
-      <div className="min-h-screen p-6" style={{ backgroundColor: '#EEFCF3' }}>
-        <p className="text-red-600">{(error as Error)?.message ?? 'Failed to load report.'}</p>
+      <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--color-page-bg)' }}>
+        <p style={{ color: 'var(--color-danger)' }}>{(error as Error)?.message ?? 'Failed to load report.'}</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-32" style={{ backgroundColor: '#EEFCF3' }}>
+    <div className="min-h-screen pb-32" style={{ backgroundColor: 'var(--color-page-bg)' }}>
       <div className="mx-auto w-full max-w-3xl px-4 pt-6">
-        <Link to="/reports" className="text-sm font-medium text-emerald-700 hover:underline">
+        <Link
+          to="/reports"
+          className="text-sm font-medium hover:underline"
+          style={{ color: 'var(--color-green-dark)' }}
+        >
           ← Back to reports
         </Link>
 
-        <h1 className="mt-3 text-2xl font-bold text-emerald-900">Report #{report.id}</h1>
-        <p className="mt-2 inline-flex rounded-full bg-emerald-100 px-3 py-1 text-sm text-emerald-800">
+        <h1 className="mt-3 text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+          Report #{report.id}
+        </h1>
+        <p
+          className="mt-2 inline-flex rounded-full px-3 py-1 text-sm"
+          style={{ backgroundColor: 'var(--color-green-normal)', color: '#ffffff' }}
+        >
           {formatStatus(report.status)}
         </p>
 
-        <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div
+          className="mt-4 overflow-hidden rounded-2xl shadow-sm"
+          style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+        >
           {report.imageUrl && (
             <img src={report.imageUrl} alt="Reported trash spot" className="h-64 w-full object-cover" />
           )}
           <div className="p-4">
-            <p className="text-lg font-semibold text-slate-900">
+            <p className="text-lg font-semibold" style={{ color: 'var(--color-text-body)' }}>
               {report.description?.trim() || 'No description'}
             </p>
-            <p className="mt-3 text-slate-700">
+            <p className="mt-3" style={{ color: 'var(--color-text-body)' }}>
               <span className="font-semibold">Location:</span> {report.location}
             </p>
-            <p className="mt-2 text-sm text-slate-600">Size: {report.size ?? 'Unknown'}</p>
+            <p className="mt-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+              Size: {report.size ?? 'Unknown'}
+            </p>
           </div>
         </div>
 
@@ -162,9 +176,14 @@ export function ReportDetailPage() {
         )}
 
         {(report.cleanupSubmissions ?? []).length > 0 && (
-          <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Cleanup verification</h2>
-            <p className="mt-1 text-sm text-slate-600">
+          <div
+            className="mt-6 rounded-2xl p-4 shadow-sm"
+            style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+          >
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-body)' }}>
+              Cleanup verification
+            </h2>
+            <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
               Vote on cleanup proof submissions. Three votes with a majority decide the outcome.
             </p>
             <div className="mt-4 space-y-4">
@@ -187,25 +206,38 @@ export function ReportDetailPage() {
           </div>
         )}
 
-        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">Submit cleanup proof</h2>
-          <p className="mt-1 text-sm text-slate-600">
+        <div
+          className="mt-6 rounded-2xl p-4 shadow-sm"
+          style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+        >
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-body)' }}>
+            Submit cleanup proof
+          </h2>
+          <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
             Upload a current photo from the cleaned spot so the community can verify it.
           </p>
 
-          <div className="mt-4 rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50/50 p-4">
-            <p className="text-sm font-medium text-emerald-900">Cleanup proof photo (required)</p>
-            <p className="mt-1 text-xs text-emerald-800">Take a clear after-photo of the cleaned spot.</p>
+          <div
+            className="mt-4 rounded-xl border-2 border-dashed p-4"
+            style={{ borderColor: 'var(--color-green-dark)', backgroundColor: 'var(--color-page-bg)' }}
+          >
+            <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+              Cleanup proof photo (required)
+            </p>
+            <p className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+              Take a clear after-photo of the cleaned spot.
+            </p>
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
-              className="mt-3 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-3 rounded-lg px-3 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+              style={{ backgroundColor: 'var(--color-green-dark)' }}
             >
               {proofFile ? 'Change photo' : 'Upload cleanup photo'}
             </button>
             {proofFile && (
-              <p className="mt-2 text-sm text-slate-700">
+              <p className="mt-2 text-sm" style={{ color: 'var(--color-text-body)' }}>
                 Selected file: <span className="font-medium">{proofFile.name}</span>
               </p>
             )}
@@ -225,23 +257,33 @@ export function ReportDetailPage() {
             placeholder="Optional note about what was cleaned"
             rows={3}
             disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
-            className="mt-3 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            className="mt-3 w-full rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2"
+            style={{
+              border: '1px solid var(--color-border)',
+              backgroundColor: 'var(--color-page-bg)',
+              color: 'var(--color-text-body)',
+            }}
           />
 
-          {formError && <p className="mt-3 text-sm text-red-600">{formError}</p>}
-          {submitSuccess && <p className="mt-3 text-sm text-emerald-700">{submitSuccess}</p>}
+          {formError && (
+            <p className="mt-3 text-sm" style={{ color: 'var(--color-danger)' }}>{formError}</p>
+          )}
+          {submitSuccess && (
+            <p className="mt-3 text-sm" style={{ color: 'var(--color-green-dark)' }}>{submitSuccess}</p>
+          )}
 
           <button
             type="button"
             onClick={handleSubmitCleanup}
             disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
-            className="mt-4 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-4 rounded-xl px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+            style={{ backgroundColor: 'var(--color-green-dark)' }}
           >
             {submitCleanupMutation.isPending ? 'Submitting...' : 'Submit cleanup'}
           </button>
 
           {!canSubmitCleanup && (
-            <p className="mt-3 text-sm text-slate-600">
+            <p className="mt-3 text-sm" style={{ color: 'var(--color-text-muted)' }}>
               {report.status === 'rejected'
                 ? 'This report was rejected and does not accept cleanup submissions.'
                 : 'This report is already cleaned and no longer accepts cleanup submissions.'}

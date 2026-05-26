@@ -36,7 +36,7 @@ export function Leaderboard() {
       ) : (
         <p className="text-body-lg" style={{ color: 'var(--color-green-dark)' }}>No leaderboard data available</p>
       )}
-      <p className="text-body-sm mt-4" style={{ color: 'var(--color-text-muted)', fontSize: '13px' }}>
+      <p className="text-body-sm" style={{ color: 'var(--color-text-muted)', fontSize: '13px', marginTop: '1rem' }}>
         Last updated: {data?.lastUpdated}
       </p>
     </PageShell>

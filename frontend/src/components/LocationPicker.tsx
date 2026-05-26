@@ -244,7 +244,7 @@ export function LocationPicker({
 				)}
 			</div>
 
-			<div className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
+			<div className="rounded-2xl overflow-hidden relative isolate z-0" style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
 				<MapContainer
 					center={mapCenter}
 					zoom={hasMapPin ? 16 : 12}

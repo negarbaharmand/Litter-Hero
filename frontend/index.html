@@ -16,6 +16,14 @@
     </script>
   </head>
   <body>
+    <script>
+      (function () {
+        var saved = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme =
+          saved === 'dark' || saved === 'light' ? saved : prefersDark ? 'dark' : 'light';
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
