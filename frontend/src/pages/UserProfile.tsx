@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import ProfileHeader from '../components/ProfileHeader'
 import PointsCard from '../components/PointsCard'
+import MilestoneCard from '../components/MilestoneCard'
 import BadgeList from '../components/BadgeList'
 import SettingsButton from '../components/SettingsButton'
 import { PageShell } from '../components/PageShell'
 import { Button } from '../components/ui'
 import { logoutUser } from '../api'
 import { useAuth } from '../hooks/useAuth'
+import { useLeaderboard } from '../hooks/useLeaderboard'
 
 const UserProfile = () => {
   const navigate = useNavigate()
@@ -15,6 +17,10 @@ const UserProfile = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const user = authState.status === 'authenticated' ? authState.user : null
+
+  // Hämtar leaderboard och letar upp inloggad användares rank via id
+  const { data: leaderboardData } = useLeaderboard('allTime')
+  const rank = leaderboardData?.entries.find((e) => e.id === user?.id)?.rank ?? null
 
   async function handleLogout() {
     setIsLoggingOut(true)
@@ -30,13 +36,15 @@ const UserProfile = () => {
 
   return (
     <PageShell>
-      <ProfileHeader username={user?.username} level={12} createdAt={user?.createdAt} />
+      <ProfileHeader username={user?.username} createdAt={user?.createdAt} />
+      {/* rank skickas till PointsCard för att visas i kortet */}
       <PointsCard
         totalPoints={user?.points ?? 0}
         weeklyPoints={user?.weeklyPoints ?? 0}
         reportsCreated={user?.reportsCreated ?? 0}
         cleanupsApproved={user?.cleanupsApproved ?? 0}
         verificationVotes={user?.verificationVotes ?? 0}
+        rank={rank}
       />
       <div className="mx-4 mt-6">
         <h3 className="mb-3!">Verification activity</h3>
@@ -69,6 +77,8 @@ const UserProfile = () => {
           label
         })) ?? [])
       ]} />
+      <MilestoneCard currentPoints={user?.points ?? 0} />
+      
       <SettingsButton onClick={() => console.log('Settings clicked')} />
       <Button
         variant="primary"
