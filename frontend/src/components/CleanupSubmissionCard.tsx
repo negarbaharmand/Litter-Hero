@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   voteOnCleanupSubmission,
@@ -37,6 +37,7 @@ export function CleanupSubmissionCard({
   const queryClient = useQueryClient();
   const { authState, refreshUser } = useAuth();
   const [voteError, setVoteError] = useState<string | null>(null);
+  const voteInFlightRef = useRef(false);
 
   const currentUserId =
     authState.status === 'authenticated' ? authState.user.id : null;
@@ -57,16 +58,23 @@ export function CleanupSubmissionCard({
       voteOnCleanupSubmission(reportId, submission.id, vote),
     onSuccess: () => {
       setVoteError(null);
+      voteInFlightRef.current = false;
       queryClient.invalidateQueries({ queryKey: ['report', reportId] });
       queryClient.invalidateQueries({ queryKey: ['reports'] });
       refreshUser();
     },
     onError: (err) => {
+      voteInFlightRef.current = false;
       setVoteError(err instanceof Error ? err.message : 'Failed to submit vote.');
     },
   });
 
   function handleVote(vote: 'clean' | 'not_clean') {
+    if (voteInFlightRef.current) {
+      return;
+    }
+
+    voteInFlightRef.current = true;
     setVoteError(null);
     requireAuth('Log in to vote on cleanup proof', () => voteMutation.mutate(vote));
   }
