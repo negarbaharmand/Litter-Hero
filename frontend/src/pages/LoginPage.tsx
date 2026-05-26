@@ -251,7 +251,7 @@ export function LoginPage() {
           <button type="submit" disabled={isLoading} className="btn-primary w-full">
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="animate-spin" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24">
                   <path d="M21 12a9 9 0 1 1-6.22-8.56" />
                 </svg>
                 Please wait…

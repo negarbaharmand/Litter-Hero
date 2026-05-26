@@ -82,7 +82,11 @@ export function HomePage() {
         />
       </div>
       <div className="fixed left-1/2 top-4 z-2000 flex max-w-[90vw] md:max-w-[80vw] -translate-x-1/2 flex-col gap-2 md:top-24">
-        <div className="flex flex-auto gap-2 md:gap-3 rounded-xl bg-white/90 dark:bg-neutral-800/90 p-2 shadow overflow-x-auto mx-2 md:mx-0">
+        <div
+          className="flex flex-auto gap-2 md:gap-3 rounded-xl bg-white/90 dark:bg-neutral-800/90 p-2 shadow overflow-x-auto mx-2 md:mx-0"
+          role="region"
+          aria-label="Report status filters"
+        >
           {STATUS_FILTER_OPTIONS.map((option) => (
             <button
               key={option.value}
@@ -105,6 +109,7 @@ export function HomePage() {
         <button
           type="button"
           onClick={() => setNeedsVotesOnly((prev) => !prev)}
+          aria-pressed={needsVotesOnly}
           className={`self-start rounded-full px-3 py-1 text-xs font-semibold shadow transition ${
             needsVotesOnly
               ? "bg-amber-500 text-white"
@@ -128,7 +133,7 @@ export function HomePage() {
             color: "var(--text-h)",
           }}
         >
-          <span className="text-xs font-medium">
+          <span className="text-xs font-medium text-white">
             {theme === "dark" ? "Dark" : "Light"}
           </span>
 

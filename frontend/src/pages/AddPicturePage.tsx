@@ -428,26 +428,27 @@ export function AddPicturePage() {
           </label>
           <div className="flex flex-wrap gap-2 items-center">
             {visibleCategories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setCategory(cat)}
-                className="px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
-                style={
-                  category === cat
-                    ? {
+<button
+                  key={cat}
+                  onClick={() => setCategory(cat)}
+                  aria-pressed={category === cat}
+                  className="px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
+                  style={
+                    category === cat
+                      ? {
                         backgroundColor: "var(--color-green-normal)",
                         color: "black",
                         border: "none",
                       }
-                    : {
+                      : {
                         backgroundColor: "var(--color-surface)",
                         color: "var(--color-text-body)",
                         border: "1px solid var(--color-border)",
                       }
-                }
-              >
-                {cat}
-              </button>
+                  }
+                >
+                  {cat}
+                </button>
             ))}
 
             <button
@@ -520,26 +521,27 @@ export function AddPicturePage() {
 
           <div className="flex gap-2">
             {SIZES.map((s) => (
-              <button
-                key={s}
-                onClick={() => setSize(s)}
-                className="px-5 py-1.5 rounded-full text-sm font-medium transition-colors"
-                style={
-                  size === s
-                    ? {
+<button
+                  key={s}
+                  onClick={() => setSize(s)}
+                  aria-pressed={size === s}
+                  className="px-5 py-1.5 rounded-full text-sm font-medium transition-colors"
+                  style={
+                    size === s
+                      ? {
                         backgroundColor: "var(--color-green-normal)",
                         color: "black",
                         border: "none",
                       }
-                    : {
+                      : {
                         backgroundColor: "var(--color-surface)",
                         color: "var(--color-text-body)",
                         border: "1px solid var(--color-border)",
                       }
-                }
-              >
-                {s}
-              </button>
+                  }
+                >
+                  {s}
+                </button>
             ))}
           </div>
         </div>

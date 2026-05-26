@@ -207,14 +207,15 @@ export function ReportDetailPage() {
             />
           </div>
 
-          <textarea
-            value={note}
-            onChange={(event) => setNote(event.target.value)}
-            placeholder="Optional note about what was cleaned"
-            rows={3}
-            disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
-            className="mt-3 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-          />
+<textarea
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+              placeholder="Optional note about what was cleaned"
+              aria-label="Optional note about what was cleaned"
+              rows={3}
+              disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
+              className="mt-3 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            />
 
           {formError && <p className="mt-3 text-sm text-red-600">{formError}</p>}
           {submitSuccess && <p className="mt-3 text-sm text-emerald-700">{submitSuccess}</p>}

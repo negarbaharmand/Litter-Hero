@@ -28,7 +28,12 @@ export function LeaderboardTable({ entries, sortBy }: LeaderboardTableProps) {
     <div className="space-y-4">
       {/* Top 3 kort */}
       {topThreeEntries.length > 0 && (
-        <div className="flex gap-3 overflow-x-auto pb-1">
+        <div 
+  className="flex gap-3 overflow-x-auto pb-1" 
+  tabIndex={0} 
+  role="region" 
+  aria-label="Top 3 leaderboard entries"
+>
           {topThreeEntries.map((entry) => (
             <div key={entry.id} className="card min-w-36 flex-1 text-center">
               <div className="mx-auto mb-2 w-fit">
@@ -55,9 +60,9 @@ export function LeaderboardTable({ entries, sortBy }: LeaderboardTableProps) {
       )}
 
       {/* Resterande rader */}
-      <div className="space-y-3">
+      <div className="space-y-3" role="list" aria-label="Leaderboard rankings">
         {remainingEntries.map((entry) => (
-          <div key={entry.id} className="card flex items-center justify-between gap-4 hover:bg-green-light transition">
+          <div key={entry.id} role="listitem" className="card flex items-center justify-between gap-4 hover:bg-green-light transition">
             <div className="w-12 text-body-lg font-bold" style={{ color: 'var(--color-green-dark)' }}>
               #{entry.rank}
             </div>

@@ -58,7 +58,7 @@ export function ReportList() {
           {visibleReports.length} reports
         </span>
       </div>
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap gap-2" role="region" aria-label="Report status filters">
         {STATUS_FILTER_OPTIONS.map((option) => (
           <button
             key={option.value}
