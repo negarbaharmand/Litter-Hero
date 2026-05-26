@@ -1,9 +1,28 @@
+import { useNavigate } from 'react-router-dom'
 import { PageShell } from '../components/PageShell'
 
 export function AboutPage() {
+  const navigate = useNavigate()
+
+  const onBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1)
+    } else {
+      navigate('/')
+    }
+  }
+
   return (
     <PageShell>
       <div className="flex flex-col gap-6 mt-2">
+        <button
+          type="button"
+          onClick={onBack}
+          className="self-start text-base font-medium transition-colors hover:opacity-80"
+          style={{ color: 'var(--color-text-body)' }}
+        >
+          ← Back
+        </button>
         <header className="text-center">
           <h1 className="mb-3">About Litter Hero</h1>
           <p

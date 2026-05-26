@@ -15,7 +15,7 @@ function App() {
   const location = useLocation()
   return (
     <>
-      {location.pathname !== '/login' && <NavBar />}
+      {location.pathname !== '/login' && location.pathname !== '/about' && <NavBar />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
