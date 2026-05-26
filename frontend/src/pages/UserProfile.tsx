@@ -71,6 +71,14 @@ const UserProfile = () => {
       ]} />
       <SettingsButton onClick={() => console.log('Settings clicked')} />
       <Button
+        variant="secondary"
+        className="mx-4 mt-3 text-left"
+        style={{ width: 'calc(100% - 2rem)' }}
+        onClick={() => navigate('/about')}
+      >
+        About us
+      </Button>
+      <Button
         variant="primary"
         fullWidth
         disabled={isLoggingOut}
