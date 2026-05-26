@@ -189,8 +189,8 @@ p {
 .page-shell {
   min-height: 100dvh;
   background-color: var(--color-page-bg);
-  /* Space for fixed bottom NavBar on mobile, top NavBar on desktop */
-  padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+  /* Space for fixed bottom NavBar on mobile */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 130px);
   padding-top: 16px;
 }
 @media (min-width: 768px) {

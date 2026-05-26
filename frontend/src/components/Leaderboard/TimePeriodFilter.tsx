@@ -14,7 +14,7 @@ export function TimePeriodFilter({ selectedPeriod, onPeriodChange }: TimePeriodF
   ];
 
   return (
-    <div className="flex flex-wrap items-center gap-3 mb-6">
+    <div className="flex flex-nowrap items-center gap-3 mb-6">
       <span className="text-body-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
         Filter by period:
       </span>

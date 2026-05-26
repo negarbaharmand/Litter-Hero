@@ -28,15 +28,24 @@ const UserProfile = () => {
 
   if (!user) return null
 
+  const display = {
+    points: user?.points ?? 0,
+    weeklyPoints: user?.weeklyPoints ?? 0,
+    reportsCreated: user?.reportsCreated ?? 0,
+    cleanupsApproved: user?.cleanupsApproved ?? 0,
+    verificationVotes: user?.verificationVotes ?? 0,
+    badges: user?.badges ?? [],
+  }
+
   return (
     <PageShell>
       <ProfileHeader username={user?.username} level={12} createdAt={user?.createdAt} />
       <PointsCard
-        totalPoints={user?.points ?? 0}
-        weeklyPoints={user?.weeklyPoints ?? 0}
-        reportsCreated={user?.reportsCreated ?? 0}
-        cleanupsApproved={user?.cleanupsApproved ?? 0}
-        verificationVotes={user?.verificationVotes ?? 0}
+        totalPoints={display.points}
+        weeklyPoints={display.weeklyPoints}
+        reportsCreated={display.reportsCreated}
+        cleanupsApproved={display.cleanupsApproved}
+        verificationVotes={display.verificationVotes}
       />
       <div className="mx-4 mt-6">
         <h3 className="mb-3!">Verification activity</h3>
@@ -47,7 +56,7 @@ const UserProfile = () => {
             </div>
             <div>
               <p className="font-bold text-lg" style={{ color: 'var(--color-text-primary)' }}>
-                {user?.verificationVotes ?? 0}
+                {display.verificationVotes}
               </p>
               <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>votes cast</p>
             </div>
@@ -64,10 +73,10 @@ const UserProfile = () => {
 
       <BadgeList badges={[
         { id: 0, label: "🔥|3 day streak" }, // TODO: implement streak logic
-        ...(user?.badges?.map((label: string, index: number) => ({
+        ...display.badges.map((label: string, index: number) => ({
           id: index + 1,
           label
-        })) ?? [])
+        }))
       ]} />
       <SettingsButton onClick={() => console.log('Settings clicked')} />
       <Button

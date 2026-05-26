@@ -41,14 +41,15 @@ export default function MarkerPopup({
 					{lat.toFixed(5)}, {lng.toFixed(5)}
 				</p>
 				{status === 'cleanup_pending_vote' && (
-					<p className="mt-2 text-xs font-semibold text-amber-600">
+					<p className="mt-2 text-xs font-semibold" style={{ color: 'var(--color-text-primary)' }}>
 						⚠ Verification needed — community vote open
 					</p>
 				)}
 				{typeof reportId === 'number' && (
 					<Link
 						to={`/reports/${reportId}`}
-						className="mt-3 inline-block text-xs font-semibold text-emerald-700 hover:underline"
+						className="mt-3 inline-block text-xs font-semibold hover:underline"
+						style={{ color: 'var(--color-green-dark)' }}
 					>
 						Open report details
 					</Link>
