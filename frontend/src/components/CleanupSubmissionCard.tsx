@@ -82,13 +82,18 @@ export function CleanupSubmissionCard({
   const votesNeeded = Math.max(0, 3 - voteSummary.totalVotes);
 
   return (
-    <div className="rounded-xl p-4" style={{ backgroundColor: 'var(--color-page-bg)', border: '1px solid var(--color-border)' }}>
+    <div
+      className="rounded-xl p-4"
+      style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-page-bg)' }}
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+        <p className="text-sm font-semibold" style={{ color: 'var(--color-text-body)' }}>
           Cleanup proof #{submission.id}
         </p>
-        <span className="rounded-full px-2 py-1 text-xs font-medium"
-          style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-body)', border: '1px solid var(--color-border)' }}>
+        <span
+          className="rounded-full px-2 py-1 text-xs font-medium"
+          style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-muted)' }}
+        >
           {formatSubmissionStatus(submission.status)}
         </span>
       </div>
@@ -100,15 +105,23 @@ export function CleanupSubmissionCard({
       />
 
       {submission.note && (
-        <p className="mt-2 text-sm" style={{ color: 'var(--color-text-body)' }}>{submission.note}</p>
+        <p className="mt-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          {submission.note}
+        </p>
       )}
 
       <div className="mt-3 flex flex-wrap gap-3 text-sm" style={{ color: 'var(--color-text-body)' }}>
         <span>
-          <span className="font-semibold" style={{ color: 'var(--color-green-dark)' }}>{voteSummary.cleanVotes}</span> clean
+          <span className="font-semibold" style={{ color: 'var(--color-green-dark)' }}>
+            {voteSummary.cleanVotes}
+          </span>{' '}
+          clean
         </span>
         <span>
-          <span className="font-semibold text-amber-500">{voteSummary.notCleanVotes}</span> not clean
+          <span className="font-semibold" style={{ color: 'var(--color-danger)' }}>
+            {voteSummary.notCleanVotes}
+          </span>{' '}
+          not clean
         </span>
         <span>
           <span className="font-semibold">{voteSummary.totalVotes}</span>/3 votes
@@ -125,13 +138,8 @@ export function CleanupSubmissionCard({
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => {
-              if (voteMutation.isPending || voteInFlightRef.current) {
-                return;
-              }
-              handleVote('clean');
-            }}
-            disabled={voteMutation.isPending || voteInFlightRef.current}
+            onClick={() => handleVote('clean')}
+            disabled={voteMutation.isPending}
             className="rounded-lg px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
             style={{ backgroundColor: 'var(--color-green-dark)' }}
           >
@@ -139,15 +147,14 @@ export function CleanupSubmissionCard({
           </button>
           <button
             type="button"
-            onClick={() => {
-              if (voteMutation.isPending || voteInFlightRef.current) {
-                return;
-              }
-              handleVote('not_clean');
-            }}
-            disabled={voteMutation.isPending || voteInFlightRef.current}
+            onClick={() => handleVote('not_clean')}
+            disabled={voteMutation.isPending}
             className="rounded-lg px-3 py-2 text-sm font-semibold disabled:opacity-60"
-            style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-body)', border: '1px solid var(--color-border)' }}
+            style={{
+              border: '1px solid var(--color-border)',
+              backgroundColor: 'var(--color-surface)',
+              color: 'var(--color-text-body)',
+            }}
           >
             Vote not clean
           </button>
@@ -155,7 +162,9 @@ export function CleanupSubmissionCard({
       )}
 
       {cannotVoteReason && submission.status === 'pending' && (
-        <p className="mt-3 text-sm" style={{ color: 'var(--color-text-muted)' }}>{cannotVoteReason}</p>
+        <p className="mt-3 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          {cannotVoteReason}
+        </p>
       )}
 
       {submission.voteSummary.myVote && (
@@ -164,7 +173,11 @@ export function CleanupSubmissionCard({
         </p>
       )}
 
-      {voteError && <p className="mt-2 text-sm text-red-500">{voteError}</p>}
+      {voteError && (
+        <p className="mt-2 text-sm" style={{ color: 'var(--color-danger)' }}>
+          {voteError}
+        </p>
+      )}
     </div>
   );
 }

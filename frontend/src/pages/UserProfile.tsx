@@ -40,18 +40,27 @@ const UserProfile = () => {
 
   if (!user) return null
 
+  // Samlar ihop user-data i ett objekt för tydligare JSX
+  const display = {
+    points: user?.points ?? 0,
+    weeklyPoints: user?.weeklyPoints ?? 0,
+    reportsCreated: user?.reportsCreated ?? 0,
+    cleanupsApproved: user?.cleanupsApproved ?? 0,
+    verificationVotes: user?.verificationVotes ?? 0,
+    badges: user?.badges ?? [],
+  }
+
   return (
     <PageShell>
-      {/* pb-32 ger tillräckligt utrymme så log out-knappen inte döljs bakom navbaren */}
       <div className="pb-32">
         <ProfileHeader username={user?.username} createdAt={user?.createdAt} />
         {/* rank skickas till PointsCard för att visas i kortet */}
         <PointsCard
-          totalPoints={user?.points ?? 0}
-          weeklyPoints={user?.weeklyPoints ?? 0}
-          reportsCreated={user?.reportsCreated ?? 0}
-          cleanupsApproved={user?.cleanupsApproved ?? 0}
-          verificationVotes={user?.verificationVotes ?? 0}
+          totalPoints={display.points}
+          weeklyPoints={display.weeklyPoints}
+          reportsCreated={display.reportsCreated}
+          cleanupsApproved={display.cleanupsApproved}
+          verificationVotes={display.verificationVotes}
           rank={rank}
         />
         {/* ActivityHeatmap visar streak och daglig aktivitet */}
@@ -68,33 +77,31 @@ const UserProfile = () => {
               </div>
               <div>
                 <p className="font-bold text-lg" style={{ color: 'var(--color-text-primary)' }}>
-                  {user?.verificationVotes ?? 0}
+                  {display.verificationVotes}
                 </p>
                 <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>votes cast</p>
               </div>
             </div>
-            <div className="flex flex-col gap-1 shrink-0">
-              <Link
-                to="/reports?tab=vote-queue"
-                className="rounded-full px-4 py-2 text-sm font-semibold transition-colors text-center"
-                style={{ backgroundColor: 'var(--color-green-normal)', color: '#ffffff' }}
-              >
-                Help verify
-              </Link>
-            </div>
+            <Link
+              to="/reports?tab=vote-queue"
+              className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+              style={{ backgroundColor: 'var(--color-green-normal)', color: '#ffffff' }}
+            >
+              Help verify
+            </Link>
           </div>
         </div>
 
-        {/* Badges från backend — streak-badge är inte längre hårdkodad */}
+        {/* Badges från backend*/}
         <BadgeList badges={
-          user?.badges?.map((label: string, index: number) => ({
+          display.badges.map((label: string, index: number) => ({
             id: index,
             label,
-          })) ?? []
+          }))
         } />
-        <MilestoneCard currentPoints={user?.points ?? 0} />
+        <MilestoneCard currentPoints={display.points} />
 
-        {/* About och Privacy finns inuti SettingsButton-kortet */}
+        {/* About, privacy and edit profile in settings */}
         <SettingsButton />
         <Button
           variant="primary"

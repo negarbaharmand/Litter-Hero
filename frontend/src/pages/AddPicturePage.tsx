@@ -8,7 +8,6 @@ import { AuthGateModal } from '../components/AuthGateModal'
 import { useAuthGate } from '../hooks/useAuthGate'
 import exifr from 'exifr'
 import { reverseGeocode } from '../utils/geocoding'
-import { getReportPointsForSize } from '../constants'
 
 const CATEGORIES = ['Mixed', 'Plastic', 'Cardboard', 'Metal', 'Glass', 'Organic']
 const SIZES = ['Small', 'Medium', 'Large'] as const
@@ -226,44 +225,7 @@ export function AddPicturePage() {
 
 			{/* Success modal */}
 			{submitSuccess && (
-				<div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
-					<div className="card mx-4 text-center p-8 relative">
-						<button
-							onClick={() => navigate('/reports')}
-							className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center"
-							style={{ backgroundColor: 'var(--color-page-bg)' }}
-							aria-label="Close"
-						>
-							<svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-								<path d="M11 3L3 11M3 3l8 8" />
-							</svg>
-						</button>
-
-						<p className="text-4xl mb-4!">🗳️</p>
-						<h3 style={{ color: 'var(--color-green-dark)', marginBottom: '0.5rem' }}>
-							Report submitted!
-						</h3>
-						<p className="text-body-sm mb-1!" style={{ color: 'var(--color-text-body)' }}>
-							Pending community verification
-						</p>
-						<p className="text-body-sm mb-6!" style={{ color: 'var(--color-text-muted)' }}>
-							Up to <span className="font-semibold text-emerald-700">+{getReportPointsForSize(size)} points</span> once the community confirms it's trash 🎉
-						</p>
-						<button
-							onClick={() => navigate('/reports?tab=vote-queue')}
-							className="btn-primary w-full mb-3"
-						>
-							Help verify reports
-						</button>
-						<button
-							onClick={() => navigate('/reports')}
-							className="w-full text-sm font-medium"
-							style={{ color: 'var(--color-text-muted)' }}
-						>
-							View all reports
-						</button>
-					</div>
-				</div>
+				<SubmitSuccessModal onDismiss={() => navigate('/reports')} />
 			)}
 
 			<div className="max-w-lg mx-auto px-4 pt-6">
@@ -532,9 +494,9 @@ export function AddPicturePage() {
 				>
 					{isSubmitting ? (
 						<svg
-							className="animate-spin h-7 w-7 dark:filter-[brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
+							className="animate-spin h-7 w-7 text-white dark:text-[var(--nav-active)]"
 							fill="none"
-							stroke="#1a5c35"
+							stroke="currentColor"
 							strokeWidth="2.5"
 							strokeLinecap="round"
 							viewBox="0 0 24 24"
@@ -543,9 +505,9 @@ export function AddPicturePage() {
 						</svg>
 					) : (
 						<svg
-							className="h-7 w-7 dark:filter-[brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
+							className="h-7 w-7 text-white dark:text-[var(--nav-active)]"
 							fill="none"
-							stroke="#1a5c35"
+							stroke="currentColor"
 							strokeWidth="2.5"
 							strokeLinecap="round"
 							strokeLinejoin="round"
@@ -558,6 +520,80 @@ export function AddPicturePage() {
 			</div>
 
 			<AuthGateModal open={gate.open} message={gate.message} onDismiss={dismiss} />
+		</div>
+	)
+}
+
+function SubmitSuccessModal({ onDismiss }: { onDismiss: () => void }) {
+	useEffect(() => {
+		document.body.style.overflow = 'hidden'
+		return () => { document.body.style.overflow = '' }
+	}, [])
+
+	useEffect(() => {
+		function onKey(e: KeyboardEvent) {
+			if (e.key === 'Escape') onDismiss()
+		}
+		window.addEventListener('keydown', onKey)
+		return () => window.removeEventListener('keydown', onKey)
+	}, [onDismiss])
+
+	return (
+		<div
+			className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/50 px-6"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="submit-success-title"
+			onClick={onDismiss}
+		>
+			<div
+				className="w-full max-w-sm rounded-2xl p-6 shadow-xl text-center relative"
+				style={{
+					backgroundColor: 'var(--color-surface)',
+					border: '1px solid var(--color-border)',
+				}}
+				onClick={(e) => e.stopPropagation()}
+			>
+				<button
+					onClick={onDismiss}
+					aria-label="Close"
+					className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:opacity-80"
+					style={{
+						backgroundColor: 'var(--color-page-bg)',
+						color: 'var(--color-text-primary)',
+					}}
+				>
+					<svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+						<path d="M11 3L3 11M3 3l8 8" />
+					</svg>
+				</button>
+
+				<div
+					className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
+					style={{ backgroundColor: 'var(--color-green-dark)' }}
+					aria-hidden="true"
+				>
+					<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+						<path d="M20 6L9 17l-5-5" />
+					</svg>
+				</div>
+
+				<h3
+					id="submit-success-title"
+					style={{ color: 'var(--color-green-dark)', marginBottom: '0.5rem' }}
+				>
+					Report submitted!
+				</h3>
+				<p className="text-body-sm mb-6!" style={{ color: 'var(--color-text-muted)' }}>
+					+10 points earned 🎉
+				</p>
+				<button
+					onClick={onDismiss}
+					className="btn-primary w-full"
+				>
+					View reports
+				</button>
+			</div>
 		</div>
 	)
 }
