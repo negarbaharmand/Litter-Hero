@@ -2,6 +2,12 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import { reverseGeocode, searchPlaces, type PlaceSuggestion } from '../utils/geocoding'
+import {
+	SWEDEN_BOUNDS,
+	SWEDEN_DEFAULT_CENTER,
+	SWEDEN_MIN_ZOOM,
+	clampToSweden,
+} from '../utils/swedenMap'
 
 function useTheme(): 'light' | 'dark' {
   const [theme, setTheme] = useState<'light' | 'dark'>(() =>
@@ -16,8 +22,6 @@ function useTheme(): 'light' | 'dark' {
   }, [])
   return theme
 }
-
-const DEFAULT_CENTER: [number, number] = [59.3293, 18.0686]
 
 const PickMarkerIcon = L.divIcon({
 	className: 'location-picker-marker',
@@ -117,20 +121,21 @@ export function LocationPicker({
 	const mapCenter: [number, number] =
 		value.latitude !== null && value.longitude !== null
 			? [value.latitude, value.longitude]
-			: DEFAULT_CENTER
+			: SWEDEN_DEFAULT_CENTER
 
 	const hasMapPin = value.latitude !== null && value.longitude !== null
 
 	const applyCoordinates = useCallback(
 		async (lat: number, lng: number, label?: string) => {
+			const [clampedLat, clampedLng] = clampToSweden(lat, lng)
 			setIsResolvingMapPoint(true)
 			try {
-				const address = label ?? (await reverseGeocode(lat, lng))
-				onChange({ location: address, latitude: lat, longitude: lng })
+				const address = label ?? (await reverseGeocode(clampedLat, clampedLng))
+				onChange({ location: address, latitude: clampedLat, longitude: clampedLng })
 				setQuery(address)
 			} catch {
-				const fallback = `${lat.toFixed(5)}, ${lng.toFixed(5)}`
-				onChange({ location: fallback, latitude: lat, longitude: lng })
+				const fallback = `${clampedLat.toFixed(5)}, ${clampedLng.toFixed(5)}`
+				onChange({ location: fallback, latitude: clampedLat, longitude: clampedLng })
 				setQuery(fallback)
 			} finally {
 				setIsResolvingMapPoint(false)
@@ -170,7 +175,7 @@ export function LocationPicker({
 					value={query}
 					onChange={(e) => handleInputChange(e.target.value)}
 					onFocus={() => setShowSuggestions(true)}
-					placeholder="Search for a street, park, or place…"
+					placeholder="Search for a street or place in Sweden…"
 					role="combobox"
 					aria-expanded={showSuggestions && suggestions.length > 0}
 					aria-controls={listboxId}
@@ -247,7 +252,10 @@ export function LocationPicker({
 			<div className="rounded-2xl overflow-hidden relative isolate z-0" style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
 				<MapContainer
 					center={mapCenter}
-					zoom={hasMapPin ? 16 : 12}
+					zoom={hasMapPin ? 16 : 6}
+					minZoom={SWEDEN_MIN_ZOOM}
+					maxBounds={SWEDEN_BOUNDS}
+					maxBoundsViscosity={1}
 					className="h-44 w-full"
 					scrollWheelZoom={false}
 				>

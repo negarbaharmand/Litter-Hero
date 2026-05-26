@@ -33,6 +33,10 @@
   --color-activity-1: #9ae8b8;
   --color-activity-2: #53e086;
   --color-activity-3: #3ea865;
+
+  --logo-litter: #111111;
+  --logo-hero: #3ea865;
+  --logo-halo: rgba(62, 168, 101, 0.18);
 }
 
 /* ── Dark mode overrides ──────────────────────────────────────── */
@@ -52,6 +56,10 @@ html[data-theme="dark"] {
   --color-activity-1: #1d4e2f;
   --color-activity-2: #3ea865;
   --color-activity-3: #53e086;
+
+  --logo-litter: #ffffff;
+  --logo-hero: #53e086;
+  --logo-halo: rgba(255, 255, 255, 0.14);
 }
 
 /* ── Base resets ──────────────────────────────────────────────── */
