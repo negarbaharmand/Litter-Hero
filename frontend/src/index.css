@@ -22,12 +22,17 @@
   --color-green-dark:     #3ea865;
   --color-danger:         #ef4444;
   --nav-gradient:         linear-gradient(180deg, #1a5c35 53%, #37c270 100%);
-  --nav-camera-bg:        #ddffe2;
+  --nav-camera-bg:        #3ea865;
   --nav-active:           #53e086;
 
   --radius-card: 20px;
   --radius-btn:  12px;
   --shadow-card: 0px 4px 4px 0px rgba(0, 0, 0, 0.15);
+
+  --color-activity-0: #d8f5e3;
+  --color-activity-1: #9ae8b8;
+  --color-activity-2: #53e086;
+  --color-activity-3: #3ea865;
 }
 
 /* ── Dark mode overrides ──────────────────────────────────────── */
@@ -42,6 +47,11 @@ html[data-theme="dark"] {
   --nav-gradient:       linear-gradient(180deg, #222222 0%, #9b9b9b 100%);
   --nav-camera-bg:      #ffffff;
   --nav-active:         #14f000;
+
+  --color-activity-0: #2a2a2a;
+  --color-activity-1: #1d4e2f;
+  --color-activity-2: #3ea865;
+  --color-activity-3: #53e086;
 }
 
 /* ── Base resets ──────────────────────────────────────────────── */
@@ -189,8 +199,8 @@ p {
 .page-shell {
   min-height: 100dvh;
   background-color: var(--color-page-bg);
-  /* Space for fixed bottom NavBar on mobile, top NavBar on desktop */
-  padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+  /* Space for fixed bottom NavBar on mobile */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 130px);
   padding-top: 16px;
 }
 @media (min-width: 768px) {
@@ -224,10 +234,59 @@ p {
   background-color: var(--color-surface);
   padding: 24px 16px;
 }
+/* Profile action buttons (settings, log out) */
+.profile-actions .btn-primary,
+.profile-actions .btn-secondary {
+  width: 100%;
+}
+
+/* Activity heatmap (Figma profile) */
+.activity-heatmap {
+  padding: 16px;
+}
+
+.activity-heatmap__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.activity-heatmap__grid-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.activity-heatmap__grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 12px);
+  gap: 4px;
+  max-width: 100%;
+}
+
+.activity-heatmap__cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.activity-heatmap__cell--0 { background-color: var(--color-activity-0); }
+.activity-heatmap__cell--1 { background-color: var(--color-activity-1); }
+.activity-heatmap__cell--2 { background-color: var(--color-activity-2); }
+.activity-heatmap__cell--3 { background-color: var(--color-activity-3); }
+
 .login-page__form {
   width: 100%;
   max-width: 360px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .leaflet-control-zoom {
+    display: none;
+  }
 }

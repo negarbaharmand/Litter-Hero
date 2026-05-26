@@ -6,7 +6,7 @@ import { fetchReports } from '../api'
 import type { Report } from '../api'
 import { getStatusPresentation, STATUS_FILTER_OPTIONS, type ReportStatusFilter } from '../utils/reportStatus'
 
-const VOTE_THRESHOLD = 3
+import { VOTE_THRESHOLD } from '../constants'
 
 function isValidFilter(value: string | null): value is ReportStatusFilter {
   return STATUS_FILTER_OPTIONS.some((opt) => opt.value === value)
@@ -40,7 +40,10 @@ export function ReportList() {
   return (
     <div className="p-1">
       <div className="flex items-center justify-between gap-4">
-        <span className="rounded-full bg-emerald-300 px-3 py-1 text-sm text-white">
+        <span
+          className="rounded-full px-3 py-1 text-sm text-white"
+          style={{ backgroundColor: 'var(--color-green-normal)' }}
+        >
           {visibleReports.length} reports
         </span>
       </div>
@@ -50,11 +53,12 @@ export function ReportList() {
             key={option.value}
             type="button"
             onClick={() => setStatusFilter(option.value)}
-            className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+            className="rounded-full px-3 py-1 text-xs font-semibold transition"
+            style={
               statusFilter === option.value
-                ? 'bg-emerald-600 text-white'
-                : 'bg-white dark:bg-neutral-700 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-600'
-            }`}
+                ? { backgroundColor: 'var(--color-green-dark)', color: '#ffffff' }
+                : { backgroundColor: 'var(--color-surface)', color: 'var(--color-text-body)', border: '1px solid var(--color-border)' }
+            }
           >
             {option.label}
           </button>
@@ -101,7 +105,12 @@ export function ReportList() {
                 </span>
                 {report.status === 'cleanup_pending_vote' && report.pendingSubmissionsCount > 0 && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
-                    <span>{report.topPendingVoteCount}/{VOTE_THRESHOLD} votes</span>
+                    <span>{report.topPendingVoteCount}/{VOTE_THRESHOLD} cleanup votes</span>
+                  </span>
+                )}
+                {report.status === 'pending' && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
+                    <span>{report.reportVerificationVoteCount}/{VOTE_THRESHOLD} verify votes</span>
                   </span>
                 )}
               </div>
@@ -114,7 +123,7 @@ export function ReportList() {
               <p className="mt-3 text-sm italic" style={{ color: 'var(--color-text-muted)' }}>
                 Size: {report.size ?? 'Unknown'}
               </p>
-              <p className="mt-3 text-sm font-medium text-emerald-700">Open details</p>
+              <p className="mt-3 text-sm font-medium" style={{ color: 'var(--color-green-dark)' }}>Open details</p>
             </div>
           </Link>
         ))}

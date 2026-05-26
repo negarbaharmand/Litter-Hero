@@ -6,6 +6,9 @@ import {
   getCleanupPointsForSize,
   getReportPointsForSize,
   resolveCleanupFromVotes,
+  resolveReportFromVotes,
+  REPORT_VOTE_THRESHOLD,
+  summarizeReportVotes,
   summarizeVotes,
 } from './reportWorkflow.js';
 
@@ -55,4 +58,34 @@ test('calculateWeeklyPoints sums size-weighted report and cleanup points', () =>
   });
   assert.equal(result, 10 + 20 + 15 + 20 + 40);
   assert.equal(result, 105);
+});
+
+test('summarizeReportVotes counts legit and not_trash votes', () => {
+  const result = summarizeReportVotes(['legit', 'not_trash', 'legit']);
+  assert.equal(result.totalVotes, 3);
+  assert.equal(result.legitVotes, 2);
+  assert.equal(result.notTrashVotes, 1);
+});
+
+test('resolveReportFromVotes stays pending before threshold', () => {
+  const result = resolveReportFromVotes(['legit', 'not_trash'], REPORT_VOTE_THRESHOLD);
+  assert.equal(result, 'pending');
+});
+
+test('resolveReportFromVotes verifies when legit votes are majority at threshold', () => {
+  const result = resolveReportFromVotes(['legit', 'legit', 'not_trash'], REPORT_VOTE_THRESHOLD);
+  assert.equal(result, 'verified');
+});
+
+test('resolveReportFromVotes rejects when not_trash votes tie or win at threshold', () => {
+  const tieResult = resolveReportFromVotes(['legit', 'not_trash', 'not_trash'], REPORT_VOTE_THRESHOLD);
+  assert.equal(tieResult, 'rejected');
+
+  const notTrashMajority = resolveReportFromVotes(['legit', 'not_trash', 'legit', 'not_trash'], 4);
+  assert.equal(notTrashMajority, 'rejected');
+});
+
+test('resolveReportFromVotes verifies with all legit votes', () => {
+  const result = resolveReportFromVotes(['legit', 'legit', 'legit'], REPORT_VOTE_THRESHOLD);
+  assert.equal(result, 'verified');
 });
