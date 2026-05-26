@@ -30,7 +30,7 @@ function formatSubmissionStatus(status: CleanupSubmissionWithVotes['status']) {
 
 export function CleanupSubmissionCard({
   reportId,
-  reportOwnerUserId,
+  reportOwnerUserId: _reportOwnerUserId,
   submission,
   requireAuth,
 }: CleanupSubmissionCardProps) {
@@ -47,11 +47,9 @@ export function CleanupSubmissionCard({
       ? 'This submission is already resolved.'
       : currentUserId === submission.userId
         ? 'You cannot vote on your own cleanup submission.'
-        : currentUserId === reportOwnerUserId
-          ? 'You cannot vote on cleanup for your own report.'
-          : submission.voteSummary.myVote
-            ? 'You already voted on this submission.'
-            : null;
+        : submission.voteSummary.myVote
+          ? 'You already voted on this submission.'
+          : null;
 
   const voteMutation = useMutation({
     mutationFn: (vote: 'clean' | 'not_clean') =>
@@ -61,6 +59,7 @@ export function CleanupSubmissionCard({
       voteInFlightRef.current = false;
       queryClient.invalidateQueries({ queryKey: ['report', reportId] });
       queryClient.invalidateQueries({ queryKey: ['reports'] });
+      queryClient.invalidateQueries({ queryKey: ['vote-queue'] });
       refreshUser();
     },
     onError: (err) => {
@@ -83,12 +82,13 @@ export function CleanupSubmissionCard({
   const votesNeeded = Math.max(0, 3 - voteSummary.totalVotes);
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+    <div className="rounded-xl p-4" style={{ backgroundColor: 'var(--color-page-bg)', border: '1px solid var(--color-border)' }}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-semibold text-slate-900">
+        <p className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
           Cleanup proof #{submission.id}
         </p>
-        <span className="rounded-full bg-white px-2 py-1 text-xs font-medium text-slate-700">
+        <span className="rounded-full px-2 py-1 text-xs font-medium"
+          style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-body)', border: '1px solid var(--color-border)' }}>
           {formatSubmissionStatus(submission.status)}
         </span>
       </div>
@@ -100,15 +100,15 @@ export function CleanupSubmissionCard({
       />
 
       {submission.note && (
-        <p className="mt-2 text-sm text-slate-600">{submission.note}</p>
+        <p className="mt-2 text-sm" style={{ color: 'var(--color-text-body)' }}>{submission.note}</p>
       )}
 
-      <div className="mt-3 flex flex-wrap gap-3 text-sm text-slate-700">
+      <div className="mt-3 flex flex-wrap gap-3 text-sm" style={{ color: 'var(--color-text-body)' }}>
         <span>
-          <span className="font-semibold text-emerald-700">{voteSummary.cleanVotes}</span> clean
+          <span className="font-semibold" style={{ color: 'var(--color-green-dark)' }}>{voteSummary.cleanVotes}</span> clean
         </span>
         <span>
-          <span className="font-semibold text-amber-700">{voteSummary.notCleanVotes}</span> not clean
+          <span className="font-semibold text-amber-500">{voteSummary.notCleanVotes}</span> not clean
         </span>
         <span>
           <span className="font-semibold">{voteSummary.totalVotes}</span>/3 votes
@@ -116,7 +116,7 @@ export function CleanupSubmissionCard({
       </div>
 
       {submission.status === 'pending' && votesNeeded > 0 && (
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
           {votesNeeded} more vote{votesNeeded === 1 ? '' : 's'} needed for a decision.
         </p>
       )}
@@ -132,7 +132,8 @@ export function CleanupSubmissionCard({
               handleVote('clean');
             }}
             disabled={voteMutation.isPending || voteInFlightRef.current}
-            className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="rounded-lg px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            style={{ backgroundColor: 'var(--color-green-dark)' }}
           >
             Vote clean
           </button>
@@ -145,7 +146,8 @@ export function CleanupSubmissionCard({
               handleVote('not_clean');
             }}
             disabled={voteMutation.isPending || voteInFlightRef.current}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-60"
+            className="rounded-lg px-3 py-2 text-sm font-semibold disabled:opacity-60"
+            style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-body)', border: '1px solid var(--color-border)' }}
           >
             Vote not clean
           </button>
@@ -153,16 +155,16 @@ export function CleanupSubmissionCard({
       )}
 
       {cannotVoteReason && submission.status === 'pending' && (
-        <p className="mt-3 text-sm text-slate-500">{cannotVoteReason}</p>
+        <p className="mt-3 text-sm" style={{ color: 'var(--color-text-muted)' }}>{cannotVoteReason}</p>
       )}
 
       {submission.voteSummary.myVote && (
-        <p className="mt-2 text-sm text-emerald-700">
+        <p className="mt-2 text-sm" style={{ color: 'var(--color-green-dark)' }}>
           Your vote: {submission.voteSummary.myVote === 'clean' ? 'Clean' : 'Not clean'}
         </p>
       )}
 
-      {voteError && <p className="mt-2 text-sm text-red-600">{voteError}</p>}
+      {voteError && <p className="mt-2 text-sm text-red-500">{voteError}</p>}
     </div>
   );
 }

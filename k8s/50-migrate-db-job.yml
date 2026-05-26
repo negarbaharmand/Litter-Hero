@@ -13,7 +13,7 @@ spec:
       containers:
         - name: migrate
           image: ${CI_REGISTRY_IMAGE}/backend:${CI_COMMIT_SHA}
-          command: ["npm", "run", "db:migrate"]
+          command: ["npm", "run", "db:migrate:prod"]
           env:
             - name: NO_COLOR
               value: "1"

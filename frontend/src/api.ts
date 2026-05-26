@@ -26,6 +26,7 @@ export type Report = {
   createdAt: string;
   pendingSubmissionsCount: number;
   topPendingVoteCount: number;
+  reportVerificationVoteCount: number;
 };
 
 export type CleanupSubmission = {
@@ -46,11 +47,19 @@ export type VoteSummary = {
   myVote: 'clean' | 'not_clean' | null;
 };
 
+export type ReportVerificationVoteSummary = {
+  totalVotes: number;
+  legitVotes: number;
+  notTrashVotes: number;
+  myVote: 'legit' | 'not_trash' | null;
+};
+
 export type CleanupSubmissionWithVotes = CleanupSubmission & {
   voteSummary: VoteSummary;
 };
 
 export type ReportDetails = Report & {
+  verificationVoteSummary: ReportVerificationVoteSummary;
   winningSubmission: CleanupSubmission | null;
   cleanupSubmissions: CleanupSubmissionWithVotes[];
 };
@@ -61,7 +70,35 @@ export type VoteOnCleanupResponse = {
   voteSummary: VoteSummary;
 };
 
-export type ReportStatusFilter = 'pending' | 'verified' | 'disputed' | 'cleaned' | 'rejected' | 'open' | 'cleanup_pending_vote';
+export type VoteOnReportVerificationResponse = {
+  status: 'pending' | 'verified' | 'rejected';
+  voteSummary: ReportVerificationVoteSummary;
+};
+
+export type TrashVerificationQueueItem = {
+  reportId: number;
+  location: string;
+  description: string | null;
+  imageUrl: string | null;
+  ownerUserId: number;
+  size: string | null;
+  createdAt: string;
+  voteSummary: ReportVerificationVoteSummary;
+};
+
+export type CleanupVerificationQueueItem = {
+  reportId: number;
+  reportLocation: string;
+  reportOwnerUserId: number;
+  submission: CleanupSubmissionWithVotes;
+};
+
+export type VoteQueueResponse = {
+  trashVerifications: TrashVerificationQueueItem[];
+  cleanupVerifications: CleanupVerificationQueueItem[];
+};
+
+export type ReportStatusFilter = 'pending' | 'verified' | 'disputed' | 'cleaned' | 'rejected' | 'open' | 'cleanup_pending_vote' | 'needs_votes';
 
 export type CreateReportPayload = {
   location: string;
@@ -86,6 +123,7 @@ export type User = {
 export type LeaderboardUser = User & {
   reportsCreated: number;
   cleanupsApproved: number;
+  reportVerificationVotes: number;
   verificationVotes: number;
 };
 
@@ -188,13 +226,33 @@ export type AuthUser = {
   createdAt: string
 }
 
+export type ActivityHeatmapData = {
+  weeks: number
+  /** 7 rows (Sun–Sat) × weeks columns, values 0–3 */
+  grid: number[][]
+}
+
+const EMPTY_ACTIVITY_GRID: ActivityHeatmapData = {
+  weeks: 9,
+  grid: Array.from({ length: 7 }, () => Array.from({ length: 9 }, () => 0)),
+}
+
+export const emptyActivityHeatmap = (): ActivityHeatmapData => ({
+  weeks: EMPTY_ACTIVITY_GRID.weeks,
+  grid: EMPTY_ACTIVITY_GRID.grid.map((row) => [...row]),
+})
+
 /** Full profile returned by GET /api/users/me */
 export type MeUser = AuthUser & {
   username: string | null
   weeklyPoints: number
   badges: string[]
+  currentStreak: number
+  longestStreak: number
+  activity: ActivityHeatmapData
   reportsCreated: number
   cleanupsApproved: number
+  reportVerificationVotes: number
   verificationVotes: number
 }
 
@@ -239,6 +297,19 @@ export const googleSignIn = async (idToken: string): Promise<AuthResponse> => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ idToken }),
+  })
+  const data = await response.json()
+  if (!response.ok) {
+    throw new Error(data.error ?? 'Google sign-in failed')
+  }
+  return data
+}
+
+export const googleSignInWithAccessToken = async (accessToken: string): Promise<AuthResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/google`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ accessToken }),
   })
   const data = await response.json()
   if (!response.ok) {
@@ -361,4 +432,43 @@ export const voteOnCleanupSubmission = async (
   }
 
   return data as VoteOnCleanupResponse;
+};
+
+export const voteOnReportVerification = async (
+  reportId: number,
+  vote: 'legit' | 'not_trash'
+): Promise<VoteOnReportVerificationResponse> => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/reports/${reportId}/verification-votes`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders(),
+      },
+      body: JSON.stringify({ vote }),
+    }
+  );
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message =
+      typeof data === 'object' &&
+      data &&
+      'error' in data &&
+      typeof (data as { error?: unknown }).error === 'string'
+        ? (data as { error: string }).error
+        : 'Failed to submit vote';
+    throw new Error(message);
+  }
+
+  return data as VoteOnReportVerificationResponse;
+};
+
+export const fetchVoteQueue = async (): Promise<VoteQueueResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/reports/vote-queue`, {
+    headers: { ...authHeaders() },
+  });
+  if (!response.ok) throw new Error('Failed to fetch vote queue');
+  return response.json() as Promise<VoteQueueResponse>;
 };

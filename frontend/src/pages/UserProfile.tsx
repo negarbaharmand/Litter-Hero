@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import ProfileHeader from '../components/ProfileHeader'
+import ActivityHeatmap from '../components/ActivityHeatmap'
 import PointsCard from '../components/PointsCard'
 import BadgeList from '../components/BadgeList'
 import SettingsButton from '../components/SettingsButton'
@@ -11,10 +12,14 @@ import { useAuth } from '../hooks/useAuth'
 
 const UserProfile = () => {
   const navigate = useNavigate()
-  const { authState, clearAuth } = useAuth()
+  const { authState, clearAuth, refreshUser } = useAuth()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const user = authState.status === 'authenticated' ? authState.user : null
+
+  useEffect(() => {
+    refreshUser()
+  }, [refreshUser])
 
   async function handleLogout() {
     setIsLoggingOut(true)
@@ -38,6 +43,10 @@ const UserProfile = () => {
         cleanupsApproved={user?.cleanupsApproved ?? 0}
         verificationVotes={user?.verificationVotes ?? 0}
       />
+      <ActivityHeatmap
+        activity={user.activity}
+        currentStreak={user.currentStreak ?? 0}
+      />
       <div className="mx-4 mt-6">
         <h3 className="mb-3!">Verification activity</h3>
         <div className="card flex items-center justify-between gap-4">
@@ -53,41 +62,39 @@ const UserProfile = () => {
             </div>
           </div>
           <Link
-            to="/reports?filter=cleanup_pending_vote"
-            className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+            to="/reports?tab=vote-queue"
+            className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors my-1 mx-1"
             style={{ backgroundColor: 'var(--color-green-normal)', color: '#ffffff' }}
           >
-            Needs votes
+            Help verify
           </Link>
         </div>
       </div>
 
-      <BadgeList badges={[
-        { id: 0, label: "🔥|3 day streak" }, // TODO: implement streak logic
-        ...(user?.badges?.map((label: string, index: number) => ({
-          id: index + 1,
-          label
-        })) ?? [])
-      ]} />
-      <SettingsButton onClick={() => console.log('Settings clicked')} />
-      <Button
-        variant="secondary"
-        className="mx-4 mt-3 text-left"
-        style={{ width: 'calc(100% - 2rem)' }}
-        onClick={() => navigate('/about')}
-      >
-        About us
-      </Button>
-      <Button
-        variant="primary"
-        fullWidth
-        disabled={isLoggingOut}
-        onClick={handleLogout}
-        className="mx-4 mt-3"
-        style={{ width: 'calc(100% - 2rem)' }}
-      >
-        {isLoggingOut ? 'Logging out...' : 'Log out'}
-      </Button>
+      <BadgeList badges={
+        user?.badges?.map((label: string, index: number) => ({
+          id: index,
+          label,
+        })) ?? []
+      } />
+      <div className="profile-actions mx-4 mt-6 mb-8 flex flex-col gap-3">
+        <SettingsButton onClick={() => console.log('Settings clicked')} />
+        <Button
+          variant="secondary"
+          fullWidth
+          onClick={() => navigate('/about')}
+        >
+          About us
+        </Button>
+        <Button
+          variant="primary"
+          fullWidth
+          disabled={isLoggingOut}
+          onClick={handleLogout}
+        >
+          {isLoggingOut ? 'Logging out...' : 'Log out'}
+        </Button>
+      </div>
     </PageShell>
   )
 }
