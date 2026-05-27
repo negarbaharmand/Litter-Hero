@@ -313,7 +313,7 @@ export function AddPicturePage() {
                   className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
                   style={{
                     backgroundColor: "var(--color-green-normal)",
-                    color: "var(--color-grey-lighter)",
+                    color: "var(--color-grey-normal)",
                   }}
                 >
                   <svg
@@ -480,9 +480,11 @@ export function AddPicturePage() {
                 backgroundColor: "var(--color-surface)",
               }}
             >
-              <strong>Small</strong> — a handful of litter · 10 pts &nbsp;·&nbsp;
+              <strong>Small</strong> — a handful of litter · 10 pts
+              &nbsp;·&nbsp;
               <strong>Medium</strong> — fills a bag · 15 pts &nbsp;·&nbsp;
-              <strong>Large</strong> — requires multiple bags or a vehicle · 20 pts
+              <strong>Large</strong> — requires multiple bags or a vehicle · 20
+              pts
             </p>
           )}
 
