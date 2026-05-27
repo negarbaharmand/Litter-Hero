@@ -9,18 +9,19 @@ Manifests are numbered by apply order.
 
 | File                       | Kind                            | Purpose                                                     |
 | -------------------------- | ------------------------------- | ----------------------------------------------------------- |
-| `10-configmap-backend.yml` | ConfigMap                       | Non-secret backend env (DB host/port, S3 endpoint).         |
+| `10-configmap-backend.yml` | ConfigMap                       | Non-secret backend env                                      |
 | `11-nginx-configmap.yml`   | ConfigMap                       | Frontend nginx config. Proxies `/api/` to the backend.      |
 | `20-gitlab-secrets.yml`    | SealedSecret                    | Image pull secret for the GitLab registry.                  |
 | `21-cc-secrets.yml`        | SealedSecret                    | App secrets (DB, S3, JWT).                                  |
 | `22-basic-auth-secret.yml` | SealedSecret                    | Credentials for the ingress basic-auth middleware.          |
+| `23-resend-secret.yml`     | SealedSecret                    | Credentials for the email verification.                     |
 | `30-deploy-database.yml`   | StatefulSet + Service           | Postgres/PostGIS with a Longhorn PVC, headless svc `db`.    |
 | `40-deploy-backend.yml`    | Deployment + Service            | Node backend, 3 replicas, ClusterIP :3000.                  |
 | `50-migrate-db-job.yml`    | Job                             | Runs `npm run db:migrate:prod` before the backend rolls out.|
 | `60-deploy-frontend.yml`   | Deployment + Service            | Nginx + frontend, 3 replicas, ClusterIP :8080.              |
 | `70-middleware.yml`        | Traefik Middleware              | Basic-auth middleware used by the ingress.                  |
 | `80-ingress.yml`           | Ingress                         | Frontend host (with basic-auth) + API host.                 |
-| `90-monitoring.yml`        | ServiceMonitor + PrometheusRule + Grafana ConfigMap | Scrape, alerts, dashboard. `main` only.  |
+| `90-monitoring.yml`        | ServiceMonitor + PrometheusRule + Grafana ConfigMap | Scrape, alerts, dashboard. `main` only. |
 
 ## Per-branch deployments
 

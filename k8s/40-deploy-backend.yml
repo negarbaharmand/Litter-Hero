@@ -31,6 +31,8 @@ spec:
           envFrom:
             - secretRef:
                 name: cc-secrets
+            - secretRef:
+                name: resend-secret
             - configMapRef:
                 name: backend-config
           resources:
