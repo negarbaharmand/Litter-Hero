@@ -61,11 +61,12 @@ test('addUtcDays shifts calendar dates in UTC', () => {
   assert.equal(addUtcDays('2026-05-26', 1), '2026-05-27');
 });
 
-test('getStreakBadges awards by current and longest thresholds', () => {
-  assert.deepEqual(getStreakBadges(2, 29), []);
-  assert.deepEqual(getStreakBadges(3, 29), ['🔥|3 Day Streak']);
-  assert.deepEqual(getStreakBadges(7, 29), ['🔥|3 Day Streak', '🔥|7 Day Streak']);
-  assert.deepEqual(getStreakBadges(1, 30), ['🔥|30 Day Streak']);
+test('getStreakBadges awards by longest streak thresholds', () => {
+  assert.deepEqual(getStreakBadges(0, 2), []);
+  assert.deepEqual(getStreakBadges(0, 3), ['3 Day Streak']);
+  assert.deepEqual(getStreakBadges(0, 7), ['3 Day Streak', '7 Day Streak']);
+  assert.deepEqual(getStreakBadges(0, 14), ['3 Day Streak', '7 Day Streak', '14 Day Streak']);
+  assert.deepEqual(getStreakBadges(0, 30), ['3 Day Streak', '7 Day Streak', '14 Day Streak', '30 Day Streak']);
 });
 
 test('activityLevelFromCount maps action counts to heatmap levels', () => {

@@ -15,12 +15,12 @@ interface PageShellProps {
  */
 export function PageShell({ children, className = '', fullWidth = false }: PageShellProps) {
   return (
-    <div className={`page-shell ${className}`}>
+    <main id="main-content" tabIndex={-1} className={`page-shell ${className}`}>
       {fullWidth ? children : (
         <div className="page-shell__inner">
           {children}
         </div>
       )}
-    </div>
+    </main>
   )
 }

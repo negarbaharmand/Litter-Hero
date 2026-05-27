@@ -29,9 +29,9 @@ export function VoteQueue() {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center px-4">
         <p className="text-4xl mb-4">🎉</p>
-        <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--color-text-primary)' }}>
+        <h2 className="font-semibold text-lg mb-2" style={{ color: 'var(--color-text-primary)' }}>
           All caught up!
-        </h3>
+        </h2>
         <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
           No reports or cleanups are waiting for your vote right now.
         </p>

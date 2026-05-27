@@ -10,7 +10,7 @@ export type AuthContextValue = {
   authState: AuthState
   setUser: (user: AuthUser, token: string) => void
   clearAuth: () => void
-  refreshUser: () => void
+  refreshUser: () => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)
