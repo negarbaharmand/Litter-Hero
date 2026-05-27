@@ -155,28 +155,29 @@ export function AccountSettingsPage() {
           <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
             Upload a photo for your profile and the leaderboard.
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-start gap-3 sm:items-center sm:gap-4">
             {previewUrl ? (
               <img
                 src={previewUrl}
                 alt="Profile"
-                className="w-16 h-16 rounded-full object-cover shrink-0"
+                className="h-20 w-20 rounded-full object-cover shrink-0"
                 onError={() => setPreviewUrl(null)}
               />
             ) : (
               <div
-                className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold shrink-0"
+                className="h-20 w-20 rounded-full flex items-center justify-center text-white text-2xl font-bold shrink-0"
                 style={{ backgroundColor: 'var(--color-green-dark)' }}
               >
                 {displayUsername.charAt(0).toUpperCase()}
               </div>
             )}
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:flex-wrap sm:flex-none">
               <Button
                 variant="secondary"
                 type="button"
                 disabled={photoLoading}
                 onClick={() => fileInputRef.current?.click()}
+                className="w-full sm:w-auto px-4 py-2.5 text-[15px]"
               >
                 {photoLoading ? 'Uploading…' : 'Change photo'}
               </Button>
@@ -186,6 +187,7 @@ export function AccountSettingsPage() {
                   type="button"
                   disabled={photoLoading}
                   onClick={handleRemovePhoto}
+                  className="w-full sm:w-auto px-4 py-2.5 text-[15px]"
                 >
                   Remove
                 </Button>
