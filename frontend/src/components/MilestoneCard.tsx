@@ -83,7 +83,7 @@ const MilestoneCard = ({ currentPoints }: MilestoneCardProps) => {
         </div>
 
         <p className="text-xs text-center" style={{ color: 'var(--color-text-primary)' }}>
-          Reach {next.points} total points to earn "{next.label}"
+          Unlock "{next.label}" badge at {next.points} points
         </p>
 
       </div>
