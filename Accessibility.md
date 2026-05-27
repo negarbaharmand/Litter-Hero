@@ -1,57 +1,88 @@
-# Accessibility Audits
+# Accessibility Documentation
 
-## Proper usage of WAI-ARIA Labels, Keyboard-only compatible, WCAG 2.2 AA guidelines, proper contrast ratios & screen-reader compatible ✔️
+This document summarizes accessibility improvements and Lighthouse results for Litter Hero.
 
-(Axe Advanced accessibility tools were used as well, not logged however)
+## Accessibility goals
 
-## 🚨 Lighthouse Tests/Darkmode Mobile:
+- Follow WCAG 2.2 AA principles
+- Support keyboard-only navigation
+- Improve screen-reader compatibility with semantic HTML and WAI-ARIA
+- Maintain accessible contrast in both light and dark themes
 
-| Pages:                           | Lighthouse Test Before: | Lighthouse Test After: |
-| -------------------------------- | ----------------------- | ---------------------- |
-| "/" or "/HomePage.tsx/"          | 93                      | 100                    |
-| "Reports" "/Reports.tsx/"        | 90                      | 100                    |
-| "add-picture" "/AddPicture.tsx/" | 94                      | 100                    |
-| "/reports?tab=vote-queue"        | 94                      | 100                    |
-| Ranks/Leaderboard                | 96                      | 100                    |
-| Login/Register                   | 92                      | 100                    |
-| Profile                          | 92                      | 100                    |
-| About Us                         | 100                     | 100                    |
+## What was improved
 
-## 🚨 Lighthouse Tests/Lightmode Mobile:
+- Added/improved semantic structure and ARIA labeling where needed
+- Improved keyboard interaction and focus behavior
+- Improved text/background contrast in key UI flows
+- Validated critical flows (home, reports, add report, vote queue, auth, profile, leaderboard)
 
-| Pages:                           | Lighthouse Test Before: | Lighthouse Test After: |
-| -------------------------------- | ----------------------- | ---------------------- |
-| "/" or "/HomePage.tsx/"          | 93                      | 100                    |
-| "Reports" "/Reports.tsx/"        | 90                      | 100                    |
-| "add-picture" "/AddPicture.tsx/" | 94                      | 100                    |
-| "/reports?tab=vote-queue"        | 94                      | 100                    |
-| Ranks/Leaderboard                | 96                      | 100                    |
-| Login/Register                   | 96                      | 100                    |
-| Profile                          | 92                      | 100                    |
-| About Us                         | 100                     | 100                    |
+## Audit method
 
-## 🚨 Lighthouse Tests/Darkmode Desktop:
+- Primary tool: Lighthouse accessibility audits
+- Additional checks: manual keyboard navigation and screen-reader-aware review
+- Supplemental tooling: Axe-based checks were used during development
+- Environment details:
+  - Test date: `TODO: Add latest audit date`
+  - Browser/version: `TODO`
+  - Lighthouse version: `TODO`
+  - Device/profile setup: `TODO`
 
-| Pages:                           | Lighthouse Test Before: | Lighthouse Test After: |
-| -------------------------------- | ----------------------- | ---------------------- |
-| "/" or "/HomePage.tsx/"          | 93                      | 100                    |
-| "Reports" "/Reports.tsx/"        | 90                      | 100                    |
-| "/reports?tab=vote-queue"        | 90                      | 100                    |
-| "add-picture" "/AddPicture.tsx/" | 94                      | 100                    |
-| Ranks/Leaderboard                | 96                      | 100                    |
-| Login/Register                   | 96                      | 100                    |
-| Profile                          | 92                      | 100                    |
-| About Us                         | 100                     | 100                    |
+## Lighthouse results
 
-## 🚨 Lighthouse Tests/Lightmode Desktop:
+### Dark mode - mobile
 
-| Pages:                           | Lighthouse Test Before: | Lighthouse Test After: |
-| -------------------------------- | ----------------------- | ---------------------- |
-| "/" or "/HomePage.tsx/"          | 93                      | 100                    |
-| "Reports" "/Reports.tsx/"        | 90                      | 100                    |
-| "/reports?tab=vote-queue"        | 90                      | 100                    |
-| "add-picture" "/AddPicture.tsx/" | 92                      | 100                    |
-| Ranks/Leaderboard                | 96                      | 100                    |
-| Login/Register                   | 96                      | 100                    |
-| Profile                          | 92                      | 100                    |
-| About Us                         | 100                     | 100                    |
+| Page/Route | Before | After |
+| ---------- | ------ | ----- |
+| `/` (Home) | 93 | 100 |
+| `/reports` | 90 | 100 |
+| `/add-picture` | 94 | 100 |
+| `/reports?tab=vote-queue` | 94 | 100 |
+| `/leaderboard` | 96 | 100 |
+| Login/Register | 92 | 100 |
+| Profile | 92 | 100 |
+| About | 100 | 100 |
+
+### Light mode - mobile
+
+| Page/Route | Before | After |
+| ---------- | ------ | ----- |
+| `/` (Home) | 93 | 100 |
+| `/reports` | 90 | 100 |
+| `/add-picture` | 94 | 100 |
+| `/reports?tab=vote-queue` | 94 | 100 |
+| `/leaderboard` | 96 | 100 |
+| Login/Register | 96 | 100 |
+| Profile | 92 | 100 |
+| About | 100 | 100 |
+
+### Dark mode - desktop
+
+| Page/Route | Before | After |
+| ---------- | ------ | ----- |
+| `/` (Home) | 93 | 100 |
+| `/reports` | 90 | 100 |
+| `/reports?tab=vote-queue` | 90 | 100 |
+| `/add-picture` | 94 | 100 |
+| `/leaderboard` | 96 | 100 |
+| Login/Register | 96 | 100 |
+| Profile | 92 | 100 |
+| About | 100 | 100 |
+
+### Light mode - desktop
+
+| Page/Route | Before | After |
+| ---------- | ------ | ----- |
+| `/` (Home) | 93 | 100 |
+| `/reports` | 90 | 100 |
+| `/reports?tab=vote-queue` | 90 | 100 |
+| `/add-picture` | 92 | 100 |
+| `/leaderboard` | 96 | 100 |
+| Login/Register | 96 | 100 |
+| Profile | 92 | 100 |
+| About | 100 | 100 |
+
+## Remaining follow-up
+
+- Add exact audit metadata (date, browser version, Lighthouse version)
+- Add screenshots or report exports for final submission appendix
+- Re-run spot checks after major UI changes to maintain the current accessibility baseline
