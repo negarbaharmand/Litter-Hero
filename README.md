@@ -29,16 +29,16 @@ The product creates one transparent flow: report litter, verify it with peers, s
 ## Table of contents
 
 - [Features](#features)
+- [Getting started](#getting-started)
+- [Project structure](#project-structure)
 - [Tech stack](#tech-stack)
 - [Architecture](#architecture)
 - [DevOps and infrastructure](#devops-and-infrastructure)
-- [Getting started](#getting-started)
 - [API documentation](#api-documentation)
 - [Accessibility](#accessibility)
 - [Performance](#performance)
 - [Monitoring snapshot](#monitoring-snapshot)
 - [Team](#team)
-- [Project structure](#project-structure)
 
 ## Features
 
@@ -75,6 +75,61 @@ The product creates one transparent flow: report litter, verify it with peers, s
 - Email/password login.
 - Google sign-in support.
 - JWT-protected API actions for reporting, voting, and cleanup flows.
+
+## Getting started
+
+### Prerequisites
+
+- Docker + Docker Compose
+- Copy and complete env files:
+  - `cp .env.example .env`
+  - `cp backend/.env.example backend/.env` (if running backend outside Docker)
+
+### Run full stack locally (recommended)
+
+```bash
+docker compose -f docker-compose.local.yml up -d --build
+docker compose logs -f
+```
+
+Default local services:
+
+- Frontend: [http://localhost:5173](http://localhost:5173)
+- Backend API: [http://localhost:3000](http://localhost:3000)
+- Swagger UI: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+- Drizzle Studio: [http://localhost:4983](http://localhost:4983)
+
+### Run without Docker
+
+```bash
+# Backend
+cd backend
+npm install
+cp .env.example .env
+npm run db:migrate
+npm run dev
+
+# Frontend (separate terminal)
+cd frontend
+npm install
+npm run dev
+```
+
+If needed, set `VITE_API_URL=http://localhost:3000` in frontend env.
+
+## Project structure
+
+```text
+grupp-2/
+|- frontend/                  # React SPA
+|- backend/                   # Express API + Drizzle schema/migrations
+|- k8s/                       # Kubernetes manifests
+|- scripts/                   # deploy/cleanup scripts
+|- docker-compose.local.yml   # local full-stack development
+|- .gitlab-ci.yml             # CI/CD pipeline
+|- Accessibility.md           # accessibility audit notes
+|- CLEANUP_FLOW_SUMMARY.md    # cleanup workflow documentation
+```
 
 ## Tech stack
 
@@ -117,47 +172,6 @@ Technical service docs:
   - ServiceMonitor scrape config,
   - Prometheus alert rules,
   - Grafana dashboard config map.
-
-## Getting started
-
-### Prerequisites
-
-- Docker + Docker Compose
-- Copy and complete env files:
-  - `cp .env.example .env`
-  - `cp backend/.env.example backend/.env` (if running backend outside Docker)
-
-### Run full stack locally (recommended)
-
-```bash
-docker compose -f docker-compose.local.yml up -d --build
-docker compose logs -f
-```
-
-Default local services:
-
-- Frontend: [http://localhost:5173](http://localhost:5173)
-- Backend API: [http://localhost:3000](http://localhost:3000)
-- Swagger UI: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
-- Drizzle Studio: [http://localhost:4983](http://localhost:4983)
-
-### Run without Docker
-
-```bash
-# Backend
-cd backend
-npm install
-cp .env.example .env
-npm run db:migrate
-npm run dev
-
-# Frontend (separate terminal)
-cd frontend
-npm install
-npm run dev
-```
-
-If needed, set `VITE_API_URL=http://localhost:3000` in frontend env.
 
 ## API documentation
 
@@ -223,16 +237,3 @@ Grafana dashboard overview from the production environment:
 
 Contributors are visible in the repository commit history.
 
-## Project structure
-
-```text
-grupp-2/
-|- frontend/                  # React SPA
-|- backend/                   # Express API + Drizzle schema/migrations
-|- k8s/                       # Kubernetes manifests
-|- scripts/                   # deploy/cleanup scripts
-|- docker-compose.local.yml   # local full-stack development
-|- .gitlab-ci.yml             # CI/CD pipeline
-|- Accessibility.md           # accessibility audit notes
-|- CLEANUP_FLOW_SUMMARY.md    # cleanup workflow documentation
-```
