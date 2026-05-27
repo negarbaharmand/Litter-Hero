@@ -10,7 +10,6 @@ import { PageShell } from "../components/PageShell";
 import { Button } from "../components/ui";
 import { logoutUser } from "../api";
 import { useAuth } from "../hooks/useAuth";
-import { useLeaderboard } from "../hooks/useLeaderboard";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 const UserProfile = () => {
@@ -22,10 +21,6 @@ const UserProfile = () => {
 
   // Sätter sidans titel till användarens namn
   useDocumentTitle(user?.username ?? "Profile");
-
-  // Hämtar leaderboard och letar upp inloggad användares rank via id
-  const { data: leaderboardData } = useLeaderboard("allTime");
-  const rank = leaderboardData?.entries.find((e) => e.id === user?.id)?.rank ?? null;
 
   // Uppdaterar användarprofilen när sidan laddas
   useEffect(() => {
@@ -60,14 +55,13 @@ const UserProfile = () => {
       <h1 className="sr-only">{user?.username ?? "Profile"}</h1>
       <div className="pb-32">
         <ProfileHeader username={user?.username} createdAt={user?.createdAt} />
-        {/* rank skickas till PointsCard för att visas i kortet */}
         <PointsCard
           totalPoints={display.points}
           weeklyPoints={display.weeklyPoints}
           reportsCreated={display.reportsCreated}
           cleanupsApproved={display.cleanupsApproved}
           verificationVotes={display.verificationVotes}
-          rank={rank}
+          rank={user.rank ?? null}
         />
         {/* ActivityHeatmap visar streak och daglig aktivitet */}
         <ActivityHeatmap

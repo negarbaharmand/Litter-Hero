@@ -107,7 +107,7 @@ export const getMe = async (req: Request, res: Response) => {
     const cleanupCount = cleanupsApprovedCount?.count ?? 0;
     const reportVerifyCount = reportVerificationVotesCount?.count ?? 0;
 
-    //Badges
+    // Badges
     if (reportCount >= 1) badges.push('First Report');
     if (reportCount >= 5) badges.push('5 Reports');
     if (reportCount >= 10) badges.push('10 Reports');
@@ -136,6 +136,13 @@ export const getMe = async (req: Request, res: Response) => {
 
     const totalVerificationVotes = (cleanupVotesCount?.count ?? 0) + reportVerifyCount;
 
+    // Rank = number of users with strictly more points + 1
+    const [rankRow] = await db
+      .select({ above: count() })
+      .from(users)
+      .where(sql`${users.points} > ${userPoints}`);
+    const rank = (rankRow?.above ?? 0) + 1;
+
     return res.json({
       ...userWithoutPassword,
       weeklyPoints,
@@ -147,6 +154,7 @@ export const getMe = async (req: Request, res: Response) => {
       cleanupsApproved: cleanupCount,
       reportVerificationVotes: reportVerifyCount,
       verificationVotes: totalVerificationVotes,
+      rank,
     });
   } catch (error) {
     console.error('Error fetching me:', error);

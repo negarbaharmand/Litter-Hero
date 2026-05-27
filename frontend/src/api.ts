@@ -255,6 +255,7 @@ export type MeUser = AuthUser & {
   cleanupsApproved: number
   reportVerificationVotes: number
   verificationVotes: number
+  rank: number
 }
 
 export type AuthResponse = {

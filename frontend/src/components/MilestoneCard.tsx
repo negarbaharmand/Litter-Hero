@@ -75,16 +75,15 @@ const MilestoneCard = ({ currentPoints }: MilestoneCardProps) => {
         {/* Progress text + remaining med ikon */}
         <div className="flex items-center justify-between">
           <span className="text-xs" style={{ color: 'var(--color-text-primary)' }}>
-            {currentPoints} / {next.points} points
+            {progress} / {range} points in this tier
           </span>
           <span className="flex items-center gap-1 text-xs font-semibold" style={{ color: 'var(--color-text-primary)' }}>
             {remaining} to go! <IconComponent size={14} color={next.color} />
           </span>
         </div>
 
-        {/* Unlock text */}
         <p className="text-xs text-center" style={{ color: 'var(--color-text-primary)' }}>
-          Unlock "{next.label}" badge at {next.points} points
+          Reach {next.points} total points to earn "{next.label}"
         </p>
 
       </div>
