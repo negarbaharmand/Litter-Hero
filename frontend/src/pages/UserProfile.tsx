@@ -80,7 +80,9 @@ const UserProfile = () => {
                 className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                 style={{ backgroundColor: "var(--color-page-bg)" }}
               >
-                <span className="text-xl" aria-hidden="true">🗳️</span>
+                <span className="text-xl" aria-hidden="true">
+                  🗳️
+                </span>
               </div>
               <div>
                 <p
@@ -100,7 +102,10 @@ const UserProfile = () => {
             <Link
               to="/reports?tab=vote-queue"
               className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-              style={{ backgroundColor: "var(--color-green-normal)", color: "#ffffff" }}
+              style={{
+                backgroundColor: "var(--color-green-darker)",
+                color: "#ffffff",
+              }}
             >
               Help verify
             </Link>
@@ -117,14 +122,19 @@ const UserProfile = () => {
         <MilestoneCard currentPoints={display.points} />
 
         {/* About, privacy and edit profile in settings */}
-        <SettingsButton onEditProfileClick={() => navigate("/profile/settings")} />
+        <SettingsButton
+          onEditProfileClick={() => navigate("/profile/settings")}
+        />
         <Button
           variant="primary"
           fullWidth
           disabled={isLoggingOut}
           onClick={handleLogout}
-          className="mx-4 mt-3"
-          style={{ width: "calc(100% - 2rem)" }}
+          className="mx-4 mt-3 bg-(--color-green-darker)"
+          style={{
+            width: "calc(100% - 2rem)",
+            color: "var(--color-grey-normal)",
+          }}
         >
           {isLoggingOut ? "Logging out..." : "Log out"}
         </Button>
