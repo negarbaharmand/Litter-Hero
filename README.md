@@ -182,6 +182,8 @@ Suggested short flow:
 Accessibility work is already documented and audited in detail:
 - [Accessibility.md](./Accessibility.md)
 
+The accessibility document includes goals, audit method, and Lighthouse before/after results for mobile and desktop in both light and dark modes.
+
 Highlights include:
 - keyboard and screen-reader considerations
 - contrast and semantic improvements
