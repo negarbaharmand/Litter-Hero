@@ -407,9 +407,38 @@ export const uploadReportImage = async (file: File): Promise<{imageUrl: string; 
     body: formData,
   });
 
-  const data = await response.json();
+  const contentType = response.headers.get('content-type') ?? '';
+  let data: unknown = null;
+  let rawText = '';
+
+  if (contentType.includes('application/json')) {
+    data = await response.json().catch(() => null);
+  } else {
+    rawText = await response.text().catch(() => '');
+  }
+
   if (!response.ok) {
-    throw new Error(data.error ?? 'Failed to upload image');
+    const apiError =
+      typeof data === 'object' &&
+      data &&
+      'error' in data &&
+      typeof (data as { error?: unknown }).error === 'string'
+        ? (data as { error: string }).error
+        : null;
+
+    if (apiError) {
+      throw new Error(apiError);
+    }
+
+    if (response.status === 413) {
+      throw new Error('Image is too large. Max size is 25 MB.');
+    }
+
+    if (rawText.trim().startsWith('<!DOCTYPE') || rawText.trim().startsWith('<html')) {
+      throw new Error('Upload failed on server. Please try again.');
+    }
+
+    throw new Error('Failed to upload image');
   }
 
   return data as { imageUrl: string; imageSizeBytes: number };
