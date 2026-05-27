@@ -23,6 +23,7 @@
   --color-grey-normal: #363636;
   --color-green-dark: #3ea865;
   --color-green-darker: #006045;
+  --color-text-highlight: #4167af;
 
   --color-danger: #ef4444;
   --nav-gradient: linear-gradient(180deg, #1a5c35 53%, #37c270 100%);
@@ -52,6 +53,7 @@ html[data-theme="dark"] {
   --color-text-body: #d2d2d2;
   --color-text-muted: #9b9b9b;
   --color-border: #363636;
+  --color-text-highlight: #5b8ce7;
 
   --nav-gradient: linear-gradient(180deg, #222222 0%, #9b9b9b 100%);
   --nav-camera-bg: var(--color-grey-light);
