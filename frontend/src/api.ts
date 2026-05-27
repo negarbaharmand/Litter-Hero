@@ -128,6 +128,7 @@ export type LeaderboardUser = User & {
 };
 
 import type { LeaderboardData, LeaderboardEntry } from './components/Leaderboard/LeaderboardTypes';
+
 // 2. Export functions that use that URL
 export const fetchReports = async (status?: ReportStatusFilter): Promise<Report[]> => {
   const query = status ? `?status=${encodeURIComponent(status)}` : '';
