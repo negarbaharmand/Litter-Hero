@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -42,9 +42,10 @@ export function ReportDetailPage() {
   const [note, setNote] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const [hasJustSubmittedCleanupProof, setHasJustSubmittedCleanupProof] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
-  const { refreshUser } = useAuth();
+  const { authState, refreshUser } = useAuth();
   const { gate, dismiss, requireAuth } = useAuthGate();
 
   const {
@@ -72,6 +73,7 @@ export function ReportDetailPage() {
     onSuccess: () => {
       setSubmitSuccess('Cleanup proof submitted and is now waiting for community votes.');
       setFormError(null);
+      setHasJustSubmittedCleanupProof(true);
       setNote('');
       setProofFile(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -85,10 +87,23 @@ export function ReportDetailPage() {
     },
   });
 
+  useEffect(() => {
+    setHasJustSubmittedCleanupProof(false);
+  }, [reportId]);
+
+  const currentUserId = authState.status === 'authenticated' ? authState.user.id : null;
+
+  const myCleanupSubmission = useMemo(() => {
+    if (!report || currentUserId === null) return null;
+    return (report.cleanupSubmissions ?? []).find((submission) => submission.userId === currentUserId) ?? null;
+  }, [report, currentUserId]);
+
+  const hasSubmittedCleanupProof = hasJustSubmittedCleanupProof || Boolean(myCleanupSubmission);
+
   const canSubmitCleanup = useMemo(() => {
     if (!report) return false;
-    return report.status !== 'cleaned' && report.status !== 'rejected';
-  }, [report]);
+    return !hasSubmittedCleanupProof && report.status !== 'cleaned' && report.status !== 'rejected';
+  }, [report, hasSubmittedCleanupProof]);
 
   function handleSubmitCleanup() {
     setFormError(null);
@@ -209,90 +224,104 @@ export function ReportDetailPage() {
           </div>
         )}
 
-        <div
-          className="mt-6 rounded-2xl p-4 shadow-sm"
-          style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}
-        >
-          <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-body)' }}>
-            Submit cleanup proof
-          </h2>
-          <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            Upload a current photo from the cleaned spot so the community can verify it.
-          </p>
-
+        {hasSubmittedCleanupProof ? (
           <div
-            className="mt-4 rounded-xl border-2 border-dashed p-4"
-            style={{ borderColor: 'var(--color-green-dark)', backgroundColor: 'var(--color-page-bg)' }}
+            className="mt-6 rounded-2xl p-4 shadow-sm"
+            style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}
           >
-            <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-              Cleanup proof photo (required)
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-body)' }}>
+              Cleanup proof submitted
+            </h2>
+            <p className="mt-1 text-sm" style={{ color: 'var(--color-green-dark)' }}>
+              You have successfully submitted proof for this cleanup.
             </p>
-            <p className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
-              Take a clear after-photo of the cleaned spot.
+          </div>
+        ) : (
+          <div
+            className="mt-6 rounded-2xl p-4 shadow-sm"
+            style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+          >
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-body)' }}>
+              Submit cleanup proof
+            </h2>
+            <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+              Upload a current photo from the cleaned spot so the community can verify it.
             </p>
+
+            <div
+              className="mt-4 rounded-xl border-2 border-dashed p-4"
+              style={{ borderColor: 'var(--color-green-dark)', backgroundColor: 'var(--color-page-bg)' }}
+            >
+              <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                Cleanup proof photo (required)
+              </p>
+              <p className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                Take a clear after-photo of the cleaned spot.
+              </p>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
+                className="mt-3 rounded-lg px-3 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+                style={{ backgroundColor: 'var(--color-green-dark)' }}
+              >
+                {proofFile ? 'Change photo' : 'Upload cleanup photo'}
+              </button>
+              {proofFile && (
+                <p className="mt-2 text-sm" style={{ color: 'var(--color-text-body)' }}>
+                  Selected file: <span className="font-medium">{proofFile.name}</span>
+                </p>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(event) => setProofFile(event.target.files?.[0] ?? null)}
+                disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
+                className="sr-only"
+              />
+            </div>
+
+            <textarea
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+              placeholder="Optional note about what was cleaned"
+              rows={3}
+              disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
+              className="mt-3 w-full rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2"
+              style={{
+                border: '1px solid var(--color-border)',
+                backgroundColor: 'var(--color-page-bg)',
+                color: 'var(--color-text-body)',
+              }}
+            />
+
+            {formError && (
+              <p className="mt-3 text-sm" style={{ color: 'var(--color-danger)' }}>{formError}</p>
+            )}
+            {submitSuccess && (
+              <p className="mt-3 text-sm" style={{ color: 'var(--color-green-dark)' }}>{submitSuccess}</p>
+            )}
+
             <button
               type="button"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={handleSubmitCleanup}
               disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
-              className="mt-3 rounded-lg px-3 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-4 rounded-xl px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
               style={{ backgroundColor: 'var(--color-green-dark)' }}
             >
-              {proofFile ? 'Change photo' : 'Upload cleanup photo'}
+              {submitCleanupMutation.isPending ? 'Submitting...' : 'Submit cleanup'}
             </button>
-            {proofFile && (
-              <p className="mt-2 text-sm" style={{ color: 'var(--color-text-body)' }}>
-                Selected file: <span className="font-medium">{proofFile.name}</span>
+
+            {!canSubmitCleanup && (
+              <p className="mt-3 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                {report.status === 'rejected'
+                  ? 'This report was rejected and does not accept cleanup submissions.'
+                  : 'This report is already cleaned and no longer accepts cleanup submissions.'}
               </p>
             )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={(event) => setProofFile(event.target.files?.[0] ?? null)}
-              disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
-              className="sr-only"
-            />
           </div>
-
-          <textarea
-            value={note}
-            onChange={(event) => setNote(event.target.value)}
-            placeholder="Optional note about what was cleaned"
-            rows={3}
-            disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
-            className="mt-3 w-full rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2"
-            style={{
-              border: '1px solid var(--color-border)',
-              backgroundColor: 'var(--color-page-bg)',
-              color: 'var(--color-text-body)',
-            }}
-          />
-
-          {formError && (
-            <p className="mt-3 text-sm" style={{ color: 'var(--color-danger)' }}>{formError}</p>
-          )}
-          {submitSuccess && (
-            <p className="mt-3 text-sm" style={{ color: 'var(--color-green-dark)' }}>{submitSuccess}</p>
-          )}
-
-          <button
-            type="button"
-            onClick={handleSubmitCleanup}
-            disabled={!canSubmitCleanup || submitCleanupMutation.isPending}
-            className="mt-4 rounded-xl px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
-            style={{ backgroundColor: 'var(--color-green-dark)' }}
-          >
-            {submitCleanupMutation.isPending ? 'Submitting...' : 'Submit cleanup'}
-          </button>
-
-          {!canSubmitCleanup && (
-            <p className="mt-3 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-              {report.status === 'rejected'
-                ? 'This report was rejected and does not accept cleanup submissions.'
-                : 'This report is already cleaned and no longer accepts cleanup submissions.'}
-            </p>
-          )}
-        </div>
+        )}
       </div>
 
       <AuthGateModal open={gate.open} message={gate.message} onDismiss={dismiss} />
