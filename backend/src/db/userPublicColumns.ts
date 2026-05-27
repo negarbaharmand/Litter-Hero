@@ -8,5 +8,6 @@ export const publicUserColumns = {
   name: users.name,
   role: users.role,
   points: users.points,
+  profileImageUrl: users.profileImageUrl,
   createdAt: users.createdAt,
 } as const;
