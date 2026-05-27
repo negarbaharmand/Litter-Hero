@@ -1,7 +1,11 @@
 // Det här är en komponent för kontoinställningar med länkar till Privacy, About och Edit Profile
 import { Link } from 'react-router-dom'
 
-const SettingsButton = () => {
+type SettingsButtonProps = {
+  onEditProfileClick?: () => void
+}
+
+const SettingsButton = ({ onEditProfileClick }: SettingsButtonProps) => {
   return (
     <div className="mx-4 mt-6">
       <h3 className="mb-3!">Account Settings</h3>
@@ -10,7 +14,7 @@ const SettingsButton = () => {
         {/* Edit Profile placeholder */}
         <button
           type="button"
-          onClick={() => console.log('Edit profile — not implemented')}
+          onClick={onEditProfileClick}
           className="flex items-center justify-between py-3 border-b"
           style={{ borderColor: 'var(--color-border)' }}
         >

@@ -27,4 +27,4 @@ COPY --chown=node:node drizzle.config.ts ./
 COPY --chown=node:node drizzle ./drizzle
 USER node
 EXPOSE 3000
-CMD ["node", "dist/index.js"]
+CMD ["sh", "-c", "node dist/migrate.js && node dist/index.js"]
