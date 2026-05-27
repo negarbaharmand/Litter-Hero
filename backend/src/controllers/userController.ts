@@ -1,10 +1,33 @@
 import type { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
+import { z } from 'zod';
 import { db } from '../db/index.js';
 import { cleanupSubmissions, cleanupSubmissionVotes, reportVerificationVotes, reports, users } from '../db/schema.js';
 import { publicUserColumns } from '../db/userPublicColumns.js';
-import { count, desc, eq, gte, and, sql, isNotNull } from 'drizzle-orm';
+import { count, desc, eq, gte, and, sql } from 'drizzle-orm';
 import { calculateWeeklyPoints } from './reportWorkflow.js';
 import { getStreakStatsForUser } from '../services/streak.js';
+
+const updateMeSchema = z.object({
+  username: z.string().min(3).max(50).optional(),
+  currentPassword: z.string().min(1).optional(),
+  newPassword: z.string().min(8).optional(),
+  profileImageUrl: z.string().url().nullable().optional(),
+}).refine(
+  (data) => !(data.newPassword && data.newPassword === data.currentPassword),
+  { message: 'New password must be different from current password', path: ['newPassword'] }
+);
+
+type PgErrorLike = { code?: string; constraint_name?: string };
+
+function getUniqueViolation(error: unknown): PgErrorLike | null {
+  for (const e of [error, (error as { cause?: unknown })?.cause]) {
+    if (e && typeof e === 'object' && (e as PgErrorLike).code === '23505') {
+      return e as PgErrorLike;
+    }
+  }
+  return null;
+}
 
 export const listUsers = async (req: Request, res: Response) => {
   try {
@@ -99,36 +122,23 @@ export const getMe = async (req: Request, res: Response) => {
       weeklyApprovedCleanupSizes: weeklyApprovedCleanups.map((cleanup) => cleanup.size),
     });
 
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: rawPassword, ...userWithoutPassword } = user;
+    const hasPassword = rawPassword !== null;
 
-    const userPoints = user.points ?? 0;
     const badges: string[] = [];
     const reportCount = reportsCreatedCount?.count ?? 0;
     const cleanupCount = cleanupsApprovedCount?.count ?? 0;
     const reportVerifyCount = reportVerificationVotesCount?.count ?? 0;
 
-    // Badges
     if (reportCount >= 1) badges.push('First Report');
-    if (reportCount >= 5) badges.push('5 Reports');
-    if (reportCount >= 10) badges.push('10 Reports');
-    if (reportCount >= 50) badges.push('50 Reports');
-
     if (cleanupCount >= 1) badges.push('First Cleanup');
     if (cleanupCount >= 5) badges.push('5 Cleanups');
     if (cleanupCount >= 10) badges.push('10 Cleanups');
     if (cleanupCount >= 50) badges.push('50 Cleanups');
-
     if (reportVerifyCount >= 1) badges.push('First Verify');
     if (reportVerifyCount >= 10) badges.push('10 Verifications');
     if (reportVerifyCount >= 50) badges.push('50 Verifications');
     if (reportVerifyCount >= 100) badges.push('100 Verifications');
-
-    if (userPoints >= 100) badges.push('Litter Spotter');
-    if (userPoints >= 250) badges.push('Street Cleaner');
-    if (userPoints >= 500) badges.push('Eco Warrior');
-    if (userPoints >= 1000) badges.push('Green Hero');
-    if (userPoints >= 2500) badges.push('Beach Hero');
-    if (userPoints >= 5000) badges.push('Planet Guardian');
 
     const { currentStreak, longestStreak, badges: streakBadges, activity } =
       await getStreakStatsForUser(userId);
@@ -136,15 +146,9 @@ export const getMe = async (req: Request, res: Response) => {
 
     const totalVerificationVotes = (cleanupVotesCount?.count ?? 0) + reportVerifyCount;
 
-    // Rank = number of users with strictly more points + 1
-    const [rankRow] = await db
-      .select({ above: count() })
-      .from(users)
-      .where(sql`${users.points} > ${userPoints}`);
-    const rank = (rankRow?.above ?? 0) + 1;
-
     return res.json({
       ...userWithoutPassword,
+      hasPassword,
       weeklyPoints,
       badges,
       currentStreak,
@@ -154,7 +158,6 @@ export const getMe = async (req: Request, res: Response) => {
       cleanupsApproved: cleanupCount,
       reportVerificationVotes: reportVerifyCount,
       verificationVotes: totalVerificationVotes,
-      rank,
     });
   } catch (error) {
     console.error('Error fetching me:', error);
@@ -196,11 +199,86 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
+
+
+
+
+export const updateMe = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const parsed = updateMeSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' });
+    }
+
+    const { username, currentPassword, newPassword, profileImageUrl } = parsed.data;
+
+    if (!username && newPassword === undefined && profileImageUrl === undefined) {
+      return res.status(400).json({ error: 'Nothing to update' });
+    }
+
+    const userId = req.user.id;
+    const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const updates: Partial<typeof users.$inferInsert> = {};
+
+    if (username !== undefined) {
+      updates.username = username;
+    }
+
+    if (newPassword !== undefined) {
+      if (user.password) {
+        if (!currentPassword) {
+          return res.status(400).json({ error: 'Current password is required to change password' });
+        }
+        const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!passwordMatch) {
+          return res.status(400).json({ error: 'Current password is incorrect' });
+        }
+      }
+      updates.password = await bcrypt.hash(newPassword, 10);
+    }
+
+    if (profileImageUrl !== undefined) {
+      updates.profileImageUrl = profileImageUrl;
+    }
+
+    try {
+      await db.update(users).set(updates).where(eq(users.id, userId));
+    } catch (err) {
+      const violation = getUniqueViolation(err);
+      if (violation) {
+        if (violation.constraint_name === 'users_username_unique') {
+          return res.status(409).json({ error: 'Username is already taken' });
+        }
+        return res.status(409).json({ error: 'Value is already in use' });
+      }
+      throw err;
+    }
+
+    const [updated] = await db
+      .select(publicUserColumns)
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    return res.json(updated);
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 export const getLeaderboard = async (req: Request, res: Response) => {
   try {
-    const rawLimit = typeof req.query.limit === 'string' ? Number(req.query.limit) : 100;
-    // Tillåter upp till 100 användare för att rank ska stämma för alla
-    const limit = Number.isFinite(rawLimit) && rawLimit >= 1 ? Math.min(100, rawLimit) : 100;
+    const rawLimit = typeof req.query.limit === 'string' ? Number(req.query.limit) : 10;
+    const limit = rawLimit === 20 ? 20 : 10;
 
     const leaderboard = await db
       .select({
@@ -223,7 +301,6 @@ export const getLeaderboard = async (req: Request, res: Response) => {
         )`,
       })
       .from(users)
-      .where(and(isNotNull(users.emailVerifiedAt), isNotNull(users.username)))
       .orderBy(desc(users.points))
       .limit(limit);
 
