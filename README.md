@@ -9,9 +9,10 @@ The current rollout and challenge scope is **Sweden-focused**, inspired by local
 ## Quick links
 
 - Repository: [git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2](https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2)
-- Live app: `TODO: Add deployed frontend URL`
-- Backend base URL: `TODO: Add deployed backend URL`
-- Demo video: `TODO: Add demo video link`
+- Live app: [https://main-litter-hero.cc.k3s.chas-lab.dev/](https://main-litter-hero.cc.k3s.chas-lab.dev/)
+- Backend base URL: [https://api-main-litter-hero.cc.k3s.chas-lab.dev/](https://api-main-litter-hero.cc.k3s.chas-lab.dev/)
+- Swagger UI: [https://api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs](https://api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs)
+- Demo video (MP4): [./demo/litter-hero-demo.mp4](./demo/litter-hero-demo.mp4)
 
 ## Project summary
 
@@ -35,6 +36,7 @@ The product creates one transparent flow: report litter, verify it with peers, s
 - [API documentation](#api-documentation)
 - [Accessibility](#accessibility)
 - [Performance](#performance)
+- [Monitoring snapshot](#monitoring-snapshot)
 - [Team](#team)
 - [Project structure](#project-structure)
 
@@ -86,7 +88,6 @@ The product creates one transparent flow: report litter, verify it with peers, s
 - **Infra**: Docker, Kubernetes manifests, Traefik ingress, GitLab CI/CD
 - **Security scanning**: Trivy container image scans in CI
 - **Email**: Resend API
-  - `TODO: Add Resend integration details (template IDs/events)`
 
 ## Architecture
 
@@ -100,6 +101,7 @@ Browser (React SPA)
 ```
 
 Technical service docs:
+
 - [Frontend README](./frontend/README.md)
 - [Backend README](./backend/README.md)
 - [Cleanup flow summary](./CLEANUP_FLOW_SUMMARY.md)
@@ -133,6 +135,7 @@ docker compose logs -f
 ```
 
 Default local services:
+
 - Frontend: [http://localhost:5173](http://localhost:5173)
 - Backend API: [http://localhost:3000](http://localhost:3000)
 - Swagger UI: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
@@ -158,9 +161,13 @@ If needed, set `VITE_API_URL=http://localhost:3000` in frontend env.
 
 ## API documentation
 
-Open Swagger at [http://localhost:3000/api-docs](http://localhost:3000/api-docs).
+Use whichever environment you are testing:
+
+- Production: [https://api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs](https://api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs)
+- Local: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
 
 Main endpoint groups:
+
 - `/api/auth`
 - `/api/users`
 - `/api/reports`
@@ -168,9 +175,16 @@ Main endpoint groups:
 
 ## Demo video
 
-`TODO: Add demo video URL or embedded player`
+Repository MP4:
+
+- [`demo/litter-hero-demo.mp4`](./demo/litter-hero-demo.mp4)
+
+GitLab inline player:
+
+![Litter Hero demo](./demo/litter-hero-demo.mp4){width=960}
 
 Suggested short flow:
+
 1. Create a report with image and location
 2. View report on map/list
 3. Submit cleanup proof
@@ -180,26 +194,34 @@ Suggested short flow:
 ## Accessibility
 
 Accessibility work is already documented and audited in detail:
+
 - [Accessibility.md](./Accessibility.md)
 
 The accessibility document includes goals, audit method, and Lighthouse before/after results for mobile and desktop in both light and dark modes.
 
 Highlights include:
+
 - keyboard and screen-reader considerations
 - contrast and semantic improvements
 - Lighthouse accessibility score improvements across key pages
 
 ## Performance
 
-- `TODO: Add measured frontend performance metrics`
-- `TODO: Add backend latency/error metrics snapshot`
-- `TODO: Add before/after benchmark notes (if available)`
+- Frontend accessibility quality is tracked in [`Accessibility.md`](./Accessibility.md), with audited routes improved to 100 accessibility in documented runs.
+- Backend runtime metrics are exposed at `/metrics` via `express-prom-bundle`.
+- Kubernetes monitoring includes `ServiceMonitor`, `PrometheusRule`, and Grafana dashboard configuration for observability.
+
+## Monitoring snapshot
+
+Grafana dashboard overview from the production environment:
+
+![Grafana monitoring overview](./docs/monitoring/grafna-overview.png)
 
 ## Team
 
 **Grupp 2 · CHAS Challenge 2026**
 
-- `TODO: Add team member names and roles`
+Contributors are visible in the repository commit history.
 
 ## Project structure
 
@@ -214,5 +236,3 @@ grupp-2/
 |- Accessibility.md           # accessibility audit notes
 |- CLEANUP_FLOW_SUMMARY.md    # cleanup workflow documentation
 ```
-
-
