@@ -28,7 +28,11 @@ export const users = pgTable('users', {
   name: varchar('name', { length: 100 }),
   role: varchar('role', { length: 50 }).default('user'),
   points: integer('points').default(0),
+  profileImageUrl: varchar('profile_image_url', { length: 500 }),
   createdAt: timestamp('created_at').defaultNow(),
+  emailVerifiedAt: timestamp('email_verified_at'), 
+  emailVerificationToken: varchar('email_verification_token'), 
+  emailVerificationTokenExpiresAt: timestamp('email_verification_token_expires_at')
 });
 
 export const reports = pgTable('reports', {

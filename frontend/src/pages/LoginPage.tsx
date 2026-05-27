@@ -24,13 +24,13 @@ const Divider = () => (
 
 export function LoginPage() {
   useDocumentTitle("Login");
-  const navigate = useNavigate();
-  const location = useLocation();
-  const startInRegister =
-    (location.state as { register?: boolean } | null)?.register === true;
-  const { setUser } = useAuth();
-  const [apiError, setApiError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate()
+  const location = useLocation()
+  const startInRegister = (location.state as { register?: boolean } | null)?.register === true
+  const { setUser } = useAuth()
+  const [apiError, setApiError] = useState<string | null>(null)
+  const [infoMessage, setInfoMessage] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
   const googleLogin = useGoogleLogin({
     scope: "openid email profile",
     onSuccess: async (tokenResponse) => {
@@ -63,20 +63,27 @@ export function LoginPage() {
       showPassword: false,
     },
     onSubmit: async ({ value }) => {
-      setApiError(null);
-      setIsLoading(true);
+      setApiError(null)
+      setInfoMessage(null)
+      setIsLoading(true)
       try {
-        const result = value.isRegistering
-          ? await registerUser(
-              value.email,
-              value.password,
-              value.username || undefined,
-              value.name || undefined,
-            )
-          : await loginUser(value.email, value.password);
+        if (value.isRegistering) {
+          const result = await registerUser(
+            value.email,
+            value.password,
+            value.username || undefined,
+            value.name || undefined
+          )
 
-        setUser(result.user, result.token);
-        navigate("/");
+          setInfoMessage(result.message || 'Account created. Please verify your email before logging in.')
+          form.setFieldValue('isRegistering', false)
+          form.setFieldValue('password', '')
+          return
+        }
+
+        const result = await loginUser(value.email, value.password)
+        setUser(result.user, result.token)
+        navigate('/')
       } catch (err) {
         setApiError(
           err instanceof Error ? err.message : "Something went wrong",
@@ -341,7 +348,18 @@ export function LoginPage() {
             </div>
           </div>
 
-          {apiError && <p className="field-error text-center">{apiError}</p>}
+          {infoMessage && (
+            <div className="text-center text-body-sm flex flex-col gap-1" style={{ color: 'var(--color-green-dark)' }}>
+              <p>{infoMessage}</p>
+              <p style={{ color: 'var(--color-text-muted)' }}>
+                Can't find it? Check your <strong>spam or junk</strong> folder.
+              </p>
+            </div>
+          )}
+
+          {apiError && (
+            <p className="field-error text-center">{apiError}</p>
+          )}
 
           {/* Submit */}
           <button

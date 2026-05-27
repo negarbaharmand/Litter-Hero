@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { register, login, logout, googleSignIn } from '../controllers/authController.js';
+import { register, login, logout, googleSignIn, verifyEmail, resendVerification } from '../controllers/authController.js';
 
 const router = Router();
 
@@ -9,7 +9,7 @@ const router = Router();
  *   post:
  *     tags: [Auth]
  *     summary: Register a new user
- *     description: Creates a user and returns a JWT plus the public user object (password is never returned).
+ *     description: Creates a user, stores an email verification token, and sends a verification email. Does not return JWT.
  *     security: []
  *     requestBody:
  *       required: true
@@ -37,11 +37,15 @@ const router = Router();
  *                 description: Optional display name
  *     responses:
  *       201:
- *         description: User created
+ *         description: User created; verification email sent
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/AuthResponse'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Account created. Please verify your email before logging in.
  *       400:
  *         description: Validation error (e.g. invalid email or short password)
  *         content:
@@ -93,6 +97,12 @@ router.post('/register', register);
  *               $ref: '#/components/schemas/ErrorMessage'
  *       401:
  *         description: Invalid email or password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       403:
+ *         description: Email not verified
  *         content:
  *           application/json:
  *             schema:
@@ -173,5 +183,97 @@ router.post('/google', googleSignIn);
  *                   example: Logged out successfully
  */
 router.post('/logout', logout);
+/**
+ * @swagger
+ * /api/auth/verify-email:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Verify a user's email address
+ *     description: Verifies the email using a token sent by email. Marks the user as verified and invalidates the token.
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, token]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               token:
+ *                 type: string
+ *                 description: Raw verification token from the email link
+ *     responses:
+ *       200:
+ *         description: Email verified successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Email verified successfully. You can now log in.
+ *       400:
+ *         description: Invalid or expired verification link
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ */
+router.post('/verify-email', verifyEmail);
+
+/**
+ * @swagger
+ * /api/auth/resend-verification:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Resend verification email
+ *     description: Generates a fresh verification token and resends the email for unverified users. Returns a generic success message to prevent account enumeration.
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Generic success response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: If the account exists, a verification email has been sent.
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ */
+router.post('/resend-verification', resendVerification);
 
 export default router;
