@@ -20,6 +20,8 @@ function normalizeMeUser(user: MeUser): MeUser {
     weeklyPoints: typeof user.weeklyPoints === 'number' ? user.weeklyPoints : 0,
     badges: Array.isArray(user.badges) ? user.badges : [],
     activity,
+    profileImageUrl: user.profileImageUrl ?? null,
+    hasPassword: typeof user.hasPassword === 'boolean' ? user.hasPassword : true,
   }
 }
 
@@ -53,7 +55,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   function setUser(_user: AuthUser, token: string) {
     localStorage.setItem('token', token)
-    // Fetch the full profile so weeklyPoints/badges are available immediately
     fetch(`${API_BASE_URL}/api/users/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -69,26 +70,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
   }
 
-  const refreshUser = useCallback(() => {
+  //async so that await refreshUser() in AddPicturePage waits until the profile is updated
+  const refreshUser = useCallback(async () => {
     const token = localStorage.getItem('token')
     if (!token) return
-    fetch(`${API_BASE_URL}/api/users/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('Unauthorized')
-        return res.json() as Promise<MeUser>
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/users/me`, {
+        headers: { Authorization: `Bearer ${token}` },
       })
-      .then((user) => {
-        const normalized = normalizeMeUser(user)
-        localStorage.setItem('user', JSON.stringify(normalized))
-        setAuthState({ status: 'authenticated', user: normalized })
-      })
-      .catch(() => {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        setAuthState({ status: 'unauthenticated' })
-      })
+      if (!res.ok) throw new Error('Unauthorized')
+      const user = await res.json() as MeUser
+      const normalized = normalizeMeUser(user)
+      localStorage.setItem('user', JSON.stringify(normalized))
+      setAuthState({ status: 'authenticated', user: normalized })
+    } catch {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      setAuthState({ status: 'unauthenticated' })
+    }
   }, [])
 
   function clearAuth() {

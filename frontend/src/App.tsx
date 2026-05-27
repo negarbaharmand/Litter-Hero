@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import LeaderboardPage from './pages/LeaderboardPage';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { HomePage } from './pages/HomePage'
@@ -9,13 +10,26 @@ import { LoginPage } from './pages/LoginPage'
 import { AddPicturePage } from './pages/AddPicturePage'
 import { ReportDetailPage } from './pages/ReportDetailPage'
 import { AboutPage } from './pages/AboutPage'
+import { AccountSettingsPage } from './pages/AccountSettingsPage'
 import PrivateRoute from './components/PrivateRoute'
+import { VerifyEmailPage } from './pages/VerifyEmailPage'
+import PrivacyPage from './pages/PrivacyPage'
 
 function App() {
   const location = useLocation()
+  const hideNavOn = new Set(['/login', '/verify-email', '/about'])
+
+  useEffect(() => {
+    const main = document.querySelector('#main-content')
+    if (main instanceof HTMLElement) {
+      main.focus()
+    }
+  }, [location.pathname])
+
   return (
     <>
-      {location.pathname !== '/login' && location.pathname !== '/about' && <NavBar />}
+      <a href="#main-content" className="skip-link">Skip to main content</a>
+      {!hideNavOn.has(location.pathname) && <NavBar />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
@@ -24,9 +38,12 @@ function App() {
         <Route path="/add-picture" element={<AddPicturePage />} />
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<UserProfile />} />
+          <Route path="/profile/settings" element={<AccountSettingsPage />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
