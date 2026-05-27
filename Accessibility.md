@@ -1,6 +1,14 @@
 # Accessibility Documentation
 
+![Header Image](https://i.imgur.com/Rq3Hjsr.png)
+
 This document summarizes accessibility improvements and Lighthouse results for Litter Hero.
+
+-- [Album of Images for **Desktop** during the test after applying fixes](https://imgur.com/a/html-export-home-OLU9n99) --
+
+-- [Album of Images for **Mobile** during the test after applying fixes](https://imgur.com/a/DxufpO9) --
+
+-- [JSON and HTML exports for _Both_ **before** applying fixes, highlighting all the issues that needed to be resolved:](https://git.chas-lab.dev/Akram/lighthouse-accessibility-scores/-/tree/main/lighthouse-html-json-tests) --
 
 ## Accessibility goals
 
