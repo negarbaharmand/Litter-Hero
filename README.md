@@ -1,6 +1,6 @@
-| |
-|:--:|
-| ![Litter Hero logo](./frontend/public/Logo.svg) |
+<p align="center">
+  <img src="./frontend/public/Logo.svg" alt="Litter Hero logo" width="120" />
+</p>
 
 # Litter Hero
 
