@@ -1,19 +1,23 @@
-import { type LeaderboardEntry } from './LeaderboardTypes';
-import ProfilePicture from './leaderboardAvatar';
+import { type LeaderboardEntry } from "./LeaderboardTypes";
+import ProfilePicture from "./leaderboardAvatar";
 
 interface LeaderboardTableProps {
   entries: LeaderboardEntry[];
-  sortBy: 'rank' | 'points' | 'username';
-  onSortChange: (sortBy: 'rank' | 'points' | 'username') => void;
+  sortBy: "rank" | "points" | "username";
+  onSortChange: (sortBy: "rank" | "points" | "username") => void;
 }
 
 export function LeaderboardTable({ entries, sortBy }: LeaderboardTableProps) {
   const sortedEntries = [...entries].sort((a, b) => {
     switch (sortBy) {
-      case 'rank': return a.rank - b.rank;
-      case 'points': return b.points - a.points;
-      case 'username': return a.username.localeCompare(b.username);
-      default: return 0;
+      case "rank":
+        return a.rank - b.rank;
+      case "points":
+        return b.points - a.points;
+      case "username":
+        return a.username.localeCompare(b.username);
+      default:
+        return 0;
     }
   });
 
@@ -28,24 +32,42 @@ export function LeaderboardTable({ entries, sortBy }: LeaderboardTableProps) {
     <div className="space-y-4">
       {/* Top 3 kort */}
       {topThreeEntries.length > 0 && (
-        <div className="flex gap-3 overflow-x-auto pb-1">
+        <div
+          className="flex gap-3 overflow-x-auto pb-1"
+          tabIndex={0}
+          role="region"
+          aria-label="Top 3 leaderboard entries"
+        >
           {topThreeEntries.map((entry) => (
             <div key={entry.id} className="card min-w-36 flex-1 text-center">
               <div className="mx-auto mb-2 w-fit">
-                <ProfilePicture username={entry.username} profilePictureUrl={entry.profilePictureUrl} />
+                <ProfilePicture
+                  username={entry.username}
+                  profilePictureUrl={entry.profilePictureUrl}
+                />
               </div>
-              <div className="text-body-sm font-semibold truncate w-full" style={{ color: 'var(--color-text-primary)' }}>
+              <div
+                className="text-body-sm font-semibold truncate w-full"
+                style={{ color: "var(--color-text-primary)" }}
+              >
                 {entry.username}
               </div>
-              <div className="text-body-sm font-medium mt-1" style={{ color: 'var(--color-text-primary)' }}>
+              <div
+                className="text-body-sm font-medium mt-1"
+                style={{ color: "var(--color-text-primary)" }}
+              >
                 {entry.points} pts
               </div>
-              <div className="mt-2 text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
-                {entry.reportsSubmitted} reports · {entry.reportsResolved} cleanups
+              <div
+                className="mt-2 text-[11px]"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                {entry.reportsSubmitted} reports · {entry.reportsResolved}{" "}
+                cleanups
               </div>
               <div
                 className="mt-2 inline-block rounded-full px-3 py-1 text-body-xs font-semibold text-white"
-                style={{ backgroundColor: 'var(--color-green-dark)' }}
+                style={{ backgroundColor: "var(--color-green-darker)" }}
               >
                 #{entry.rank}
               </div>
@@ -55,20 +77,40 @@ export function LeaderboardTable({ entries, sortBy }: LeaderboardTableProps) {
       )}
 
       {/* Resterande rader */}
-      <div className="space-y-3">
+      <div className="space-y-3" role="list" aria-label="Leaderboard rankings">
         {remainingEntries.map((entry) => (
-          <div key={entry.id} className="card flex items-center justify-between gap-4 hover:bg-green-light transition">
-            <div className="w-12 text-body-lg font-bold" style={{ color: 'var(--color-green-dark)' }}>
+          <div
+            key={entry.id}
+            role="listitem"
+            className="card flex items-center justify-between gap-4 hover:bg-green-light transition"
+          >
+            <div
+              className="w-12 text-body-lg font-bold"
+              style={{ color: "var(--color-text-primary)" }}
+            >
               #{entry.rank}
             </div>
-            <ProfilePicture username={entry.username} profilePictureUrl={entry.profilePictureUrl} />
-            <div className="flex-1 min-w-0 text-body-lg" style={{ color: 'var(--color-text-primary)' }}>
+            <ProfilePicture
+              username={entry.username}
+              profilePictureUrl={entry.profilePictureUrl}
+            />
+            <div
+              className="flex-1 min-w-0 text-body-lg"
+              style={{ color: "var(--color-text-primary)" }}
+            >
               <div className="truncate">{entry.username}</div>
-              <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                {entry.reportsSubmitted} reports · {entry.reportsResolved} cleanups
+              <div
+                className="text-xs"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                {entry.reportsSubmitted} reports · {entry.reportsResolved}{" "}
+                cleanups
               </div>
             </div>
-            <div className="font-bold" style={{ color: 'var(--color-text-primary)' }}>
+            <div
+              className="font-bold"
+              style={{ color: "var(--color-text-primary)" }}
+            >
               {entry.points} pts
             </div>
           </div>

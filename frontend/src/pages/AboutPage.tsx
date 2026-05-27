@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { PageShell } from '../components/PageShell'
 
 export function AboutPage() {
+  useDocumentTitle('About')
   const navigate = useNavigate()
 
   const onBack = () => {
