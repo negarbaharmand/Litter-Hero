@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./frontend/public/Logo%20Section_margin.svg" alt="Litter Hero logo" width="140" />
+  <img src="./docs/logo-readme-dark.svg" alt="Litter Hero logo" width="140" />
 </p>
 
 # Litter Hero
@@ -46,6 +46,7 @@ Most environmental apps reward you for saying you did something. LitterHero only
 ## Table of contents
 
 - [Features](#features)
+- [Demo video](#demo-video)
 - [Tech stack](#tech-stack)
 - [Architecture](#architecture)
 - [DevOps and infrastructure](#devops-and-infrastructure)
@@ -55,6 +56,13 @@ Most environmental apps reward you for saying you did something. LitterHero only
 - [Accessibility and performance](#accessibility-and-performance)
 - [Project structure](#project-structure)
 - [Team](#team)
+
+---
+
+## Demo video
+
+- File in repo: [`demo/litter-hero-demo.mp4`](./demo/litter-hero-demo.mp4)
+- Direct link: [Watch demo](./demo/litter-hero-demo.mp4)
 
 ---
 
