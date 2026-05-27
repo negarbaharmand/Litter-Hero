@@ -4,7 +4,7 @@
 
 This document summarizes accessibility improvements and Lighthouse results for Litter Hero.
 
--- [Album of Images for **Desktop** during the test after applying fixes](https://imgur.com/a/html-export-home-OLU9n99) --
+-- [Album of Images for **Desktop** during the test after applying fixes](https://imgur.com/a/MfVIF09) --
 
 -- [Album of Images for **Mobile** during the test after applying fixes](https://imgur.com/a/DxufpO9) --
 
