@@ -197,14 +197,6 @@ GitLab inline player:
 
 ![Litter Hero demo](./demo/litter-hero-demo.mp4){width=960}
 
-Suggested short flow:
-
-1. Create a report with image and location
-2. View report on map/list
-3. Submit cleanup proof
-4. Show voting and status transition
-5. Show profile points and leaderboard update
-
 ## Accessibility
 
 Accessibility work is already documented and audited in detail:
@@ -236,4 +228,3 @@ Grafana dashboard overview from the production environment:
 **Grupp 2 · CHAS Challenge 2026**
 
 Contributors are visible in the repository commit history.
-
