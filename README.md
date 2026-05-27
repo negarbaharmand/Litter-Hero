@@ -1,4 +1,6 @@
-![Litter Hero logo](./frontend/public/Logo.svg)
+| |
+|:--:|
+| ![Litter Hero logo](./frontend/public/Logo.svg) |
 
 # Litter Hero
 
