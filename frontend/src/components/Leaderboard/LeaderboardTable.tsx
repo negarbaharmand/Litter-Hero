@@ -33,13 +33,12 @@ export function LeaderboardTable({ entries, sortBy }: LeaderboardTableProps) {
       {/* Top 3 kort */}
       {topThreeEntries.length > 0 && (
         <div
-          className="flex gap-3 overflow-x-auto pb-1"
-          tabIndex={0}
+          className="grid grid-cols-3 gap-2 sm:gap-3"
           role="region"
           aria-label="Top 3 leaderboard entries"
         >
           {topThreeEntries.map((entry) => (
-            <div key={entry.id} className="card min-w-36 flex-1 text-center">
+            <div key={entry.id} className="card min-w-0 p-3 sm:p-4 text-center">
               <div className="mx-auto mb-2 w-fit">
                 <ProfilePicture
                   username={entry.username}
@@ -47,26 +46,26 @@ export function LeaderboardTable({ entries, sortBy }: LeaderboardTableProps) {
                 />
               </div>
               <div
-                className="text-body-sm font-semibold truncate w-full"
+                className="text-sm font-semibold truncate w-full"
                 style={{ color: "var(--color-text-primary)" }}
               >
                 {entry.username}
               </div>
               <div
-                className="text-body-sm font-medium mt-1"
+                className="text-sm font-medium mt-1"
                 style={{ color: "var(--color-text-primary)" }}
               >
                 {entry.points} pts
               </div>
               <div
-                className="mt-2 text-[11px]"
+                className="mt-2 text-[10px] sm:text-[11px]"
                 style={{ color: "var(--color-text-muted)" }}
               >
                 {entry.reportsSubmitted} reports · {entry.reportsResolved}{" "}
                 cleanups
               </div>
               <div
-                className="mt-2 inline-block rounded-full px-3 py-1 text-body-xs font-semibold text-white"
+                className="mt-2 inline-block rounded-full px-2.5 py-1 text-xs font-semibold text-white"
                 style={{ backgroundColor: "var(--color-green-darker)" }}
               >
                 #{entry.rank}

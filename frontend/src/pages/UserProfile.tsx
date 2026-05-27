@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ProfileHeader from "../components/ProfileHeader";
 import ActivityHeatmap from "../components/ActivityHeatmap";
 import PointsCard from "../components/PointsCard";
@@ -54,7 +54,11 @@ const UserProfile = () => {
       {/* Dold rubrik för skärmläsare */}
       <h1 className="sr-only">{user?.username ?? "Profile"}</h1>
       <div className="pb-32">
-        <ProfileHeader username={user?.username} createdAt={user?.createdAt} />
+        <ProfileHeader
+          username={user?.username}
+          createdAt={user?.createdAt}
+          profileImageUrl={user?.profileImageUrl}
+        />
         <PointsCard
           totalPoints={display.points}
           weeklyPoints={display.weeklyPoints}
@@ -113,7 +117,7 @@ const UserProfile = () => {
         <MilestoneCard currentPoints={display.points} />
 
         {/* About, privacy and edit profile in settings */}
-        <SettingsButton />
+        <SettingsButton onEditProfileClick={() => navigate("/profile/settings")} />
         <Button
           variant="primary"
           fullWidth
