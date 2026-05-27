@@ -8,3 +8,5 @@ data:
   S3_URL: https://group-2-chas-challenge-2026.hel1.your-objectstorage.com
   S3_BUCKET: group-2-chas-challenge-2026
   S3_REGION: garage
+  APP_URL: https://main-litter-hero.cc.k3s.chas-lab.dev/
+  EMAIL_FROM: noreply@litterhero.online
