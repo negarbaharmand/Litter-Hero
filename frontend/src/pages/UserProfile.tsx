@@ -1,37 +1,39 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import ProfileHeader from '../components/ProfileHeader'
-import ActivityHeatmap from '../components/ActivityHeatmap'
-import PointsCard from '../components/PointsCard'
-import BadgeList from '../components/BadgeList'
-import SettingsButton from '../components/SettingsButton'
-import { PageShell } from '../components/PageShell'
-import { Button } from '../components/ui'
-import { logoutUser } from '../api'
-import { useAuth } from '../hooks/useAuth'
+import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import ProfileHeader from "../components/ProfileHeader";
+import ActivityHeatmap from "../components/ActivityHeatmap";
+import PointsCard from "../components/PointsCard";
+import BadgeList from "../components/BadgeList";
+import SettingsButton from "../components/SettingsButton";
+import { PageShell } from "../components/PageShell";
+import { Button } from "../components/ui";
+import { logoutUser } from "../api";
+import { useAuth } from "../hooks/useAuth";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 const UserProfile = () => {
-  const navigate = useNavigate()
-  const { authState, clearAuth, refreshUser } = useAuth()
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const navigate = useNavigate();
+  const { authState, clearAuth, refreshUser } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const user = authState.status === 'authenticated' ? authState.user : null
+  const user = authState.status === "authenticated" ? authState.user : null;
+  useDocumentTitle(user?.username ?? "Profile");
 
   useEffect(() => {
-    refreshUser()
-  }, [refreshUser])
+    refreshUser();
+  }, [refreshUser]);
 
   async function handleLogout() {
-    setIsLoggingOut(true)
+    setIsLoggingOut(true);
     try {
-      await logoutUser()
+      await logoutUser();
     } finally {
-      clearAuth()
-      navigate('/login')
+      clearAuth();
+      navigate("/login");
     }
   }
 
-  if (!user) return null
+  if (!user) return null;
 
   const display = {
     points: user?.points ?? 0,
@@ -40,11 +42,16 @@ const UserProfile = () => {
     cleanupsApproved: user?.cleanupsApproved ?? 0,
     verificationVotes: user?.verificationVotes ?? 0,
     badges: user?.badges ?? [],
-  }
+  };
 
   return (
     <PageShell>
-      <ProfileHeader username={user?.username} level={12} createdAt={user?.createdAt} />
+      <h1 className="sr-only">{user?.username ?? "Profile"}</h1>
+      <ProfileHeader
+        username={user?.username}
+        level={12}
+        createdAt={user?.createdAt}
+      />
       <PointsCard
         totalPoints={display.points}
         weeklyPoints={display.weeklyPoints}
@@ -60,40 +67,56 @@ const UserProfile = () => {
         <h3 className="mb-3!">Verification activity</h3>
         <div className="card flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--color-page-bg)' }}>
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+              style={{ backgroundColor: "var(--color-page-bg)" }}
+            >
               <span className="text-xl">🗳️</span>
             </div>
             <div>
-              <p className="font-bold text-lg" style={{ color: 'var(--color-text-primary)' }}>
+              <p
+                className="font-bold text-lg"
+                style={{ color: "var(--color-text-primary)" }}
+              >
                 {display.verificationVotes}
               </p>
-              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>votes cast</p>
+              <p
+                className="text-sm"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                votes cast
+              </p>
             </div>
           </div>
           <Link
             to="/reports?tab=vote-queue"
             className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors my-1 mx-1"
-            style={{ backgroundColor: 'var(--color-green-normal)', color: '#ffffff' }}
+            style={{
+              backgroundColor: "var(--color-green-darker)",
+              color: "white",
+            }}
           >
             Help verify
           </Link>
         </div>
       </div>
 
-      <BadgeList badges={[
-        { id: 0, label: "🔥|3 day streak" }, // TODO: implement streak logic
-        ...display.badges.map((label: string, index: number) => ({
-          id: index + 1,
-          label
-        }))
-      ]} />
+      <BadgeList
+        badges={[
+          { id: 0, label: "🔥|3 day streak" }, // TODO: implement streak logic
+          ...display.badges.map((label: string, index: number) => ({
+            id: index + 1,
+            label,
+          })),
+        ]}
+      />
       <div className="mx-4 mt-6 mb-8 flex flex-col gap-3">
-        <SettingsButton onClick={() => console.log('Settings clicked')} />
+        <SettingsButton onClick={() => console.log("Settings clicked")} />
         <Button
           variant="secondary"
           fullWidth
           className="text-left"
-          onClick={() => navigate('/about')}
+          onClick={() => navigate("/about")}
         >
           About us
         </Button>
@@ -103,11 +126,11 @@ const UserProfile = () => {
           disabled={isLoggingOut}
           onClick={handleLogout}
         >
-          {isLoggingOut ? 'Logging out...' : 'Log out'}
+          {isLoggingOut ? "Logging out..." : "Log out"}
         </Button>
       </div>
     </PageShell>
-  )
-}
+  );
+};
 
-export default UserProfile
+export default UserProfile;
