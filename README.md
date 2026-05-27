@@ -4,7 +4,7 @@
 
 # Litter Hero
 
-**Grupp 2 · [CHAS Challenge 2026](https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2)**
+[CHAS Challenge 2026](https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2)\*\*
 
 Litter Hero is a community-driven web application for reporting litter and verifying cleanups. Users photograph trash, pin it on a map, and earn points for reporting and cleaning up. Cleanup proof is validated through **community voting**.
 
@@ -12,14 +12,14 @@ Litter Hero is a community-driven web application for reporting litter and verif
 
 ## Links
 
-| Resource | URL |
-|----------|-----|
-| **GitLab repository** | [git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2](https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2) |
-| **Live web app** | [main-litter-hero.cc.k3s.chas-lab.dev](https://main-litter-hero.cc.k3s.chas-lab.dev/) |
-| **Website login** | BasicAuth |
-| **Backend API** | [api-main-litter-hero.cc.k3s.chas-lab.dev](https://api-main-litter-hero.cc.k3s.chas-lab.dev/) |
-| **Swagger UI** | [api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs](https://api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs) |
-| **Demo video (repo file)** | [`demo/litter-hero-demo.mp4`](./demo/litter-hero-demo.mp4) |
+| Resource                   | URL                                                                                                                  |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **GitLab repository**      | [git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2](https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2) |
+| **Live web app**           | [main-litter-hero.cc.k3s.chas-lab.dev](https://main-litter-hero.cc.k3s.chas-lab.dev/)                                |
+| **Website login**          | BasicAuth                                                                                                            |
+| **Backend API**            | [api-main-litter-hero.cc.k3s.chas-lab.dev](https://api-main-litter-hero.cc.k3s.chas-lab.dev/)                        |
+| **Swagger UI**             | [api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs](https://api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs)       |
+| **Demo video (repo file)** | [`demo/litter-hero-demo.mp4`](./demo/litter-hero-demo.mp4)                                                           |
 
 ---
 
@@ -33,12 +33,12 @@ Most environmental apps reward you for saying you did something. LitterHero only
 
 **CHAS Challenge 2026 theme:** _Tech for Good_
 
-| How we address the theme | What it means in practice |
-|--------------------------|---------------------------|
-| **Environmental impact** | Makes litter visible on a map and tracks it from report to verified cleanup |
-| **Community empowerment** | Peer voting verifies cleanups without top-down moderation |
-| **Accessibility of action** | Mobile-first UI, camera capture, automatic location, and low friction reporting |
-| **Transparency** | Open lifecycle states, vote outcomes, and points linked to verified actions |
+| How we address the theme    | What it means in practice                                                         |
+| --------------------------- | --------------------------------------------------------------------------------- |
+| **Environmental impact**    | Makes litter visible on a map and tracks it from report to verified cleanup       |
+| **Community empowerment**   | Peer voting verifies cleanups without top-down moderation                         |
+| **Accessibility of action** | Mobile-first UI, camera capture, automatic location, and low friction reporting   |
+| **Transparency**            | Open lifecycle states, vote outcomes, and points linked to verified actions       |
 | **Sustainable engineering** | Cloud-native deployment on CHAS infrastructure with reproducible DevOps workflows |
 
 ---
@@ -85,21 +85,21 @@ Most environmental apps reward you for saying you did something. LitterHero only
 
 Users submit after-photos as cleanup proof. Submissions enter community voting:
 
-| Rule | Detail |
-|------|--------|
-| Vote threshold | 3 votes per submission |
-| Outcome | Majority **clean** approves cleanup; otherwise rejected |
-| Restrictions | Reporter and submitter cannot vote on their own submission |
-| Report lifecycle | `open` -> `cleanup_pending_vote` -> `cleaned` |
+| Rule             | Detail                                                     |
+| ---------------- | ---------------------------------------------------------- |
+| Vote threshold   | 3 votes per submission                                     |
+| Outcome          | Majority **clean** approves cleanup; otherwise rejected    |
+| Restrictions     | Reporter and submitter cannot vote on their own submission |
+| Report lifecycle | `open` -> `cleanup_pending_vote` -> `cleaned`              |
 
 Approved submissions mark reports as cleaned, expire competing pending submissions, and award points.
 
 ### Points and gamification
 
-| Action | Small | Medium | Large |
-|--------|------:|-------:|------:|
-| Report litter | +10 | +15 | +20 |
-| Approved cleanup | +20 | +30 | +40 |
+| Action           | Small | Medium | Large |
+| ---------------- | ----: | -----: | ----: |
+| Report litter    |   +10 |    +15 |   +20 |
+| Approved cleanup |   +20 |    +30 |   +40 |
 
 - Leaderboard with time-period filters.
 - Profile stats for activity, points, reports, cleanups, and votes.
@@ -116,17 +116,17 @@ Approved submissions mark reports as cleaned, expire competing pending submissio
 
 ## Tech stack
 
-| Layer | Technologies |
-|-------|-------------|
-| **Frontend** | React 19, TypeScript, Vite, React Router, TanStack Query, Tailwind CSS, Leaflet |
-| **Backend** | Node.js, Express 5, TypeScript, Zod |
-| **Database** | PostgreSQL + PostGIS, Drizzle ORM, Drizzle Kit |
-| **Storage** | Garage (S3-compatible) |
-| **Auth** | JWT, bcrypt, Google OAuth |
-| **API docs** | Swagger UI at `/api-docs` |
-| **Observability** | Prometheus metrics (`express-prom-bundle`), ServiceMonitor, PrometheusRule, Grafana dashboard |
-| **Infrastructure** | Docker, Kubernetes (k3s), Traefik, GitLab CI/CD |
-| **Security** | Trivy image scanning in CI |
+| Layer              | Technologies                                                                                  |
+| ------------------ | --------------------------------------------------------------------------------------------- |
+| **Frontend**       | React 19, TypeScript, Vite, React Router, TanStack Query, Tailwind CSS, Leaflet               |
+| **Backend**        | Node.js, Express 5, TypeScript, Zod                                                           |
+| **Database**       | PostgreSQL + PostGIS, Drizzle ORM, Drizzle Kit                                                |
+| **Storage**        | Garage (S3-compatible)                                                                        |
+| **Auth**           | JWT, bcrypt, Google OAuth                                                                     |
+| **API docs**       | Swagger UI at `/api-docs`                                                                     |
+| **Observability**  | Prometheus metrics (`express-prom-bundle`), ServiceMonitor, PrometheusRule, Grafana dashboard |
+| **Infrastructure** | Docker, Kubernetes (k3s), Traefik, GitLab CI/CD                                               |
+| **Security**       | Trivy image scanning in CI                                                                    |
 
 ---
 
@@ -159,12 +159,12 @@ Approved submissions mark reports as cleaned, expire competing pending submissio
 
 Defined in [`.gitlab-ci.yml`](./.gitlab-ci.yml):
 
-| Stage | What it does |
-|-------|--------------|
-| **Build** | Builds frontend/backend/deploy images and pushes to GitLab Container Registry |
-| **Scan** | Runs Trivy checks for HIGH/CRITICAL vulnerabilities and stores reports as artifacts |
-| **Deploy** | Deploys to CHAS k3s (review apps for branches, production for `main`) |
-| **Cleanup** | Manual cleanup for review environments |
+| Stage       | What it does                                                                        |
+| ----------- | ----------------------------------------------------------------------------------- |
+| **Build**   | Builds frontend/backend/deploy images and pushes to GitLab Container Registry       |
+| **Scan**    | Runs Trivy checks for HIGH/CRITICAL vulnerabilities and stores reports as artifacts |
+| **Deploy**  | Deploys to CHAS k3s (review apps for branches, production for `main`)               |
+| **Cleanup** | Manual cleanup for review environments                                              |
 
 ### Kubernetes
 
@@ -192,12 +192,12 @@ docker compose -f docker-compose.local.yml up -d --build
 docker compose logs -f
 ```
 
-| Service | URL |
-|---------|-----|
-| Frontend | http://localhost:5173 |
-| Backend API | http://localhost:3000 |
-| Swagger docs | http://localhost:3000/api-docs |
-| Drizzle Studio | http://localhost:4983 |
+| Service        | URL                            |
+| -------------- | ------------------------------ |
+| Frontend       | http://localhost:5173          |
+| Backend API    | http://localhost:3000          |
+| Swagger docs   | http://localhost:3000/api-docs |
+| Drizzle Studio | http://localhost:4983          |
 
 ### Run without Docker
 
@@ -220,12 +220,12 @@ Swagger UI:
 - Production: [https://api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs](https://api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs)
 - Local: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
 
-| Group | Base path | Description |
-|-------|-----------|-------------|
-| Auth | `/api/auth` | Register, login, Google OAuth |
-| Users | `/api/users` | Profile and leaderboard |
+| Group   | Base path      | Description                         |
+| ------- | -------------- | ----------------------------------- |
+| Auth    | `/api/auth`    | Register, login, Google OAuth       |
+| Users   | `/api/users`   | Profile and leaderboard             |
 | Reports | `/api/reports` | Reports, cleanup submissions, votes |
-| Upload | `/api/upload` | Image upload to Garage |
+| Upload  | `/api/upload`  | Image upload to Garage              |
 
 ---
 
