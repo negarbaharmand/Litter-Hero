@@ -30,7 +30,7 @@ function formatSubmissionStatus(status: CleanupSubmissionWithVotes['status']) {
 
 export function CleanupSubmissionCard({
   reportId,
-  reportOwnerUserId: _reportOwnerUserId,
+  reportOwnerUserId,
   submission,
   requireAuth,
 }: CleanupSubmissionCardProps) {
@@ -45,11 +45,13 @@ export function CleanupSubmissionCard({
   const cannotVoteReason =
     submission.status !== 'pending'
       ? 'This submission is already resolved.'
-      : currentUserId === submission.userId
-        ? 'You cannot vote on your own cleanup submission.'
-        : submission.voteSummary.myVote
-          ? 'You already voted on this submission.'
-          : null;
+      : currentUserId === reportOwnerUserId
+        ? 'You cannot vote on your own report.'
+        : currentUserId === submission.userId
+          ? 'You cannot vote on your own cleanup submission.'
+          : submission.voteSummary.myVote
+            ? 'You already voted on this submission.'
+            : null;
 
   const voteMutation = useMutation({
     mutationFn: (vote: 'clean' | 'not_clean') =>
@@ -135,7 +137,7 @@ export function CleanupSubmissionCard({
       )}
 
       {submission.status === 'pending' && !cannotVoteReason && (
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3 flex flex-wrap gap-2" role="region" aria-label="Submission voting">
           <button
             type="button"
             onClick={() => handleVote('clean')}

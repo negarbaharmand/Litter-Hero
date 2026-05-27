@@ -176,7 +176,7 @@ export const fetchUsers = async (
 };
 
 export const fetchLeaderboard = async (timePeriod: 'allTime' | 'monthly' | 'weekly'): Promise<LeaderboardData> => {
-  const response = await fetch(`${API_BASE_URL}/api/users/leaderboard`, {
+  const response = await fetch(`${API_BASE_URL}/api/users/leaderboard?limit=100`, {
     headers: { ...authHeaders() },
   });
   if (!response.ok) {
@@ -255,11 +255,20 @@ export type MeUser = AuthUser & {
   cleanupsApproved: number
   reportVerificationVotes: number
   verificationVotes: number
+  rank: number
 }
 
 export type AuthResponse = {
   token: string
   user: AuthUser
+}
+
+export type RegisterResponse = {
+  message: string
+}
+
+export type MessageResponse = {
+  message: string
 }
 
 export const loginUser = async (email: string, password: string): Promise<AuthResponse> => {
@@ -280,7 +289,7 @@ export const registerUser = async (
   password: string,
   username?: string,
   name?: string
-): Promise<AuthResponse> => {
+): Promise<RegisterResponse> => {
   const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -289,6 +298,32 @@ export const registerUser = async (
   const data = await response.json()
   if (!response.ok) {
     throw new Error(data.error ?? 'Registration failed')
+  }
+  return data
+}
+
+export const verifyEmail = async (email: string, token: string): Promise<MessageResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/verify-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, token }),
+  })
+  const data = await response.json()
+  if (!response.ok) {
+    throw new Error(data.error ?? 'Email verification failed')
+  }
+  return data
+}
+
+export const resendVerification = async (email: string): Promise<MessageResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/resend-verification`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  })
+  const data = await response.json()
+  if (!response.ok) {
+    throw new Error(data.error ?? 'Could not resend verification email')
   }
   return data
 }

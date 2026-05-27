@@ -1,32 +1,36 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap");
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ── Root & theme tokens ──────────────────────────────────────── */
 :root {
-  font-family: 'Noto Sans', system-ui, sans-serif;
+  font-family: "Noto Sans", system-ui, sans-serif;
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color-scheme: light dark;
 
-  --color-page-bg:        #eefcf3;
-  --color-surface:        #ffffff;
-  --color-text-primary:   #1d4e2f;
-  --color-text-body:      #363636;
-  --color-text-muted:     #717171;
-  --color-border:         #d2d2d2;
-  --color-green-normal:   #53e086;
-  --color-green-dark:     #3ea865;
-  --color-danger:         #ef4444;
-  --nav-gradient:         linear-gradient(180deg, #1a5c35 53%, #37c270 100%);
-  --nav-camera-bg:        #3ea865;
-  --nav-active:           #53e086;
+  --color-page-bg: #eefcf3;
+  --color-surface: #ffffff;
+  --color-text-primary: #1d4e2f;
+  --color-text-body: #363636;
+  --color-text-muted: #717171;
+  --color-border: #d2d2d2;
+  --color-green-normal: #53e086;
+  --color-grey-light: #696969;
+  --color-grey-normal: #363636;
+  --color-green-dark: #3ea865;
+  --color-green-darker: #006045;
+
+  --color-danger: #ef4444;
+  --nav-gradient: linear-gradient(180deg, #1a5c35 53%, #37c270 100%);
+  --nav-camera-bg: #3ea865;
+  --nav-active: #13281b;
 
   --radius-card: 20px;
-  --radius-btn:  12px;
+  --radius-btn: 12px;
   --shadow-card: 0px 4px 4px 0px rgba(0, 0, 0, 0.15);
 
   --color-activity-0: #d8f5e3;
@@ -41,16 +45,16 @@
 
 /* ── Dark mode overrides ──────────────────────────────────────── */
 html[data-theme="dark"] {
-  --color-page-bg:      #191919;
-  --color-surface:      #1f1f1f;
+  --color-page-bg: #191919;
+  --color-surface: #1f1f1f;
   --color-text-primary: #53e086;
-  --color-text-body:    #d2d2d2;
-  --color-text-muted:   #9b9b9b;
-  --color-border:       #363636;
+  --color-text-body: #d2d2d2;
+  --color-text-muted: #9b9b9b;
+  --color-border: #363636;
 
-  --nav-gradient:       linear-gradient(180deg, #222222 0%, #9b9b9b 100%);
-  --nav-camera-bg:      #ffffff;
-  --nav-active:         #14f000;
+  --nav-gradient: linear-gradient(180deg, #222222 0%, #9b9b9b 100%);
+  --nav-camera-bg: var(--color-grey-light);
+  --nav-active: #14f000;
 
   --color-activity-0: #2a2a2a;
   --color-activity-1: #1d4e2f;
@@ -63,7 +67,9 @@ html[data-theme="dark"] {
 }
 
 /* ── Base resets ──────────────────────────────────────────────── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -129,7 +135,7 @@ p {
   justify-content: center;
   gap: 8px;
   background-color: var(--color-green-normal);
-  color: #ffffff;
+  color: var(--color-grey-normal);
   font-family: inherit;
   font-size: 16px;
   font-weight: 600;
@@ -139,8 +145,12 @@ p {
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
-.btn-primary:hover  { background-color: #4bca79; }
-.btn-primary:active { background-color: #42b36b; }
+.btn-primary:hover {
+  background-color: #4bca79;
+}
+.btn-primary:active {
+  background-color: #42b36b;
+}
 .btn-primary:disabled {
   background-color: var(--color-border);
   color: var(--color-text-muted);
@@ -154,17 +164,19 @@ p {
   justify-content: center;
   gap: 8px;
   background-color: transparent;
-  color: var(--color-green-dark);
+  color: var(--color-text-primary);
   font-family: inherit;
   font-size: 16px;
   font-weight: 600;
-  border: 2px solid var(--color-green-dark);
+  border: 2px solid var(--color-text-primary);
   border-radius: var(--radius-btn);
   padding: 12px 24px;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
-.btn-secondary:hover  {
+.btn-secondary:hover {
   background-color: var(--color-page-bg);
 }
 .btn-secondary:active {
@@ -187,7 +199,9 @@ p {
   border-radius: var(--radius-btn);
   padding: 14px 16px;
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 .input::placeholder {
   color: var(--color-text-muted);
@@ -223,6 +237,30 @@ p {
   max-width: 640px;
   margin: 0 auto;
   padding: 0 16px;
+}
+
+/* Skip-to-content link (visually hidden until focused) */
+.skip-link {
+  position: fixed;
+  top: -100%;
+  left: 8px;
+  z-index: 9999;
+  padding: 8px 16px;
+  background: white;
+  color: black;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: top 0.1s ease;
+}
+.skip-link:focus {
+  top: 8px;
+}
+
+/* Remove focus ring from <main> when programmatically focused */
+#main-content:focus {
+  outline: none;
 }
 
 /* Field error text */
@@ -280,10 +318,18 @@ p {
   border-radius: 3px;
 }
 
-.activity-heatmap__cell--0 { background-color: var(--color-activity-0); }
-.activity-heatmap__cell--1 { background-color: var(--color-activity-1); }
-.activity-heatmap__cell--2 { background-color: var(--color-activity-2); }
-.activity-heatmap__cell--3 { background-color: var(--color-activity-3); }
+.activity-heatmap__cell--0 {
+  background-color: var(--color-activity-0);
+}
+.activity-heatmap__cell--1 {
+  background-color: var(--color-activity-1);
+}
+.activity-heatmap__cell--2 {
+  background-color: var(--color-activity-2);
+}
+.activity-heatmap__cell--3 {
+  background-color: var(--color-activity-3);
+}
 
 .login-page__form {
   width: 100%;

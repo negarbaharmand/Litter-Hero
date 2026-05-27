@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { PageShell } from '../components/PageShell'
 
 export function AboutPage() {
+  useDocumentTitle('About')
   const navigate = useNavigate()
 
   const onBack = () => {
@@ -34,16 +36,16 @@ export function AboutPage() {
         </header>
 
         <section className="card">
-          <h2 className="mb-3">Our mission</h2>
+          <h2 className="mb-3!">Our mission</h2>
           <p style={{ color: 'var(--color-text-body)' }}>
             We built Litter Hero because we genuinely care about the environment and want to see it thrive for future generations. The idea is simple: Think of it as Pokemon Go but for litter - when you spot a mess, you report it. That small act goes into a shared map, other people can see it, clean it up, and slowly things actually get better. No shaming, no preaching. Just people looking out for the environment while doing something good.
           </p>
         </section>
 
         <section className="card">
-          <h2 className="mb-3">The impact</h2>
+          <h2 className="mb-3!">The impact</h2>
           <p
-            className="mb-3"
+            className="mb-3!"
             style={{ color: 'var(--color-text-body)' }}
           >
             Every report you submit builds a real picture of where litter
@@ -58,7 +60,7 @@ export function AboutPage() {
         </section>
 
         <section className="card">
-          <h2 className="mb-3">How it came to be</h2>
+          <h2 className="mb-3!">How it came to be</h2>
           <p style={{ color: 'var(--color-text-body)' }}>
             We at Litter Hero genuinely care about the environment and wanted to help people who care about the environment make their efforts more rewarding than just the work itself. 
             
@@ -66,9 +68,9 @@ export function AboutPage() {
         </section>
 
         <section className="card">
-          <h2 className="mb-3">What's next</h2>
+          <h2 className="mb-3!">What's next</h2>
           <p
-            className="mb-3"
+            className="mb-3!"
             style={{ color: 'var(--color-text-body)' }}
           >
             Reporting and cleaning up earns you points. Right now those points lands you a

@@ -27,6 +27,9 @@ services:
       - S3_REGION=${S3_REGION}
       - access_key_S3=${access_key_S3}
       - secret_key_S3=${secret_key_S3}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM=${EMAIL_FROM}
+      - APP_URL=${APP_URL}
     ports:
       - 3000:3000
     volumes:

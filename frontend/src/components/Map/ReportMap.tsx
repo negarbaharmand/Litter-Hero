@@ -42,7 +42,7 @@ export default function ReportMap({
   theme?: 'light' | 'dark';
 }) {
   return (
-    <div className="relative h-full w-full overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden" aria-label="Litter report map" role="application">
       <MapContainer
         center={center}
         zoom={13}
