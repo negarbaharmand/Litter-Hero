@@ -8,7 +8,7 @@ const router = Router();
 // Store uploaded files in memory — the buffer is forwarded directly to Garage
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB max
+  limits: { fileSize: 25 * 1024 * 1024 }, // 25 MB max
   fileFilter(_req, file, cb) {
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
@@ -37,7 +37,7 @@ const upload = multer({
  *               image:
  *                 type: string
  *                 format: binary
- *                 description: Image file (max 10 MB)
+ *                 description: Image file (max 25 MB)
  *     responses:
  *       201:
  *         description: Image uploaded successfully
@@ -68,6 +68,25 @@ const upload = multer({
  *             schema:
  *               $ref: '#/components/schemas/ErrorMessage'
  */
-router.post('/', authenticate, upload.single('image'), uploadImage);
+const uploadSingleImage = upload.single('image');
+
+router.post('/', authenticate, (req, res, next) => {
+  uploadSingleImage(req, res, (error) => {
+    if (!error) return next();
+
+    if (error instanceof multer.MulterError) {
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        return res.status(413).json({ error: 'Image is too large. Max size is 25 MB.' });
+      }
+      return res.status(400).json({ error: `Upload error: ${error.message}` });
+    }
+
+    if (error instanceof Error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    return res.status(400).json({ error: 'Invalid upload request' });
+  });
+}, uploadImage);
 
 export default router;

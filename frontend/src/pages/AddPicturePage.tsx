@@ -219,7 +219,7 @@ export function AddPicturePage() {
         );
         return;
       }
-      refreshUser();
+      await refreshUser();
       setSubmitSuccess(true);
     } catch (err) {
       showPopUp(
@@ -474,15 +474,15 @@ export function AddPicturePage() {
 
           {showSizeInfo && (
             <p
-              className="text-xs mb-2 rounded-xl px-3 py-2"
+              className="text-xs mb-2! rounded-xl px-3 py-2"
               style={{
                 color: "var(--color-text-muted)",
                 backgroundColor: "var(--color-surface)",
               }}
             >
-              <strong>Small</strong> — a handful of litter &nbsp;·&nbsp;
-              <strong>Medium</strong> — fills a bag &nbsp;·&nbsp;
-              <strong>Large</strong> — requires multiple bags or a vehicle
+              <strong>Small</strong> — a handful of litter · 10 pts &nbsp;·&nbsp;
+              <strong>Medium</strong> — fills a bag · 15 pts &nbsp;·&nbsp;
+              <strong>Large</strong> — requires multiple bags or a vehicle · 20 pts
             </p>
           )}
 
@@ -729,7 +729,7 @@ function SubmitSuccessModal({ onDismiss }: { onDismiss: () => void }) {
           className="text-body-sm mb-6!"
           style={{ color: "var(--color-text-muted)" }}
         >
-          +10 points earned 🎉
+          Points will be awarded after community verification 🌍
         </p>
         <button onClick={onDismiss} className="btn-primary w-full">
           View reports

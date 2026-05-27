@@ -10,10 +10,14 @@ import { LoginPage } from './pages/LoginPage'
 import { AddPicturePage } from './pages/AddPicturePage'
 import { ReportDetailPage } from './pages/ReportDetailPage'
 import { AboutPage } from './pages/AboutPage'
+import { AccountSettingsPage } from './pages/AccountSettingsPage'
 import PrivateRoute from './components/PrivateRoute'
+import { VerifyEmailPage } from './pages/VerifyEmailPage'
+import PrivacyPage from './pages/PrivacyPage'
 
 function App() {
   const location = useLocation()
+  const hideNavOn = new Set(['/login', '/verify-email', '/about'])
 
   useEffect(() => {
     const main = document.querySelector('#main-content')
@@ -25,7 +29,7 @@ function App() {
   return (
     <>
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      {location.pathname !== '/login' && location.pathname !== '/about' && <NavBar />}
+      {!hideNavOn.has(location.pathname) && <NavBar />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
@@ -34,9 +38,12 @@ function App() {
         <Route path="/add-picture" element={<AddPicturePage />} />
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<UserProfile />} />
+          <Route path="/profile/settings" element={<AccountSettingsPage />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

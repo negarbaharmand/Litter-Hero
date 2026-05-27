@@ -11,7 +11,8 @@ envsubst '${CI_COMMIT_REF_SLUG}' <k8s/11-nginx-configmap.yml | kubectl apply -n 
 
 kubectl apply -n "${NAMESPACE}" -f k8s/20-gitlab-secrets.yml \
   -f k8s/21-cc-secrets.yml \
-  -f k8s/22-basic-auth-secret.yml
+  -f k8s/22-basic-auth-secret.yml \
+  -f k8s/23-resend-secret.yml
 
 kubectl apply -n "${NAMESPACE}" -f k8s/30-deploy-database.yml
 kubectl rollout status statefulset database -n "${NAMESPACE}" --timeout=5m
