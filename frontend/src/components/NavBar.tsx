@@ -114,7 +114,7 @@ export function NavBar() {
           <NavLink
             to="/add-picture"
             aria-label="Add Report"
-            className="flex h-18.5 w-18.5 -translate-y-[1px] items-center justify-center rounded-full bg-[var(--nav-camera-bg)] transition-colors"
+            className="relative z-10 flex h-18.5 w-18.5 -translate-y-[1px] items-center justify-center rounded-full bg-[var(--nav-camera-bg)] transition-colors [box-shadow:0_0_0_10px_var(--nav-camera-ring-bg)]"
           >
             <img
               src={cameraIcon}
