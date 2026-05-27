@@ -16,7 +16,10 @@ export function AboutPage() {
 
   return (
     <PageShell>
-      <div className="flex flex-col gap-6 mt-2">
+      <div
+        className="flex flex-col gap-6 mt-2"
+        style={{ fontFamily: '"Noto Sans", system-ui, sans-serif' }}
+      >
         <button
           type="button"
           onClick={onBack}
