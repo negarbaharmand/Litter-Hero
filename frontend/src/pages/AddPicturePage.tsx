@@ -219,7 +219,7 @@ export function AddPicturePage() {
         );
         return;
       }
-      refreshUser();
+      await refreshUser();
       setSubmitSuccess(true);
     } catch (err) {
       showPopUp(
