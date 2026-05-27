@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./frontend/public/Logo.svg" alt="Litter Hero logo" width="120" />
+  <img src="./frontend/public/Logo%20Section_margin.svg" alt="Litter Hero logo" width="140" />
 </p>
 
 # Litter Hero
