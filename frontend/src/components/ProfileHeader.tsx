@@ -54,12 +54,12 @@ const ProfileHeader = ({ username, createdAt, profileImageUrl }: ProfileHeaderPr
       )}
 
       {/* Namn */}
-      <span
+      <h2
         className="font-semibold text-body-xl"
         style={{ color: "var(--color-text-primary)" }}
       >
         {displayName}
-      </span>
+      </h2>
 
       {/* Member since */}
       <span
