@@ -32,6 +32,12 @@ You will see an interactive list of all available endpoints where you can read d
 
 ---
 
+## Accessibility
+
+See [Accessibility.md](./Accessibility.md) for WAI-ARIA usage, contrast work, keyboard support, and Lighthouse audit results for the frontend.
+
+---
+
 ### Adding docs for new endpoints
 
 When you create a new route, you **must** add a `@swagger` JSDoc comment block directly above the route definition in the relevant file inside `backend/src/routes/`.

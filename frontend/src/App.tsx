@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import LeaderboardPage from './pages/LeaderboardPage';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { HomePage } from './pages/HomePage'
@@ -13,8 +14,17 @@ import PrivateRoute from './components/PrivateRoute'
 
 function App() {
   const location = useLocation()
+
+  useEffect(() => {
+    const main = document.querySelector('#main-content')
+    if (main instanceof HTMLElement) {
+      main.focus()
+    }
+  }, [location.pathname])
+
   return (
     <>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       {location.pathname !== '/login' && location.pathname !== '/about' && <NavBar />}
       <Routes>
         <Route path="/" element={<HomePage />} />

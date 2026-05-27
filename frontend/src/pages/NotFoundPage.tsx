@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 export function NotFoundPage() {
+	useDocumentTitle('404 — Page Not Found')
 	return (
 		<main
+			id="main-content"
+			tabIndex={-1}
 			className="flex min-h-screen items-center justify-center px-6 pb-24 lg:pt-[74px] lg:pb-10"
 			style={{ backgroundColor: 'var(--color-page-bg)', color: 'var(--color-text-body)' }}
 		>
