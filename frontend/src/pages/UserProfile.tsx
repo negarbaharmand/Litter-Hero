@@ -92,8 +92,8 @@ const UserProfile = () => {
             to="/reports?tab=vote-queue"
             className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors my-1 mx-1"
             style={{
-              backgroundColor: "var(--color-green-normal)",
-              color: "#363636",
+              backgroundColor: "var(--color-green-darker)",
+              color: "white",
             }}
           >
             Help verify

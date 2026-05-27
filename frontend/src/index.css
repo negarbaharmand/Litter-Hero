@@ -19,12 +19,15 @@
   --color-text-muted: #717171;
   --color-border: #d2d2d2;
   --color-green-normal: #53e086;
+  --color-grey-light: #696969;
   --color-grey-normal: #363636;
   --color-green-dark: #3ea865;
+  --color-green-darker: #006045;
+
   --color-danger: #ef4444;
   --nav-gradient: linear-gradient(180deg, #1a5c35 53%, #37c270 100%);
   --nav-camera-bg: #3ea865;
-  --nav-active: #53e086;
+  --nav-active: #13281b;
 
   --radius-card: 20px;
   --radius-btn: 12px;
@@ -50,7 +53,7 @@ html[data-theme="dark"] {
   --color-border: #363636;
 
   --nav-gradient: linear-gradient(180deg, #222222 0%, #9b9b9b 100%);
-  --nav-camera-bg: #ffffff;
+  --nav-camera-bg: var(--color-grey-light);
   --nav-active: #14f000;
 
   --color-activity-0: #2a2a2a;
@@ -132,7 +135,7 @@ p {
   justify-content: center;
   gap: 8px;
   background-color: var(--color-green-normal);
-  color: #363636;
+  color: var(--color-grey-normal);
   font-family: inherit;
   font-size: 16px;
   font-weight: 600;
@@ -248,7 +251,7 @@ p {
   font-weight: 600;
   font-size: 14px;
   border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   transition: top 0.1s ease;
 }
 .skip-link:focus {

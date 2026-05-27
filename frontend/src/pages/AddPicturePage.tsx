@@ -23,7 +23,7 @@ const SIZES = ["Small", "Medium", "Large"] as const;
 type Size = (typeof SIZES)[number];
 
 export function AddPicturePage() {
-  useDocumentTitle('Add Report')
+  useDocumentTitle("Add Report");
   const navigate = useNavigate();
   const { refreshUser } = useAuth();
   const { gate, dismiss, requireAuth } = useAuthGate();
@@ -290,7 +290,7 @@ export function AddPicturePage() {
                   width="14"
                   height="14"
                   fill="none"
-                  stroke="black"
+                  stroke="var(--color-green-normal)"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                 >
@@ -302,7 +302,7 @@ export function AddPicturePage() {
             <>
               <p
                 className="text-sm text-center pb-5"
-                style={{ color: "var(--color-grey-lighter)" }}
+                style={{ color: "(--color-grey-lighter)" }}
               >
                 Take photo or upload image
               </p>
@@ -320,7 +320,7 @@ export function AddPicturePage() {
                     width="22"
                     height="22"
                     fill="none"
-                    stroke="black"
+                    stroke="var(--color-grey-normal)"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -404,7 +404,7 @@ export function AddPicturePage() {
                   category === cat
                     ? {
                         backgroundColor: "var(--color-green-normal)",
-                        color: "black",
+                        color: "var(--color-grey-normal)",
                         border: "none",
                       }
                     : {
@@ -497,7 +497,7 @@ export function AddPicturePage() {
                   size === s
                     ? {
                         backgroundColor: "var(--color-green-normal)",
-                        color: "black",
+                        color: "var(--color-grey-normal)",
                         border: "none",
                       }
                     : {
@@ -588,7 +588,7 @@ export function AddPicturePage() {
           onClick={handleSubmit}
           disabled={isSubmitting}
           aria-label="Submit report"
-          className="h-18 w-18 -mt-3.5 -translate-y-px rounded-full flex items-center justify-center bg-(--nav-camera-bg) pointer-events-auto disabled:opacity-60 active:scale-95 transition-transform"
+          className="h-18.5 w-18.5 -mt-3.5 -translate-y-px rounded-full flex items-center justify-center bg-(--nav-camera-bg) pointer-events-auto disabled:opacity-60 active:scale-95 transition-transform"
         >
           {isSubmitting ? (
             <svg
@@ -632,7 +632,7 @@ function SubmitSuccessModal({ onDismiss }: { onDismiss: () => void }) {
   useEffect(() => {
     document.body.style.overflow = "hidden";
     const prev = document.activeElement as HTMLElement | null;
-    const focusable = dialogRef.current?.querySelector<HTMLElement>('button');
+    const focusable = dialogRef.current?.querySelector<HTMLElement>("button");
     focusable?.focus();
     return () => {
       document.body.style.overflow = "";
@@ -643,17 +643,18 @@ function SubmitSuccessModal({ onDismiss }: { onDismiss: () => void }) {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onDismiss();
-      if (e.key === 'Tab') {
-        const focusable = dialogRef.current?.querySelectorAll<HTMLElement>('button')
-        if (!focusable || focusable.length === 0) return
-        const first = focusable[0]
-        const last = focusable[focusable.length - 1]
+      if (e.key === "Tab") {
+        const focusable =
+          dialogRef.current?.querySelectorAll<HTMLElement>("button");
+        if (!focusable || focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
         if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault()
-          last.focus()
+          e.preventDefault();
+          last.focus();
         } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault()
-          first.focus()
+          e.preventDefault();
+          first.focus();
         }
       }
     }

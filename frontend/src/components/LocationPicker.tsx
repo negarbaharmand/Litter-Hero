@@ -1,13 +1,23 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
-import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
-import L from 'leaflet'
-import { reverseGeocode, searchPlaces, type PlaceSuggestion } from '../utils/geocoding'
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import {
-	SWEDEN_BOUNDS,
-	SWEDEN_DEFAULT_CENTER,
-	SWEDEN_MIN_ZOOM,
-	clampToSweden,
-} from '../utils/swedenMap'
+  MapContainer,
+  Marker,
+  TileLayer,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
+import L from "leaflet";
+import {
+  reverseGeocode,
+  searchPlaces,
+  type PlaceSuggestion,
+} from "../utils/geocoding";
+import {
+  SWEDEN_BOUNDS,
+  SWEDEN_DEFAULT_CENTER,
+  SWEDEN_MIN_ZOOM,
+  clampToSweden,
+} from "../utils/swedenMap";
 
 function useTheme(): "light" | "dark" {
   const [theme, setTheme] = useState<"light" | "dark">(() =>
@@ -127,32 +137,40 @@ export function LocationPicker({
     return () => document.removeEventListener("mousedown", handlePointerDown);
   }, []);
 
-	const mapCenter: [number, number] =
-		value.latitude !== null && value.longitude !== null
-			? [value.latitude, value.longitude]
-			: SWEDEN_DEFAULT_CENTER
+  const mapCenter: [number, number] =
+    value.latitude !== null && value.longitude !== null
+      ? [value.latitude, value.longitude]
+      : SWEDEN_DEFAULT_CENTER;
 
   const hasMapPin = value.latitude !== null && value.longitude !== null;
 
-	const applyCoordinates = useCallback(
-		async (lat: number, lng: number, label?: string) => {
-			const [clampedLat, clampedLng] = clampToSweden(lat, lng)
-			setIsResolvingMapPoint(true)
-			try {
-				const address = label ?? (await reverseGeocode(clampedLat, clampedLng))
-				onChange({ location: address, latitude: clampedLat, longitude: clampedLng })
-				setQuery(address)
-			} catch {
-				const fallback = `${clampedLat.toFixed(5)}, ${clampedLng.toFixed(5)}`
-				onChange({ location: fallback, latitude: clampedLat, longitude: clampedLng })
-				setQuery(fallback)
-			} finally {
-				setIsResolvingMapPoint(false)
-				setShowSuggestions(false)
-			}
-		},
-		[onChange]
-	)
+  const applyCoordinates = useCallback(
+    async (lat: number, lng: number, label?: string) => {
+      const [clampedLat, clampedLng] = clampToSweden(lat, lng);
+      setIsResolvingMapPoint(true);
+      try {
+        const address = label ?? (await reverseGeocode(clampedLat, clampedLng));
+        onChange({
+          location: address,
+          latitude: clampedLat,
+          longitude: clampedLng,
+        });
+        setQuery(address);
+      } catch {
+        const fallback = `${clampedLat.toFixed(5)}, ${clampedLng.toFixed(5)}`;
+        onChange({
+          location: fallback,
+          latitude: clampedLat,
+          longitude: clampedLng,
+        });
+        setQuery(fallback);
+      } finally {
+        setIsResolvingMapPoint(false);
+        setShowSuggestions(false);
+      }
+    },
+    [onChange],
+  );
 
   function selectSuggestion(suggestion: PlaceSuggestion) {
     void applyCoordinates(suggestion.lat, suggestion.lon, suggestion.label);
@@ -176,27 +194,29 @@ export function LocationPicker({
     void applyCoordinates(lat, lng);
   }
 
-	return (
-		<div ref={containerRef} className="space-y-3">
-			<div className="relative">
-				<input
-					type="text"
-					value={query}
-					onChange={(e) => handleInputChange(e.target.value)}
-					onFocus={() => setShowSuggestions(true)}
-					placeholder="Search for a street or place in Sweden…"
-					role="combobox"
-					aria-expanded={showSuggestions && suggestions.length > 0}
-					aria-controls={listboxId}
-					aria-autocomplete="list"
-					className="w-full rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 min-w-0"
-					style={{
-						backgroundColor: 'var(--color-surface)',
-						color: 'var(--color-text-body)',
-						border: '1px solid var(--color-border)',
-						'--tw-ring-color': '#53E086',
-					} as React.CSSProperties}
-				/>
+  return (
+    <div ref={containerRef} className="space-y-3">
+      <div className="relative">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => handleInputChange(e.target.value)}
+          onFocus={() => setShowSuggestions(true)}
+          placeholder="Search for a street or place in Sweden…"
+          role="combobox"
+          aria-expanded={showSuggestions && suggestions.length > 0}
+          aria-controls={listboxId}
+          aria-autocomplete="list"
+          className="w-full rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 min-w-0"
+          style={
+            {
+              backgroundColor: "var(--color-surface)",
+              color: "var(--color-text-body)",
+              border: "1px solid var(--color-border)",
+              "--tw-ring-color": "#53E086",
+            } as React.CSSProperties
+          }
+        />
 
         {showSuggestions && query.trim().length >= 2 && (
           <ul
@@ -266,8 +286,8 @@ export function LocationPicker({
             disabled={isLocating}
             className="px-3 py-1.5 rounded-lg text-sm font-medium disabled:opacity-60"
             style={{
-              border: "1.5px solid #53E086",
-              color: "#53E086",
+              border: "1.5px solid var(--color-green-normal)",
+              color: "var(--color-text-primary)",
               backgroundColor: "transparent",
             }}
           >
@@ -284,48 +304,58 @@ export function LocationPicker({
         )}
       </div>
 
-			<div className="rounded-2xl overflow-hidden relative isolate z-0" style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
-				<MapContainer
-					center={mapCenter}
-					zoom={hasMapPin ? 16 : 6}
-					minZoom={SWEDEN_MIN_ZOOM}
-					maxBounds={SWEDEN_BOUNDS}
-					maxBoundsViscosity={1}
-					className="h-44 w-full"
-					scrollWheelZoom={false}
-				>
-					<TileLayer
-						attribution={
-							theme === 'dark'
-								? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-								: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-						}
-						url={
-							theme === 'dark'
-								? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-								: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-						}
-					/>
-					<MapRecenter center={mapCenter} />
-					<MapClickHandler onPick={handleMapPick} />
-					{hasMapPin && (
-						<Marker
-							position={mapCenter}
-							icon={PickMarkerIcon}
-							draggable
-							eventHandlers={{
-								dragend: (e) => {
-									const { lat, lng } = e.target.getLatLng()
-									handleMarkerDrag(lat, lng)
-								},
-							}}
-						/>
-					)}
-				</MapContainer>
-				<p className="px-3 py-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
-					Tap the map or drag the pin to set an exact spot. Search above for named places.
-				</p>
-			</div>
-		</div>
-	)
+      <div
+        className="rounded-2xl overflow-hidden relative isolate z-0"
+        style={{
+          border: "1px solid var(--color-border)",
+          backgroundColor: "var(--color-surface)",
+        }}
+      >
+        <MapContainer
+          center={mapCenter}
+          zoom={hasMapPin ? 16 : 6}
+          minZoom={SWEDEN_MIN_ZOOM}
+          maxBounds={SWEDEN_BOUNDS}
+          maxBoundsViscosity={1}
+          className="h-44 w-full"
+          scrollWheelZoom={false}
+        >
+          <TileLayer
+            attribution={
+              theme === "dark"
+                ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }
+            url={
+              theme === "dark"
+                ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            }
+          />
+          <MapRecenter center={mapCenter} />
+          <MapClickHandler onPick={handleMapPick} />
+          {hasMapPin && (
+            <Marker
+              position={mapCenter}
+              icon={PickMarkerIcon}
+              draggable
+              eventHandlers={{
+                dragend: (e) => {
+                  const { lat, lng } = e.target.getLatLng();
+                  handleMarkerDrag(lat, lng);
+                },
+              }}
+            />
+          )}
+        </MapContainer>
+        <p
+          className="px-3 py-2 text-xs"
+          style={{ color: "var(--color-text-muted)" }}
+        >
+          Tap the map or drag the pin to set an exact spot. Search above for
+          named places.
+        </p>
+      </div>
+    </div>
+  );
 }

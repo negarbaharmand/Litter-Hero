@@ -9,7 +9,7 @@ import {
   type ReportStatusFilter,
 } from "../utils/reportStatus";
 
-import { VOTE_THRESHOLD } from '../constants'
+import { VOTE_THRESHOLD } from "../constants";
 
 function isValidFilter(value: string | null): value is ReportStatusFilter {
   return STATUS_FILTER_OPTIONS.some((opt) => opt.value === value);
@@ -55,13 +55,17 @@ export function ReportList() {
     <div className="p-1">
       <div className="flex items-center justify-between gap-4">
         <span
-          className="rounded-full px-3 py-1 text-sm text-gray-950"
-          style={{ backgroundColor: 'var(--color-green-normal)' }}
+          className="rounded-full px-3 py-1 text-sm text-white"
+          style={{ backgroundColor: "var(--color-green-darker)" }}
         >
           {visibleReports.length} reports
         </span>
       </div>
-      <div className="mt-4 flex flex-wrap gap-2" role="region" aria-label="Report status filters">
+      <div
+        className="mt-4 flex flex-wrap gap-2"
+        role="region"
+        aria-label="Report status filters"
+      >
         {STATUS_FILTER_OPTIONS.map((option) => (
           <button
             key={option.value}
@@ -70,8 +74,15 @@ export function ReportList() {
             className="rounded-full px-3 py-1 text-xs font-semibold transition"
             style={
               statusFilter === option.value
-                ? { backgroundColor: 'var(--color-green-dark)', color: '#ffffff' }
-                : { backgroundColor: 'var(--color-surface)', color: 'var(--color-text-body)', border: '1px solid var(--color-border)' }
+                ? {
+                    backgroundColor: "var(--color-green-darker)",
+                    color: "white",
+                  }
+                : {
+                    backgroundColor: "var(--color-surface)",
+                    color: "var(--color-text-body)",
+                    border: "1px solid var(--color-border)",
+                  }
             }
           >
             {option.label}
@@ -122,14 +133,21 @@ export function ReportList() {
                 >
                   {getStatusPresentation(report.status).label}
                 </span>
-                {report.status === 'cleanup_pending_vote' && report.pendingSubmissionsCount > 0 && (
+                {report.status === "cleanup_pending_vote" &&
+                  report.pendingSubmissionsCount > 0 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
+                      <span>
+                        {report.topPendingVoteCount}/{VOTE_THRESHOLD} cleanup
+                        votes
+                      </span>
+                    </span>
+                  )}
+                {report.status === "pending" && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
-                    <span>{report.topPendingVoteCount}/{VOTE_THRESHOLD} cleanup votes</span>
-                  </span>
-                )}
-                {report.status === 'pending' && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400">
-                    <span>{report.reportVerificationVoteCount}/{VOTE_THRESHOLD} verify votes</span>
+                    <span>
+                      {report.reportVerificationVoteCount}/{VOTE_THRESHOLD}{" "}
+                      verify votes
+                    </span>
                   </span>
                 )}
               </div>
@@ -154,7 +172,12 @@ export function ReportList() {
               >
                 Size: {report.size ?? "Unknown"}
               </p>
-              <p className="mt-3 text-sm font-medium" style={{ color: 'var(--color-green-dark)' }}>Open details</p>
+              <p
+                className="mt-3 text-sm font-medium"
+                style={{ color: "var(--color-green-dark)" }}
+              >
+                Open details
+              </p>
             </div>
           </Link>
         ))}

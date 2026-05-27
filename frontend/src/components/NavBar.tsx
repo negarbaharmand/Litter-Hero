@@ -45,7 +45,7 @@ function MobileNavItem({ to, icon, label, end, onClick }: NavItemProps) {
           />
           <span className="text-base leading-[1.2]">{label}</span>
           {isActive && (
-            <div className="absolute bottom-5 w-8 h-0.5 bg-gray-700 rounded-full" />
+            <div className="absolute bottom-5 w-10 h-0.5 bg-(--nav-active) rounded-full" />
           )}
         </>
       )}
@@ -84,8 +84,8 @@ function DesktopNavLink({
 }
 
 export function NavBar() {
-    const navigate = useNavigate();
-    const { authState } = useAuth();
+  const navigate = useNavigate();
+  const { authState } = useAuth();
 
   const onProfileClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -104,22 +104,25 @@ export function NavBar() {
           aria-hidden="true"
           className="absolute inset-0 bg-[image:var(--nav-gradient)] shadow-lg [mask-image:radial-gradient(circle_40px_at_calc(50%_-_0px)_22px,transparent_98%,black_100%)] [-webkit-mask-image:radial-gradient(circle_40px_at_calc(50%_-_0px)_22px,transparent_98%,black_100%)]"
         />
-        <nav aria-label="Main navigation" className="relative mx-auto flex h-full max-w-2xl items-end justify-around px-4 pb-9">
+        <nav
+          aria-label="Main navigation"
+          className="relative mx-auto flex h-full max-w-2xl items-end justify-around px-4 pb-9"
+        >
           <MobileNavItem to="/" icon={mapIcon} label="Map" end />
           <MobileNavItem to="/reports" icon={reportsIcon} label="Reports" />
 
-                    <NavLink
-                        to="/add-picture"
-                        aria-label="Add Report"
-                        className="flex h-18 w-18 -translate-y-[1px] items-center justify-center rounded-full bg-[var(--nav-camera-bg)] transition-colors"
-                    >
-                        <img
-                            src={cameraIcon}
-                            alt=""
-                            aria-hidden="true"
-                            className="h-7 w-7 [filter:brightness(0)_invert(1)] dark:[filter:brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
-                        />
-                    </NavLink>
+          <NavLink
+            to="/add-picture"
+            aria-label="Add Report"
+            className="flex h-18.5 w-18.5 -translate-y-[1px] items-center justify-center rounded-full bg-[var(--nav-camera-bg)] transition-colors"
+          >
+            <img
+              src={cameraIcon}
+              alt=""
+              aria-hidden="true"
+              className="h-7 w-7 [filter:brightness(0)_invert(1)] dark:[filter:brightness(0)_saturate(100%)_invert(78%)_sepia(58%)_saturate(2700%)_hue-rotate(73deg)_brightness(101%)_contrast(101%)]"
+            />
+          </NavLink>
 
           <MobileNavItem to="/leaderboard" icon={ranksIcon} label="Ranks" />
           <MobileNavItem
@@ -131,26 +134,33 @@ export function NavBar() {
         </nav>
       </header>
 
-            {/* Desktop top navbar (md+) */}
-            <header className="sticky top-0 z-30 hidden h-20 border-b border-[var(--color-border)] bg-[var(--color-surface)] md:block">
-                <nav aria-label="Main navigation" className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
-                    <NavLink
-                        to="/"
-                        end
-                        aria-label="Litter Hero — Home"
-                        className="flex h-16 shrink-0 items-center [&_svg]:h-full [&_svg]:w-auto"
-                        dangerouslySetInnerHTML={{ __html: logoRaw }}
-                    />
+      {/* Desktop top navbar (md+) */}
+      <header className="sticky top-0 z-30 hidden h-20 border-b border-[var(--color-border)] bg-[var(--color-surface)] md:block">
+        <nav
+          aria-label="Main navigation"
+          className="mx-auto flex h-full max-w-7xl items-center justify-between px-6"
+        >
+          <NavLink
+            to="/"
+            end
+            aria-label="Litter Hero — Home"
+            className="flex h-16 shrink-0 items-center [&_svg]:h-full [&_svg]:w-auto"
+            dangerouslySetInnerHTML={{ __html: logoRaw }}
+          />
 
-                    <div className="flex items-center gap-8">
-                        <DesktopNavLink to="/" label="Map" end />
-                        <DesktopNavLink to="/reports" label="Reports" />
-                        <DesktopNavLink to="/add-picture" label="Add Report" />
-                        <DesktopNavLink to="/leaderboard" label="Ranks" />
-                        <DesktopNavLink to="/profile" label="Profile" onClick={onProfileClick} />
-                    </div>
-                </nav>
-            </header>
-        </>
-    );
+          <div className="flex items-center gap-8">
+            <DesktopNavLink to="/" label="Map" end />
+            <DesktopNavLink to="/reports" label="Reports" />
+            <DesktopNavLink to="/add-picture" label="Add Report" />
+            <DesktopNavLink to="/leaderboard" label="Ranks" />
+            <DesktopNavLink
+              to="/profile"
+              label="Profile"
+              onClick={onProfileClick}
+            />
+          </div>
+        </nav>
+      </header>
+    </>
+  );
 }

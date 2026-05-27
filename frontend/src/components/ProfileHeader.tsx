@@ -61,7 +61,7 @@ const ProfileHeader = ({ username, level, createdAt }: ProfileHeaderProps) => {
       <span
         className="text-body-sm mt-2 border rounded-full px-3 py-0.5"
         style={{
-          color: "var(--color-text-body)",
+          color: "var(--color-text-primary)",
           borderColor: "var(--color-green-dark)",
         }}
       >
