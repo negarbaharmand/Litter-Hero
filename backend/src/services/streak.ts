@@ -102,9 +102,10 @@ export function buildActivityGrid(
 
 export function getStreakBadges(currentStreak: number, longestStreak: number): string[] {
   const badges: string[] = [];
-  if (currentStreak >= 3) badges.push('🔥|3 Day Streak');
-  if (currentStreak >= 7) badges.push('🔥|7 Day Streak');
-  if (longestStreak >= 30) badges.push('🔥|30 Day Streak');
+  if (longestStreak >= 3) badges.push('3 Day Streak');
+  if (longestStreak >= 7) badges.push('7 Day Streak');
+  if (longestStreak >= 14) badges.push('14 Day Streak');
+  if (longestStreak >= 30) badges.push('30 Day Streak');
   return badges;
 }
 

@@ -1,7 +1,6 @@
-//Det här en komponent för att visa användarens profilheader
+// Det här är en komponent för att visa användarens profilheader
 interface ProfileHeaderProps {
   username: string | null;
-  level: number;
   createdAt?: string;
 }
 
@@ -26,7 +25,7 @@ const formatMemberSince = (dateStr?: string) => {
   return `Member since ${date.toLocaleString("en-US", { month: "short", year: "numeric" })}`;
 };
 
-const ProfileHeader = ({ username, level, createdAt }: ProfileHeaderProps) => {
+const ProfileHeader = ({ username, createdAt }: ProfileHeaderProps) => {
   const displayName = username ?? "User";
   const initial = getInitial(displayName);
   const avatarColor = getAvatarColor(displayName);
@@ -37,6 +36,7 @@ const ProfileHeader = ({ username, level, createdAt }: ProfileHeaderProps) => {
       <div
         className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-3"
         style={{ backgroundColor: avatarColor }}
+        aria-hidden="true"
       >
         {initial}
       </div>
@@ -55,17 +55,6 @@ const ProfileHeader = ({ username, level, createdAt }: ProfileHeaderProps) => {
         style={{ color: "var(--color-text-body)" }}
       >
         {formatMemberSince(createdAt)}
-      </span>
-
-      {/* Level badge */}
-      <span
-        className="text-body-sm mt-2 border rounded-full px-3 py-0.5"
-        style={{
-          color: "var(--color-text-primary)",
-          borderColor: "var(--color-green-dark)",
-        }}
-      >
-        Level {level}
       </span>
     </div>
   );

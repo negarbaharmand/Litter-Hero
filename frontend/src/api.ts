@@ -176,7 +176,7 @@ export const fetchUsers = async (
 };
 
 export const fetchLeaderboard = async (timePeriod: 'allTime' | 'monthly' | 'weekly'): Promise<LeaderboardData> => {
-  const response = await fetch(`${API_BASE_URL}/api/users/leaderboard`, {
+  const response = await fetch(`${API_BASE_URL}/api/users/leaderboard?limit=100`, {
     headers: { ...authHeaders() },
   });
   if (!response.ok) {
@@ -255,6 +255,7 @@ export type MeUser = AuthUser & {
   cleanupsApproved: number
   reportVerificationVotes: number
   verificationVotes: number
+  rank: number
 }
 
 export type AuthResponse = {

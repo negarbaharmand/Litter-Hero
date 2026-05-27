@@ -11,6 +11,7 @@ import { AddPicturePage } from './pages/AddPicturePage'
 import { ReportDetailPage } from './pages/ReportDetailPage'
 import { AboutPage } from './pages/AboutPage'
 import PrivateRoute from './components/PrivateRoute'
+import PrivacyPage from './pages/PrivacyPage'
 
 function App() {
   const location = useLocation()
@@ -37,6 +38,7 @@ function App() {
         </Route>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

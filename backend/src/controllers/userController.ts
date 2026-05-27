@@ -101,26 +101,47 @@ export const getMe = async (req: Request, res: Response) => {
 
     const { password: _, ...userWithoutPassword } = user;
 
+    const userPoints = user.points ?? 0;
     const badges: string[] = [];
     const reportCount = reportsCreatedCount?.count ?? 0;
     const cleanupCount = cleanupsApprovedCount?.count ?? 0;
     const reportVerifyCount = reportVerificationVotesCount?.count ?? 0;
 
+    // Badges
     if (reportCount >= 1) badges.push('First Report');
+    if (reportCount >= 5) badges.push('5 Reports');
+    if (reportCount >= 10) badges.push('10 Reports');
+    if (reportCount >= 50) badges.push('50 Reports');
+
     if (cleanupCount >= 1) badges.push('First Cleanup');
     if (cleanupCount >= 5) badges.push('5 Cleanups');
     if (cleanupCount >= 10) badges.push('10 Cleanups');
     if (cleanupCount >= 50) badges.push('50 Cleanups');
+
     if (reportVerifyCount >= 1) badges.push('First Verify');
     if (reportVerifyCount >= 10) badges.push('10 Verifications');
     if (reportVerifyCount >= 50) badges.push('50 Verifications');
     if (reportVerifyCount >= 100) badges.push('100 Verifications');
+
+    if (userPoints >= 100) badges.push('Litter Spotter');
+    if (userPoints >= 250) badges.push('Street Cleaner');
+    if (userPoints >= 500) badges.push('Eco Warrior');
+    if (userPoints >= 1000) badges.push('Green Hero');
+    if (userPoints >= 2500) badges.push('Beach Hero');
+    if (userPoints >= 5000) badges.push('Planet Guardian');
 
     const { currentStreak, longestStreak, badges: streakBadges, activity } =
       await getStreakStatsForUser(userId);
     badges.push(...streakBadges);
 
     const totalVerificationVotes = (cleanupVotesCount?.count ?? 0) + reportVerifyCount;
+
+    // Rank = number of users with strictly more points + 1
+    const [rankRow] = await db
+      .select({ above: count() })
+      .from(users)
+      .where(sql`${users.points} > ${userPoints}`);
+    const rank = (rankRow?.above ?? 0) + 1;
 
     return res.json({
       ...userWithoutPassword,
@@ -133,6 +154,7 @@ export const getMe = async (req: Request, res: Response) => {
       cleanupsApproved: cleanupCount,
       reportVerificationVotes: reportVerifyCount,
       verificationVotes: totalVerificationVotes,
+      rank,
     });
   } catch (error) {
     console.error('Error fetching me:', error);
@@ -174,14 +196,11 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-
-
-
-
 export const getLeaderboard = async (req: Request, res: Response) => {
   try {
-    const rawLimit = typeof req.query.limit === 'string' ? Number(req.query.limit) : 10;
-    const limit = rawLimit === 20 ? 20 : 10;
+    const rawLimit = typeof req.query.limit === 'string' ? Number(req.query.limit) : 100;
+    // Tillåter upp till 100 användare för att rank ska stämma för alla
+    const limit = Number.isFinite(rawLimit) && rawLimit >= 1 ? Math.min(100, rawLimit) : 100;
 
     const leaderboard = await db
       .select({

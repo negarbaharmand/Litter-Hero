@@ -219,7 +219,7 @@ export function AddPicturePage() {
         );
         return;
       }
-      refreshUser();
+      await refreshUser();
       setSubmitSuccess(true);
     } catch (err) {
       showPopUp(
@@ -729,7 +729,7 @@ function SubmitSuccessModal({ onDismiss }: { onDismiss: () => void }) {
           className="text-body-sm mb-6!"
           style={{ color: "var(--color-text-muted)" }}
         >
-          +10 points earned 🎉
+          Points will be awarded after community verification 🌍
         </p>
         <button onClick={onDismiss} className="btn-primary w-full">
           View reports
