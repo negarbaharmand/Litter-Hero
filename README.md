@@ -1,5 +1,187 @@
 # Litter Hero
 
+Community-driven litter reporting and cleanup verification.
+
+**Grupp 2 · [CHAS Challenge 2026](https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2)**
+
+Inspired by Swedish cleanup initiatives such as [Håll Sverige Rent](https://www.hsr.se/), Litter Hero helps communities report litter, verify reports, submit cleanup proof, and reward real impact.
+
+## Quick links
+
+- Repository: [git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2](https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2)
+- Live app: [https://main-litter-hero.cc.k3s.chas-lab.dev/](https://main-litter-hero.cc.k3s.chas-lab.dev/)
+- Backend API: [https://api-main-litter-hero.cc.k3s.chas-lab.dev/](https://api-main-litter-hero.cc.k3s.chas-lab.dev/)
+- Swagger UI: [https://api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs](https://api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs)
+
+## Demo
+
+- MP4 file: [`demo/litter-hero-demo.mp4`](./demo/litter-hero-demo.mp4)
+
+![Litter Hero demo](./demo/litter-hero-demo.mp4){width=960}
+
+## Monitoring snapshot
+
+![Grafana monitoring overview](./docs/monitoring/grafna-overview.png)
+
+## Why this project matters
+
+- **Environmental impact**: tracks litter from report to verified cleanup.
+- **Community trust**: verification and cleanup decisions are vote-driven.
+- **Low-friction action**: mobile-friendly image + location workflow.
+- **Transparent outcomes**: status changes and points are tied to verifiable events.
+
+## Features
+
+- Create reports with photo, location, size, and description.
+- Explore active reports in map and list views.
+- Vote to verify reports and cleanup submissions.
+- Submit cleanup proof and resolve results through thresholds.
+- Earn points, streaks, badges, and leaderboard progression.
+
+<details>
+<summary>Feature details</summary>
+
+### Report litter
+
+- Upload flow supports Garage (S3-compatible) image storage.
+- Backend quality rules include:
+  - minimum image size checks,
+  - hourly report rate limit,
+  - duplicate detection within nearby radius.
+
+### Explore and verify
+
+- Dedicated report detail page with status and submissions.
+- Community report verification voting (`legit` vs `not_trash`).
+
+### Cleanup proof and voting
+
+- Users submit cleanup proof (after-photo + optional note).
+- Rules include self-vote restrictions and vote thresholds.
+- Approved cleanup updates report status and awards points.
+
+### Gamification and profile
+
+- Size-based points for reports and approved cleanups.
+- Leaderboard and profile statistics.
+- Streaks, activity heatmap, and badges in profile.
+
+</details>
+
+## Getting started
+
+### Prerequisites
+
+- Docker + Docker Compose
+- Copy and complete env files:
+  - `cp .env.example .env`
+  - `cp backend/.env.example backend/.env` (if running backend outside Docker)
+
+### Run full stack locally (recommended)
+
+```bash
+docker compose -f docker-compose.local.yml up -d --build
+docker compose logs -f
+```
+
+Local services:
+
+- Frontend: [http://localhost:5173](http://localhost:5173)
+- Backend API: [http://localhost:3000](http://localhost:3000)
+- Swagger UI: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+- Drizzle Studio: [http://localhost:4983](http://localhost:4983)
+
+### Run without Docker
+
+```bash
+# Backend
+cd backend
+npm install
+cp .env.example .env
+npm run db:migrate
+npm run dev
+
+# Frontend (separate terminal)
+cd frontend
+npm install
+npm run dev
+```
+
+If needed, set `VITE_API_URL=http://localhost:3000` in frontend env.
+
+## Project structure
+
+```text
+grupp-2/
+|- frontend/                  # React SPA
+|- backend/                   # Express API + Drizzle schema/migrations
+|- k8s/                       # Kubernetes manifests
+|- scripts/                   # deploy/cleanup scripts
+|- docker-compose.local.yml   # local full-stack development
+|- .gitlab-ci.yml             # CI/CD pipeline
+|- Accessibility.md           # accessibility audit notes
+|- CLEANUP_FLOW_SUMMARY.md    # cleanup workflow documentation
+```
+
+## Technical details
+
+### Tech stack
+
+- **Frontend**: React 19, TypeScript, Vite, React Router, TanStack Query, Tailwind CSS, Leaflet
+- **Backend**: Node.js, Express 5, TypeScript, Zod
+- **Database**: PostgreSQL + PostGIS, Drizzle ORM, Drizzle Kit
+- **Storage**: Garage (S3-compatible)
+- **Auth**: JWT, bcrypt, Google OAuth
+- **Monitoring**: `express-prom-bundle`, ServiceMonitor, PrometheusRule, Grafana dashboard config
+- **Infra**: Docker, Kubernetes manifests, Traefik ingress, GitLab CI/CD
+- **Security scanning**: Trivy container image scans in CI
+- **Email**: Resend API
+
+### Architecture
+
+```text
+Browser (React SPA)
+  -> Frontend (Vite/Nginx in production)
+    -> /api/* -> Backend (Express API)
+      -> PostgreSQL/PostGIS
+      -> Garage (S3-compatible object storage)
+      -> /metrics -> Prometheus/Grafana stack
+```
+
+### DevOps and infrastructure
+
+- CI/CD pipeline in [`.gitlab-ci.yml`](./.gitlab-ci.yml) with build, scan, deploy, and cleanup stages.
+- Docker image builds for frontend/backend and deploy utility image.
+- Kubernetes manifests in [`k8s/`](./k8s/) for app, DB, ingress, migration job, and monitoring.
+- Deployment scripts in [`scripts/`](./scripts/) for deploy and cleanup.
+
+### API documentation
+
+Use whichever environment you are testing:
+
+- Production: [https://api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs](https://api-main-litter-hero.cc.k3s.chas-lab.dev/api-docs)
+- Local: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+
+Main endpoint groups:
+
+- `/api/auth`
+- `/api/users`
+- `/api/reports`
+- `/api/upload`
+
+### Accessibility and performance
+
+- Accessibility audit and Lighthouse results: [Accessibility.md](./Accessibility.md)
+- Backend runtime metrics exposed at `/metrics`.
+- Observability in Kubernetes via ServiceMonitor, PrometheusRule, and Grafana dashboard config.
+
+## Team
+
+**Grupp 2 · CHAS Challenge 2026**
+
+Contributors are visible in the repository commit history.
+# Litter Hero
+
 **Grupp 2 · [CHAS Challenge 2026](https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2)**
 
 Litter Hero is a community-driven web app for reporting street litter and verifying cleanups. Users photograph trash, pin it on a map, and help close the loop through community voting. The app combines civic action with points, badges, and leaderboards to make environmental care collaborative and rewarding.
