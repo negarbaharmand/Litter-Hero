@@ -87,7 +87,6 @@ export function LocationPicker({
 }: LocationPickerProps) {
   const theme = useTheme();
   const listboxId = useId();
-  const [query, setQuery] = useState(value.location);
   const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -95,22 +94,17 @@ export function LocationPicker({
   const [searchError, setSearchError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setQuery(value.location);
-  }, [value.location]);
+  const canSearch = showSuggestions && value.location.trim().length >= 2;
 
   useEffect(() => {
-    if (!showSuggestions || query.trim().length < 2) {
-      setSuggestions([]);
-      return;
-    }
+    if (!canSearch) return;
 
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       setIsSearching(true);
       setSearchError(null);
       try {
-        const results = await searchPlaces(query, controller.signal);
+        const results = await searchPlaces(value.location, controller.signal);
         setSuggestions(results);
       } catch {
         if (controller.signal.aborted) return;
@@ -125,7 +119,7 @@ export function LocationPicker({
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [query, showSuggestions]);
+  }, [value.location, canSearch]);
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
@@ -155,7 +149,6 @@ export function LocationPicker({
           latitude: clampedLat,
           longitude: clampedLng,
         });
-        setQuery(address);
       } catch {
         const fallback = `${clampedLat.toFixed(5)}, ${clampedLng.toFixed(5)}`;
         onChange({
@@ -163,7 +156,6 @@ export function LocationPicker({
           latitude: clampedLat,
           longitude: clampedLng,
         });
-        setQuery(fallback);
       } finally {
         setIsResolvingMapPoint(false);
         setShowSuggestions(false);
@@ -177,7 +169,6 @@ export function LocationPicker({
   }
 
   function handleInputChange(next: string) {
-    setQuery(next);
     setShowSuggestions(true);
     onChange({
       location: next,
@@ -199,12 +190,12 @@ export function LocationPicker({
       <div className="relative">
         <input
           type="text"
-          value={query}
+          value={value.location}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => setShowSuggestions(true)}
           placeholder="Search for a street or place in Sweden…"
           role="combobox"
-          aria-expanded={showSuggestions && suggestions.length > 0}
+          aria-expanded={canSearch && suggestions.length > 0}
           aria-controls={listboxId}
           aria-autocomplete="list"
           className="w-full rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 min-w-0"
@@ -218,7 +209,7 @@ export function LocationPicker({
           }
         />
 
-        {showSuggestions && query.trim().length >= 2 && (
+        {canSearch && (
           <ul
             id={listboxId}
             role="listbox"

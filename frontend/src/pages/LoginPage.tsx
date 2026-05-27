@@ -147,7 +147,7 @@ export function LoginPage() {
                           onChange={(e) => field.handleChange(e.target.value)}
                           onBlur={field.handleBlur}
                           placeholder="Your name"
-                          className={`input ${field.state.meta.errors[0] ? "input--error" : " py-44 px-44"}`}
+                          className={`input ${field.state.meta.errors[0] ? "input--error" : ""}`}
                         />
                         {field.state.meta.errors[0] && (
                           <p className="field-error">
