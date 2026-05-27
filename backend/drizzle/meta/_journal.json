@@ -61,12 +61,19 @@
     {
       "idx": 8,
       "version": "7",
+      "when": 1779702310284,
+      "tag": "0008_slim_blue_marvel",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
       "when": 1779900000000,
       "tag": "0008_fix_status_default",
       "breakpoints": true
     },
     {
-      "idx": 9,
+      "idx": 10,
       "version": "7",
       "when": 1748167800000,
       "tag": "0009_report_verification_votes",

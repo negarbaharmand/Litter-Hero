@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { db } from '../db/index.js';
 import { cleanupSubmissions, cleanupSubmissionVotes, reportVerificationVotes, reports, users } from '../db/schema.js';
 import { publicUserColumns } from '../db/userPublicColumns.js';
-import { count, desc, eq, gte, and, sql } from 'drizzle-orm';
+import { count, desc, eq, gte, and, sql, isNotNull } from 'drizzle-orm';
 import { calculateWeeklyPoints } from './reportWorkflow.js';
 import { getStreakStatsForUser } from '../services/streak.js';
 
@@ -223,6 +223,7 @@ export const getLeaderboard = async (req: Request, res: Response) => {
         )`,
       })
       .from(users)
+      .where(and(isNotNull(users.emailVerifiedAt), isNotNull(users.username)))
       .orderBy(desc(users.points))
       .limit(limit);
 
