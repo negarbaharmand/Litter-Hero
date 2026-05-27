@@ -61,13 +61,10 @@ Most environmental apps reward you for saying you did something. LitterHero only
 
 ## Demo video
 
-<video controls preload="metadata" width="960">
-  <source src="https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2/-/raw/main/demo/litter-hero-demo.mp4" type="video/mp4" />
-  Your browser does not support HTML5 video.
-</video>
+![Litter Hero demo](./demo/litter-hero-demo.mp4){width=960}
 
 - File in repo: [`demo/litter-hero-demo.mp4`](./demo/litter-hero-demo.mp4)
-- Direct link: [Watch demo](https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2/-/raw/main/demo/litter-hero-demo.mp4)
+- Direct link: [Watch demo](./demo/litter-hero-demo.mp4)
 
 ---
 
