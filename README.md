@@ -4,7 +4,7 @@
 
 # Litter Hero
 
-[CHAS Challenge 2026](https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2)\*\*
+**Grupp 2 · [CHAS Challenge 2026](https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2)**
 
 Litter Hero is a community-driven web application for reporting litter and verifying cleanups. Users photograph trash, pin it on a map, and earn points for reporting and cleaning up. Cleanup proof is validated through **community voting**.
 
@@ -61,8 +61,13 @@ Most environmental apps reward you for saying you did something. LitterHero only
 
 ## Demo video
 
+<video controls preload="metadata" width="960">
+  <source src="https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2/-/raw/main/demo/litter-hero-demo.mp4" type="video/mp4" />
+  Your browser does not support HTML5 video.
+</video>
+
 - File in repo: [`demo/litter-hero-demo.mp4`](./demo/litter-hero-demo.mp4)
-- Direct link: [Watch demo](./demo/litter-hero-demo.mp4)
+- Direct link: [Watch demo](https://git.chas-lab.dev/chas-challenge-2026/grupp-2/grupp-2/-/raw/main/demo/litter-hero-demo.mp4)
 
 ---
 
