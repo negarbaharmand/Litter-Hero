@@ -117,6 +117,7 @@ export type User = {
   email: string;
   points: number;
   role: string;
+  profileImageUrl: string | null;
   createdAt: string;
 };
 
@@ -202,7 +203,7 @@ export const fetchLeaderboard = async (timePeriod: 'allTime' | 'monthly' | 'week
     email: user.email,
     points: user.points,
     rank: index + 1,
-    profilePictureUrl: null,
+    profilePictureUrl: user.profileImageUrl ?? null,
     reportsSubmitted: user.reportsCreated,
     reportsResolved: user.cleanupsApproved,
     verificationVotes: user.verificationVotes,
@@ -224,6 +225,7 @@ export type AuthUser = {
   name: string | null
   role: string | null
   points: number | null
+  profileImageUrl: string | null
   createdAt: string
 }
 
@@ -246,6 +248,7 @@ export const emptyActivityHeatmap = (): ActivityHeatmapData => ({
 /** Full profile returned by GET /api/users/me */
 export type MeUser = AuthUser & {
   username: string | null
+  hasPassword: boolean
   weeklyPoints: number
   badges: string[]
   currentStreak: number
@@ -256,6 +259,13 @@ export type MeUser = AuthUser & {
   reportVerificationVotes: number
   verificationVotes: number
   rank: number
+}
+
+export type UpdateMyProfilePayload = {
+  username?: string
+  currentPassword?: string
+  newPassword?: string
+  profileImageUrl?: string | null
 }
 
 export type AuthResponse = {
@@ -354,6 +364,22 @@ export const googleSignInWithAccessToken = async (accessToken: string): Promise<
   return data
 }
 
+export const updateMyProfile = async (payload: UpdateMyProfilePayload): Promise<User> => {
+  const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders(),
+    },
+    body: JSON.stringify(payload),
+  })
+  const data = await response.json()
+  if (!response.ok) {
+    throw new Error(data.error ?? 'Failed to update profile')
+  }
+  return data as User
+}
+
 export const logoutUser = async (): Promise<void> => {
   const token = localStorage.getItem('token')
   await fetch(`${API_BASE_URL}/api/auth/logout`, {
@@ -381,9 +407,38 @@ export const uploadReportImage = async (file: File): Promise<{imageUrl: string; 
     body: formData,
   });
 
-  const data = await response.json();
+  const contentType = response.headers.get('content-type') ?? '';
+  let data: unknown = null;
+  let rawText = '';
+
+  if (contentType.includes('application/json')) {
+    data = await response.json().catch(() => null);
+  } else {
+    rawText = await response.text().catch(() => '');
+  }
+
   if (!response.ok) {
-    throw new Error(data.error ?? 'Failed to upload image');
+    const apiError =
+      typeof data === 'object' &&
+      data &&
+      'error' in data &&
+      typeof (data as { error?: unknown }).error === 'string'
+        ? (data as { error: string }).error
+        : null;
+
+    if (apiError) {
+      throw new Error(apiError);
+    }
+
+    if (response.status === 413) {
+      throw new Error('Image is too large. Max size is 25 MB.');
+    }
+
+    if (rawText.trim().startsWith('<!DOCTYPE') || rawText.trim().startsWith('<html')) {
+      throw new Error('Upload failed on server. Please try again.');
+    }
+
+    throw new Error('Failed to upload image');
   }
 
   return data as { imageUrl: string; imageSizeBytes: number };
