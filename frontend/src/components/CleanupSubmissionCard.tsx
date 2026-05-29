@@ -71,13 +71,13 @@ export function CleanupSubmissionCard({
   });
 
   function handleVote(vote: 'clean' | 'not_clean') {
-    if (voteInFlightRef.current) {
-      return;
-    }
-
-    voteInFlightRef.current = true;
+    if (voteInFlightRef.current) return;
     setVoteError(null);
-    requireAuth('Log in to vote on cleanup proof', () => voteMutation.mutate(vote));
+    requireAuth('Log in to vote on cleanup proof', () => {
+      if (voteInFlightRef.current) return;
+      voteInFlightRef.current = true;
+      voteMutation.mutate(vote);
+    });
   }
 
   const { voteSummary } = submission;
