@@ -48,7 +48,7 @@ export function VoteQueue() {
 
       {trashItems.length > 0 && (
         <section>
-          <h3 className="text-sm font-semibold uppercase tracking-wide mb-3 px-1"
+          <h3 className="text-sm font-semibold uppercase tracking-wide mb-4 px-1"
             style={{ color: 'var(--color-text-muted)' }}>
             🗳️ Is this trash? ({trashItems.length})
           </h3>
@@ -95,7 +95,7 @@ export function VoteQueue() {
 
       {cleanupItems.length > 0 && (
         <section>
-          <h3 className="text-sm font-semibold uppercase tracking-wide mb-3 px-1"
+          <h3 className="text-sm font-semibold uppercase tracking-wide mb-4 px-1"
             style={{ color: 'var(--color-text-muted)' }}>
             🧹 Was this cleaned? ({cleanupItems.length})
           </h3>
