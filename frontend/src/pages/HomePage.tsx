@@ -15,16 +15,10 @@ import {
 } from "../utils/swedenMap";
 
 function getInitialTheme(): "light" | "dark" {
-  const saved = localStorage.getItem("theme");
   const prefersDark = window.matchMedia?.(
     "(prefers-color-scheme: dark)",
   )?.matches;
-  const next: "light" | "dark" =
-    saved === "dark" || saved === "light"
-      ? (saved as "light" | "dark")
-      : prefersDark
-        ? "dark"
-        : "light";
+  const next: "light" | "dark" = prefersDark ? "dark" : "light";
   document.documentElement.dataset.theme = next;
   return next;
 }
@@ -78,7 +72,6 @@ export function HomePage() {
   function toggleTheme() {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
-    localStorage.setItem("theme", next);
     document.documentElement.dataset.theme = next;
   }
 
