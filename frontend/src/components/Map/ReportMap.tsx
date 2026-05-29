@@ -49,6 +49,7 @@ export default function ReportMap({
         minZoom={SWEDEN_MIN_ZOOM}
         maxBounds={SWEDEN_BOUNDS}
         maxBoundsViscosity={1}
+        touchZoom={true}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
