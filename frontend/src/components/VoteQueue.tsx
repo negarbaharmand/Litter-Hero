@@ -52,7 +52,7 @@ export function VoteQueue() {
             style={{ color: 'var(--color-text-muted)' }}>
             🗳️ Is this trash? ({trashItems.length})
           </h3>
-          <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
             {trashItems.map((item) => (
               <div key={item.reportId} className="rounded-2xl p-4 shadow-sm"
                 style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
@@ -99,7 +99,7 @@ export function VoteQueue() {
             style={{ color: 'var(--color-text-muted)' }}>
             🧹 Was this cleaned? ({cleanupItems.length})
           </h3>
-          <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
             {cleanupItems.map((item) => (
               <div key={item.submission.id} className="rounded-2xl p-4 shadow-sm"
                 style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>

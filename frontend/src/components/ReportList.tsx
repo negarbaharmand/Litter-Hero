@@ -90,7 +90,7 @@ export function ReportList() {
         ))}
       </div>
 
-      <div className="mt-6 grid gap-4">
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
         {visibleReports.map((report) => (
           <Link
             key={report.id}
