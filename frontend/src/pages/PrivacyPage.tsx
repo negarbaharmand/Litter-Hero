@@ -22,15 +22,15 @@ const PrivacyPage = () => {
         </button>
 
         <div>
-          <h1>Integritetspolicy för Litter Hero</h1>
+          <h1 className="text-xl!">Integritetspolicy för Litter Hero</h1>
           <p
-            className="text-sm mt-1"
+            className="text-xs mt-1"
             style={{ color: "var(--color-text-muted)" }}
           >
             Version: 1.0 · Datum: 13 maj 2026
           </p>
           <p
-            className="text-base mt-2"
+            className="text-sm mt-2"
             style={{ color: "var(--color-text-body)" }}
           >
             Denna integritetspolicy beskriver hur Litter Hero ("vi", "oss" eller
@@ -40,16 +40,16 @@ const PrivacyPage = () => {
         </div>
 
         <div>
-          <h2>1. Personuppgiftsansvarig</h2>
+          <h2 className="text-base!">1. Personuppgiftsansvarig</h2>
           <p
-            className="text-base mt-2"
+            className="text-sm mt-2"
             style={{ color: "var(--color-text-body)" }}
           >
             Litter Hero är ansvarig för behandlingen av de personuppgifter som
             samlas in via appen.
           </p>
           <p
-            className="text-base mt-2"
+            className="text-sm mt-2"
             style={{ color: "var(--color-text-body)" }}
           >
             Chas Challange 2026, Chas Academy · Projektgrupp 2: Litter Hero ·
@@ -58,9 +58,9 @@ const PrivacyPage = () => {
         </div>
 
         <div>
-          <h2>2. Vilka uppgifter vi samlar in och varför</h2>
+          <h2 className="text-base!">2. Vilka uppgifter vi samlar in och varför</h2>
           <p
-            className="text-base mt-2 mb-3"
+            className="text-sm mt-2 mb-3"
             style={{ color: "var(--color-text-body)" }}
           >
             Vi samlar endast in uppgifter som är nödvändiga för att
@@ -99,13 +99,13 @@ const PrivacyPage = () => {
                 style={{ borderColor: "var(--color-border)" }}
               >
                 <span
-                  className="font-semibold text-base"
+                  className="font-semibold text-sm"
                   style={{ color: "var(--color-text-primary)" }}
                 >
                   {row.type}
                 </span>
                 <span
-                  className="text-base"
+                  className="text-sm"
                   style={{ color: "var(--color-text-body)" }}
                 >
                   {row.purpose}
@@ -122,9 +122,9 @@ const PrivacyPage = () => {
         </div>
 
         <div>
-          <h2>3. Särskilt om Bilder och Metadata</h2>
+          <h2 className="text-base!">3. Särskilt om Bilder och Metadata</h2>
           <p
-            className="text-base mt-2"
+            className="text-sm mt-2"
             style={{ color: "var(--color-text-body)" }}
           >
             När du laddar upp en bild på ett utfört skräpuppdrag kan appen komma
@@ -137,9 +137,9 @@ const PrivacyPage = () => {
         </div>
 
         <div>
-          <h2>4. Lagring av data</h2>
+          <h2 className="text-base!">4. Lagring av data</h2>
           <ul
-            className="text-base mt-2 flex flex-col gap-2"
+            className="text-sm mt-2 flex flex-col gap-2"
             style={{ color: "var(--color-text-body)" }}
           >
             <li>
@@ -160,9 +160,9 @@ const PrivacyPage = () => {
         </div>
 
         <div>
-          <h2>5. Dina rättigheter enligt GDPR</h2>
+          <h2 className="text-base!">5. Dina rättigheter enligt GDPR</h2>
           <p
-            className="text-base mt-2"
+            className="text-sm mt-2"
             style={{ color: "var(--color-text-body)" }}
           >
             Du har rätt att begära utdrag, rättelse eller radering av dina
@@ -172,9 +172,9 @@ const PrivacyPage = () => {
         </div>
 
         <div>
-          <h2>6. Säkerhet</h2>
+          <h2 className="text-base!">6. Säkerhet</h2>
           <p
-            className="text-base mt-2"
+            className="text-sm mt-2"
             style={{ color: "var(--color-text-body)" }}
           >
             Vi använder kryptering vid all överföring av data och vidtar
@@ -184,9 +184,9 @@ const PrivacyPage = () => {
         </div>
 
         <div className="mb-6">
-          <h2>Kontakt</h2>
+          <h2 className="text-base!">Kontakt</h2>
           <p
-            className="text-lg mt-2"
+            className="text-sm mt-2"
             style={{ color: "var(--color-text-body)" }}
           >
             För frågor om dina data, kontakta oss på:{" "}
