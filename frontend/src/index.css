@@ -349,3 +349,54 @@ html {
     display: none;
   }
 }
+
+/* ── Badge celebration modal animations ──────────────────────── */
+@keyframes cel-fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cel-fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+@keyframes cel-card-in {
+  from { transform: scale(0.7) translateY(40px); opacity: 0; }
+  to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+
+@keyframes cel-badge-pop {
+  0%   { transform: scale(0) rotate(-12deg); opacity: 0; }
+  55%  { transform: scale(1.18) rotate(4deg); opacity: 1; }
+  75%  { transform: scale(0.94) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes cel-ring {
+  0%   { transform: scale(0.5); opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+@keyframes cel-slide-down {
+  from { transform: translateY(-16px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+@keyframes cel-slide-up {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── Gaming badge animations ──────────────────────────────────── */
+@keyframes bdg-breathe {
+  0%, 100% { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25)) drop-shadow(0 0 4px var(--bdg, rgba(0,0,0,0.2))); }
+  50%       { filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)) drop-shadow(0 0 14px var(--bdg, rgba(0,0,0,0.2))); }
+}
+@keyframes bdg-fire {
+  0%, 100% { filter: drop-shadow(0 0 6px #f97316) drop-shadow(0 2px 6px rgba(127,29,29,0.5)); }
+  50%       { filter: drop-shadow(0 0 18px #ef4444) drop-shadow(0 4px 8px rgba(185,28,28,0.45)); }
+}
+@keyframes bdg-legendary {
+  0%   { filter: drop-shadow(0 0 10px #a855f7) drop-shadow(0 2px 4px rgba(0,0,0,0.35)); }
+  33%  { filter: drop-shadow(0 0 12px #06b6d4) drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+  66%  { filter: drop-shadow(0 0 10px #e879f9) drop-shadow(0 2px 4px rgba(0,0,0,0.35)); }
+  100% { filter: drop-shadow(0 0 10px #a855f7) drop-shadow(0 2px 4px rgba(0,0,0,0.35)); }
+}
+
+.bdg-breathe   { animation: bdg-breathe   3.5s ease-in-out infinite; }
+.bdg-fire      { animation: bdg-fire      1.6s ease-in-out infinite; }
+.bdg-legendary { animation: bdg-legendary 3s   ease-in-out infinite; }

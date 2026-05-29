@@ -14,10 +14,13 @@ import { AccountSettingsPage } from './pages/AccountSettingsPage'
 import PrivateRoute from './components/PrivateRoute'
 import { VerifyEmailPage } from './pages/VerifyEmailPage'
 import PrivacyPage from './pages/PrivacyPage'
+import BadgeCelebration from './components/BadgeCelebration'
+import { useAuth } from './hooks/useAuth'
 
 function App() {
   const location = useLocation()
   const hideNavOn = new Set(['/login', '/verify-email', '/about'])
+  const { newBadges, clearNewBadges } = useAuth()
 
   useEffect(() => {
     const main = document.querySelector('#main-content')
@@ -30,6 +33,9 @@ function App() {
     <>
       <a href="#main-content" className="skip-link">Skip to main content</a>
       {!hideNavOn.has(location.pathname) && <NavBar />}
+      {newBadges.length > 0 && (
+        <BadgeCelebration badges={newBadges} onDismiss={clearNewBadges} />
+      )}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
