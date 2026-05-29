@@ -36,33 +36,33 @@ export const TIER_META: Record<BadgeTier, { stars: number; dotColor: string; ani
 }
 
 export const BADGE_CONFIG: Record<string, BadgeConfig> = {
-  // Reports — blue/indigo, hexagon
-  'First Report':      { icon: LuFilePen,          from: '#60a5fa', to: '#1d4ed8', border: '#1e3a8a', glow: '#3b82f6', shape: 'hex',     tier: 'common' },
-  '5 Reports':         { icon: SiOpenstreetmap,     from: '#818cf8', to: '#4338ca', border: '#312e81', glow: '#6366f1', shape: 'hex',     tier: 'rare' },
-  '10 Reports':        { icon: GiFallingStar,       from: '#38bdf8', to: '#0284c7', border: '#075985', glow: '#0ea5e9', shape: 'hex',     tier: 'rare' },
-  '50 Reports':        { icon: RxRocket,            from: '#c084fc', to: '#7c3aed', border: '#4c1d95', glow: '#a855f7', shape: 'hex',     tier: 'epic' },
-  // Cleanups — emerald/gold, hexagon
+  // Reports — lime green (energetic, spotting litter)
+  'First Report':      { icon: LuFilePen,          from: '#d9f99d', to: '#65a30d', border: '#4d7c0f', glow: '#84cc16', shape: 'hex',     tier: 'common' },
+  '5 Reports':         { icon: SiOpenstreetmap,     from: '#bef264', to: '#4d7c0f', border: '#3f6212', glow: '#65a30d', shape: 'hex',     tier: 'rare' },
+  '10 Reports':        { icon: GiFallingStar,       from: '#a3e635', to: '#3f6212', border: '#365314', glow: '#4d7c0f', shape: 'hex',     tier: 'rare' },
+  '50 Reports':        { icon: RxRocket,            from: '#84cc16', to: '#365314', border: '#1a2e05', glow: '#3f6212', shape: 'hex',     tier: 'epic' },
+  // Cleanups — emerald → gold for higher tiers (nature restored, then achievement)
   'First Cleanup':     { icon: PiBroomBold,         from: '#4ade80', to: '#15803d', border: '#14532d', glow: '#22c55e', shape: 'hex',     tier: 'common' },
   '5 Cleanups':        { icon: RiRecycleFill,       from: '#34d399', to: '#047857', border: '#064e3b', glow: '#10b981', shape: 'hex',     tier: 'rare' },
   '10 Cleanups':       { icon: HiOutlineTrophy,     from: '#fcd34d', to: '#d97706', border: '#b45309', glow: '#f59e0b', shape: 'hex',     tier: 'rare' },
   '50 Cleanups':       { icon: GiKnockedOutStars,   from: '#fde68a', to: '#ca8a04', border: '#a16207', glow: '#eab308', shape: 'hex',     tier: 'epic' },
-  // Verifications — purple/violet, hexagon
-  'First Verify':      { icon: LuUserRoundCheck,    from: '#c084fc', to: '#7c3aed', border: '#6d28d9', glow: '#8b5cf6', shape: 'hex',     tier: 'common' },
-  '10 Verifications':  { icon: FaMagnifyingGlass,   from: '#e879f9', to: '#9333ea', border: '#7e22ce', glow: '#a855f7', shape: 'hex',     tier: 'rare' },
-  '50 Verifications':  { icon: IoGlassesOutline,    from: '#a78bfa', to: '#5b21b6', border: '#4c1d95', glow: '#7c3aed', shape: 'hex',     tier: 'epic' },
-  '100 Verifications': { icon: FaShieldCat,         from: '#f0abfc', to: '#9333ea', border: '#701a75', glow: '#d946ef', shape: 'shield',  tier: 'legendary' },
-  // Streaks — fire, diamond shape
+  // Verifications — amber/gold (trusted, confirmed, official)
+  'First Verify':      { icon: LuUserRoundCheck,    from: '#fde68a', to: '#d97706', border: '#b45309', glow: '#f59e0b', shape: 'hex',     tier: 'common' },
+  '10 Verifications':  { icon: FaMagnifyingGlass,   from: '#fcd34d', to: '#b45309', border: '#92400e', glow: '#d97706', shape: 'hex',     tier: 'rare' },
+  '50 Verifications':  { icon: IoGlassesOutline,    from: '#fbbf24', to: '#92400e', border: '#78350f', glow: '#b45309', shape: 'hex',     tier: 'epic' },
+  '100 Verifications': { icon: FaShieldCat,         from: '#fef08a', to: '#a16207', border: '#854d0e', glow: '#ca8a04', shape: 'shield',  tier: 'legendary' },
+  // Streaks — fire (passion and dedication, universal)
   '3 Day Streak':      { icon: FaFireFlameCurved,   from: '#fb923c', to: '#c2410c', border: '#9a3412', glow: '#f97316', shape: 'diamond', tier: 'streak' },
   '7 Day Streak':      { icon: VscFlame,            from: '#f87171', to: '#dc2626', border: '#991b1b', glow: '#ef4444', shape: 'diamond', tier: 'streak' },
   '14 Day Streak':     { icon: GiFlame,             from: '#fca5a5', to: '#b91c1c', border: '#7f1d1d', glow: '#dc2626', shape: 'diamond', tier: 'streak' },
-  '30 Day Streak':     { icon: GiLightningFlame,    from: '#d8b4fe', to: '#7c3aed', border: '#5b21b6', glow: '#a855f7', shape: 'diamond', tier: 'streak' },
-  // Milestones — shield shape
+  '30 Day Streak':     { icon: GiLightningFlame,    from: '#fdba74', to: '#c2410c', border: '#9a3412', glow: '#f97316', shape: 'diamond', tier: 'streak' },
+  // Milestones — shield shape, deep nature greens & ocean teals
   'Litter Spotter':    { icon: PiPlant,             from: '#86efac', to: '#15803d', border: '#14532d', glow: '#22c55e', shape: 'shield',  tier: 'common' },
-  'Street Cleaner':    { icon: GiMagicBroom,        from: '#fde68a', to: '#ca8a04', border: '#a16207', glow: '#eab308', shape: 'shield',  tier: 'rare' },
-  'Eco Warrior':       { icon: LuSwords,            from: '#fcd34d', to: '#b45309', border: '#92400e', glow: '#f59e0b', shape: 'shield',  tier: 'rare' },
-  'Green Hero':        { icon: GiNinjaHeroicStance, from: '#34d399', to: '#065f46', border: '#064e3b', glow: '#10b981', shape: 'shield',  tier: 'epic' },
-  'Beach Hero':        { icon: TbBeach,             from: '#7dd3fc', to: '#0369a1', border: '#075985', glow: '#0ea5e9', shape: 'shield',  tier: 'epic' },
-  'Planet Guardian':   { icon: GiPlanetConquest,    from: '#818cf8', to: '#0891b2', border: '#155e75', glow: '#06b6d4', shape: 'shield',  tier: 'legendary' },
+  'Street Cleaner':    { icon: GiMagicBroom,        from: '#34d399', to: '#0f766e', border: '#134e4a', glow: '#0d9488', shape: 'shield',  tier: 'rare' },
+  'Eco Warrior':       { icon: LuSwords,            from: '#4ade80', to: '#065f46', border: '#064e3b', glow: '#10b981', shape: 'shield',  tier: 'rare' },
+  'Green Hero':        { icon: GiNinjaHeroicStance, from: '#22c55e', to: '#14532d', border: '#052e16', glow: '#16a34a', shape: 'shield',  tier: 'epic' },
+  'Beach Hero':        { icon: TbBeach,             from: '#34d399', to: '#0f766e', border: '#134e4a', glow: '#0d9488', shape: 'shield',  tier: 'epic' },
+  'Planet Guardian':   { icon: GiPlanetConquest,    from: '#4ade80', to: '#052e16', border: '#14532d', glow: '#16a34a', shape: 'shield',  tier: 'legendary' },
 }
 
 // ── SVG shape data ────────────────────────────────────────────────

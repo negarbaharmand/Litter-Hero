@@ -391,10 +391,9 @@ html {
   50%       { filter: drop-shadow(0 0 18px #ef4444) drop-shadow(0 4px 8px rgba(185,28,28,0.45)); }
 }
 @keyframes bdg-legendary {
-  0%   { filter: drop-shadow(0 0 10px #a855f7) drop-shadow(0 2px 4px rgba(0,0,0,0.35)); }
-  33%  { filter: drop-shadow(0 0 12px #06b6d4) drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
-  66%  { filter: drop-shadow(0 0 10px #e879f9) drop-shadow(0 2px 4px rgba(0,0,0,0.35)); }
-  100% { filter: drop-shadow(0 0 10px #a855f7) drop-shadow(0 2px 4px rgba(0,0,0,0.35)); }
+  0%   { filter: drop-shadow(0 0 10px #22c55e) drop-shadow(0 2px 4px rgba(0,0,0,0.35)); }
+  50%  { filter: drop-shadow(0 0 14px #eab308) drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+  100% { filter: drop-shadow(0 0 10px #22c55e) drop-shadow(0 2px 4px rgba(0,0,0,0.35)); }
 }
 
 .bdg-breathe   { animation: bdg-breathe   3.5s ease-in-out infinite; }
