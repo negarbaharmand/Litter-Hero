@@ -282,16 +282,21 @@ export type MessageResponse = {
 }
 
 export const loginUser = async (email: string, password: string): Promise<AuthResponse> => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  })
-  const data = await response.json()
-  if (!response.ok) {
-    throw new Error(data.error ?? 'Login failed')
+  let response: Response
+  try {
+    response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+  } catch {
+    throw new Error('Network error. Please check your connection and try again.')
   }
-  return data
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    throw new Error((data as { error?: string }).error ?? 'Login failed')
+  }
+  return data as AuthResponse
 }
 
 export const registerUser = async (
@@ -300,16 +305,21 @@ export const registerUser = async (
   username?: string,
   name?: string
 ): Promise<RegisterResponse> => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password, username, name }),
-  })
-  const data = await response.json()
-  if (!response.ok) {
-    throw new Error(data.error ?? 'Registration failed')
+  let response: Response
+  try {
+    response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, username, name }),
+    })
+  } catch {
+    throw new Error('Network error. Please check your connection and try again.')
   }
-  return data
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    throw new Error((data as { error?: string }).error ?? 'Registration failed')
+  }
+  return data as RegisterResponse
 }
 
 export const verifyEmail = async (email: string, token: string): Promise<MessageResponse> => {
@@ -560,6 +570,9 @@ export const fetchVoteQueue = async (): Promise<VoteQueueResponse> => {
   const response = await fetch(`${API_BASE_URL}/api/reports/vote-queue`, {
     headers: { ...authHeaders() },
   });
-  if (!response.ok) throw new Error('Failed to fetch vote queue');
-  return response.json() as Promise<VoteQueueResponse>;
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error((data as { error?: string }).error ?? 'Failed to fetch vote queue');
+  }
+  return data as VoteQueueResponse;
 };

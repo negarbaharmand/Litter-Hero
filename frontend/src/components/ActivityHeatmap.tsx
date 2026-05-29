@@ -17,15 +17,15 @@ const ActivityHeatmap = ({ activity, currentStreak }: ActivityHeatmapProps) => {
 
   return (
     <div className="mx-4 mt-6">
+      <div className="activity-heatmap__header mb-3">
+        <h3>Activity</h3>
+        {currentStreak > 0 && (
+          <span className="text-body-sm font-semibold shrink-0" style={{ color: 'var(--color-green-normal)' }}>
+            🔥 {currentStreak} day{currentStreak === 1 ? '' : 's'}
+          </span>
+        )}
+      </div>
       <div className="card activity-heatmap">
-        <div className="activity-heatmap__header">
-          <h3 className="mb-0!">Activity</h3>
-          {currentStreak > 0 && (
-            <span className="text-body-sm font-semibold shrink-0" style={{ color: 'var(--color-green-normal)' }}>
-              🔥 {currentStreak} day{currentStreak === 1 ? '' : 's'}
-            </span>
-          )}
-        </div>
         <div className="activity-heatmap__grid-wrap">
           <div
             className="activity-heatmap__grid"
