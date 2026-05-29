@@ -135,7 +135,7 @@ Approved submissions mark reports as cleaned, expire competing pending submissio
 ## Architecture
 
 ```text
-┌─────────────┐     HTTPS      ┌──────────────┐     /api/*     ┌─────────────┐
+┌─────────────┐     HTTPS      ┌──────────────┐    /api/*     ┌─────────────┐
 │   Browser   │ ──────────────▶│   Frontend   │ ─────────────▶│   Backend   │
 │  (React SPA)│                │    (Nginx)   │               │  (Express)  │
 └─────────────┘                └──────────────┘               └──────┬──────┘
