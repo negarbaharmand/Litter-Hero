@@ -78,7 +78,7 @@ export function VoteQueue() {
                   <img
                     src={item.imageUrl}
                     alt="Report"
-                    className="w-full max-h-48 object-cover rounded-lg mb-3"
+                    className="aspect-[4/3] w-full object-cover rounded-lg mb-3"
                   />
                 )}
                 <ReportVerificationCard

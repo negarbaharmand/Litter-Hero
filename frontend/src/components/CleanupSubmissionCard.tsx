@@ -113,19 +113,16 @@ export function CleanupSubmissionCard({
       </div>
 
       {/* Proof image */}
-      <div className="px-5 pt-4">
-        <img
-          src={submission.imageUrl}
-          alt="Cleanup proof"
-          className="w-full rounded-xl object-cover"
-          style={{ maxHeight: '220px' }}
-        />
-        {submission.note && (
-          <p className="mt-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            {submission.note}
-          </p>
-        )}
-      </div>
+      <img
+        src={submission.imageUrl}
+        alt="Cleanup proof"
+        className="aspect-[4/3] w-full object-cover"
+      />
+      {submission.note && (
+        <p className="px-5 pt-3 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          {submission.note}
+        </p>
+      )}
 
       {/* Vote stats + progress */}
       <div className="px-5 py-4">

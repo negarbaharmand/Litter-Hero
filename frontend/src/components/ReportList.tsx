@@ -102,27 +102,25 @@ export function ReportList() {
             }}
           >
             {report.imageUrl && (
-              <div className="w-full bg-slate-100 dark:bg-neutral-800 p-3">
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setPreviewImageUrl(report.imageUrl);
-                    setPreviewImageAlt(
-                      report.description?.trim() || "Report image",
-                    );
-                  }}
-                  className="mx-auto block w-full max-w-[320px] overflow-hidden rounded-xl"
-                  aria-label="Open report image preview"
-                >
-                  <img
-                    src={report.imageUrl}
-                    alt={report.description?.trim() || "Report image"}
-                    className="aspect-square w-full object-cover transition-transform duration-200 hover:scale-[1.02]"
-                  />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setPreviewImageUrl(report.imageUrl);
+                  setPreviewImageAlt(
+                    report.description?.trim() || "Report image",
+                  );
+                }}
+                className="block w-full overflow-hidden"
+                aria-label="Open report image preview"
+              >
+                <img
+                  src={report.imageUrl}
+                  alt={report.description?.trim() || "Report image"}
+                  className="aspect-[4/3] w-full object-cover transition-transform duration-200 hover:scale-[1.02]"
+                />
+              </button>
             )}
             <div className="p-4">
               <div className="flex items-center gap-2 flex-wrap">
