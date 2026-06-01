@@ -5,6 +5,25 @@ import { AuthContext, type AuthState } from './authContext'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? ''
 
+const SEEN_BADGES_KEY = 'seenBadges'
+
+function getSeenBadges(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(SEEN_BADGES_KEY) ?? '[]')
+  } catch {
+    return []
+  }
+}
+
+function saveSeenBadges(badges: string[]) {
+  localStorage.setItem(SEEN_BADGES_KEY, JSON.stringify(badges))
+}
+
+function detectNewBadges(currentBadges: string[]): string[] {
+  const seen = getSeenBadges()
+  return currentBadges.filter(b => !seen.includes(b))
+}
+
 function normalizeMeUser(user: MeUser): MeUser {
   const activity =
     user.activity &&
@@ -33,6 +52,24 @@ function getInitialAuthState(): AuthState {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>(getInitialAuthState)
+  const [newBadges, setNewBadges] = useState<string[]>([])
+
+  const clearNewBadges = useCallback(() => setNewBadges([]), [])
+
+  function applyUser(user: MeUser, skipNewBadgeDetection = false) {
+    const normalized = normalizeMeUser(user)
+    if (!skipNewBadgeDetection) {
+      const fresh = detectNewBadges(normalized.badges)
+      if (fresh.length > 0) {
+        setNewBadges(prev => {
+          const combined = [...prev, ...fresh.filter(b => !prev.includes(b))]
+          return combined
+        })
+      }
+    }
+    saveSeenBadges(normalized.badges)
+    return normalized
+  }
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -45,7 +82,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!res.ok) throw new Error('Unauthorized')
         return res.json() as Promise<MeUser>
       })
-      .then((user) => setAuthState({ status: 'authenticated', user: normalizeMeUser(user) }))
+      .then((user) => {
+        // On app load, don't fire celebrations for already-owned badges
+        const normalized = normalizeMeUser(user)
+        saveSeenBadges(normalized.badges)
+        setAuthState({ status: 'authenticated', user: normalized })
+      })
       .catch(() => {
         localStorage.removeItem('token')
         localStorage.removeItem('user')
@@ -60,9 +102,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
       .then((res) => res.json() as Promise<MeUser>)
       .then((meUser) => {
-        const user = normalizeMeUser(meUser)
-        localStorage.setItem('user', JSON.stringify(user))
-        setAuthState({ status: 'authenticated', user })
+        // On login, mark all current badges as seen (no celebration for pre-existing badges)
+        const normalized = normalizeMeUser(meUser)
+        saveSeenBadges(normalized.badges)
+        localStorage.setItem('user', JSON.stringify(normalized))
+        setAuthState({ status: 'authenticated', user: normalized })
       })
       .catch(() => {
         localStorage.removeItem('token')
@@ -70,7 +114,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
   }
 
-  //async so that await refreshUser() in AddPicturePage waits until the profile is updated
   const refreshUser = useCallback(async () => {
     const token = localStorage.getItem('token')
     if (!token) return
@@ -80,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       if (!res.ok) throw new Error('Unauthorized')
       const user = await res.json() as MeUser
-      const normalized = normalizeMeUser(user)
+      const normalized = applyUser(user)
       localStorage.setItem('user', JSON.stringify(normalized))
       setAuthState({ status: 'authenticated', user: normalized })
     } catch {
@@ -97,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ authState, setUser, clearAuth, refreshUser }}>
+    <AuthContext.Provider value={{ authState, setUser, clearAuth, refreshUser, newBadges, clearNewBadges }}>
       {children}
     </AuthContext.Provider>
   )

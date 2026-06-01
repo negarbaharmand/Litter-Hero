@@ -99,7 +99,7 @@ export function NavBar() {
   return (
     <>
       {/* Mobile bottom navbar (< md) */}
-      <header className="fixed inset-x-0 bottom-0 z-30 h-[94px] pb-[env(safe-area-inset-bottom)] md:hidden">
+      <header className="fixed inset-x-0 bottom-0 z-30 h-[calc(94px+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] will-change-transform md:hidden">
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-[image:var(--nav-gradient)] shadow-lg [mask-image:radial-gradient(circle_40px_at_calc(50%_-_0px)_22px,transparent_98%,black_100%)] [-webkit-mask-image:radial-gradient(circle_40px_at_calc(50%_-_0px)_22px,transparent_98%,black_100%)]"

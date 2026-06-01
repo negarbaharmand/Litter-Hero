@@ -680,13 +680,20 @@ export const voteOnReportVerification = async (req: Request, res: Response) => {
       if (report.status !== 'pending') return { type: 'not_pending' } as const;
       if (report.userId === userId) return { type: 'forbidden_self_vote' } as const;
 
-      try {
-        await tx.insert(reportVerificationVotes).values({ reportId, userId, vote });
-      } catch (error) {
-        const maybePgError = error as { code?: string };
-        if (maybePgError.code === '23505') return { type: 'duplicate_vote' } as const;
-        throw error;
-      }
+      const [existingVote] = await tx
+        .select({ id: reportVerificationVotes.id })
+        .from(reportVerificationVotes)
+        .where(
+          and(
+            eq(reportVerificationVotes.reportId, reportId),
+            eq(reportVerificationVotes.userId, userId)
+          )
+        )
+        .limit(1);
+
+      if (existingVote) return { type: 'duplicate_vote' } as const;
+
+      await tx.insert(reportVerificationVotes).values({ reportId, userId, vote });
 
       await tx
         .update(users)
