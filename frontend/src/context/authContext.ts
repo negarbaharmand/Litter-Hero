@@ -11,6 +11,8 @@ export type AuthContextValue = {
   setUser: (user: AuthUser, token: string) => void
   clearAuth: () => void
   refreshUser: () => Promise<void>
+  newBadges: string[]
+  clearNewBadges: () => void
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)

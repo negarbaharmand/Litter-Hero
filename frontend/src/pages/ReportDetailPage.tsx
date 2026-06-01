@@ -167,7 +167,7 @@ export function ReportDetailPage() {
           style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}
         >
           {report.imageUrl && (
-            <img src={report.imageUrl} alt="Reported trash spot" className="h-64 w-full object-cover" />
+            <img src={report.imageUrl} alt="Reported trash spot" className="aspect-[4/3] w-full object-cover" />
           )}
           <div className="p-4">
             <p className="text-lg font-semibold" style={{ color: 'var(--color-text-body)' }}>

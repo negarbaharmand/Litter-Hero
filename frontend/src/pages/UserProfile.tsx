@@ -130,7 +130,7 @@ const UserProfile = () => {
           fullWidth
           disabled={isLoggingOut}
           onClick={handleLogout}
-          className="mx-4 mt-3 bg-(--color-green-darker)"
+          className="mx-4 mt-8 bg-(--color-green-darker)"
           style={{
             width: "calc(100% - 2rem)",
             color: "var(--color-grey-normal)",
