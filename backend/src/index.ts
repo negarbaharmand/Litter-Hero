@@ -5,7 +5,7 @@ import reportRoutes from './routes/reportRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import express from 'express';
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import promBundle from 'express-prom-bundle';
 import swaggerUi from 'swagger-ui-express';
@@ -44,6 +44,18 @@ app.get('/config-test', (req: Request, res: Response) => {
     port: PORT,
     db_connected: !!process.env.DATABASE_URL,
   });
+});
+
+// 404 handler — must be after all routes
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
+// Global error handler — must be last and have all 4 parameters
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 app.listen(PORT, () => {

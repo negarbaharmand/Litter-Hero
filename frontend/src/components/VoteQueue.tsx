@@ -48,11 +48,11 @@ export function VoteQueue() {
 
       {trashItems.length > 0 && (
         <section>
-          <h3 className="text-sm font-semibold uppercase tracking-wide mb-3 px-1"
+          <h3 className="text-sm font-semibold uppercase tracking-wide mb-4 px-1"
             style={{ color: 'var(--color-text-muted)' }}>
             🗳️ Is this trash? ({trashItems.length})
           </h3>
-          <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
             {trashItems.map((item) => (
               <div key={item.reportId} className="rounded-2xl p-4 shadow-sm"
                 style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
@@ -78,7 +78,7 @@ export function VoteQueue() {
                   <img
                     src={item.imageUrl}
                     alt="Report"
-                    className="w-full max-h-48 object-cover rounded-lg mb-3"
+                    className="aspect-[4/3] w-full object-cover rounded-lg mb-3"
                   />
                 )}
                 <ReportVerificationCard
@@ -95,11 +95,11 @@ export function VoteQueue() {
 
       {cleanupItems.length > 0 && (
         <section>
-          <h3 className="text-sm font-semibold uppercase tracking-wide mb-3 px-1"
+          <h3 className="text-sm font-semibold uppercase tracking-wide mb-4 px-1"
             style={{ color: 'var(--color-text-muted)' }}>
             🧹 Was this cleaned? ({cleanupItems.length})
           </h3>
-          <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
             {cleanupItems.map((item) => (
               <div key={item.submission.id} className="rounded-2xl p-4 shadow-sm"
                 style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
