@@ -142,16 +142,11 @@ export function AccountSettingsPage() {
           ← Back
         </button>
 
-        <header className="text-center">
-          <h1 className="mb-2">Account settings</h1>
-          <p className="text-base" style={{ color: 'var(--color-text-muted)' }}>
-            Update your profile photo, username, and password.
-          </p>
-        </header>
+       
 
         {/* ── Profile photo ─────────────────────────────────────────────── */}
         <section className="card flex flex-col gap-4">
-          <h2 className="mb-0">Profile photo</h2>
+          <h2 className="mb-0">Profile Photo</h2>
           <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
             Upload a photo for your profile and the leaderboard.
           </p>

@@ -39,50 +39,46 @@ export function AboutPage() {
         </header>
 
         <section className="card">
-          <h2 className="mb-3!">Our mission</h2>
+          <h2 className="text-xl! mb-3!">Our mission</h2>
           <p style={{ color: 'var(--color-text-body)' }}>
-            We built Litter Hero because we genuinely care about the environment and want to see it thrive for future generations. The idea is simple: Think of it as Pokemon Go but for litter - when you spot a mess, you report it. That small act goes into a shared map, other people can see it, clean it up, and slowly things actually get better. No shaming, no preaching. Just people looking out for the environment while doing something good.
+            We built Litter Hero because we genuinely care about the environment and want to see it thrive for future generations. The idea is simple: when you spot a mess, you report it. That small act goes into a shared map, other people can see it, clean it up, and slowly things actually get better. No shaming, no preaching. Just people looking out for the environment while doing something good.
           </p>
         </section>
 
         <section className="card">
-          <h2 className="mb-3!">The impact</h2>
-          <p
-            className="mb-3!"
-            style={{ color: 'var(--color-text-body)' }}
-          >
-            Every report you submit builds a real picture of where litter
-            accumulates. That helps people organise cleanups, gives local groups
-            a way to prioritise their efforts, and means your minute of
-            effort actually counts for something. One photo at a time,
-            things genuinely get better.
-          </p>
+          <h2 className="text-xl! mb-3!">The impact</h2>
           <p style={{ color: 'var(--color-text-body)' }}>
+            Every report you submit builds a real picture of where litter accumulates.
+            That helps people organise cleanups, gives local groups a way to prioritise
+            their efforts, and means your minute of effort actually counts for something.
             One photo at a time, the map gets cleaner.
           </p>
         </section>
 
         <section className="card">
-          <h2 className="mb-3!">How it came to be</h2>
+          <h2 className="text-xl! mb-3!">How it came to be</h2>
           <p style={{ color: 'var(--color-text-body)' }}>
-            We at Litter Hero genuinely care about the environment and wanted to help people who care about the environment make their efforts more rewarding than just the work itself. 
-            
+            Litter Hero started as a CHAS Challenge 2026 project by a group of developers
+            who wanted to build something that matters. We looked at the gap between
+            people who care about their local environment and the tools available to act
+            on that care — and decided to close it. A shared map, community verification,
+            and a points system that rewards real action: that's the loop we built.
           </p>
         </section>
 
         <section className="card">
-          <h2 className="mb-3!">What's next</h2>
+          <h2 className="text-xl! mb-3!">What's next</h2>
           <p
             className="mb-3!"
             style={{ color: 'var(--color-text-body)' }}
           >
-            Reporting and cleaning up earns you points. Right now those points lands you a
+            Reporting and cleaning up earn you points. Right now those points land you a
             spot on the leaderboard. But that's only the start.
           </p>
           <p style={{ color: 'var(--color-text-body)' }}>
-            We're working toward turning those points into something tangible - gift
+            We're working toward turning those points into something tangible — gift
             cards and discounts at local stores and brands that care about the same things
-            you do. Doing good for the environment can be more rewarding than just the work itself.
+            you do. Doing good for the environment should be rewarding in more ways than one.
           </p>
         </section>
 

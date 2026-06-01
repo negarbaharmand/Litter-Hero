@@ -43,6 +43,7 @@ export function AddPicturePage() {
   const [isLocating, setIsLocating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitErrorTitle, setSubmitErrorTitle] = useState('Error');
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [showSizeInfo, setShowSizeInfo] = useState(false);
   const [locationRequired, setLocationRequired] = useState(false);
@@ -157,8 +158,9 @@ export function AddPicturePage() {
     requireAuth("Create an account to submit a report", submitReport);
   }
 
-  function showPopUp(message: string) {
+  function showPopUp(message: string, title = 'Error') {
     setSubmitError(message);
+    setSubmitErrorTitle(title);
 
     if (popupTimerRef.current) {
       clearTimeout(popupTimerRef.current);
@@ -213,9 +215,8 @@ export function AddPicturePage() {
 
       if (created.status === "rejected") {
         showPopUp(
-          created.rejectionReason
-            ? `report was rejected: ${created.rejectionReason}`
-            : "report was rejected by automatic verification",
+          created.rejectionReason ?? "Your report was rejected by automatic verification.",
+          "Report rejected",
         );
         return;
       }
@@ -540,14 +541,13 @@ export function AddPicturePage() {
           <div className="fixed top-5 right-5 z-50 max-w-sm w-[calc(100%-2rem)] rounded-xl border border-red-300 bg-red-50 text-red-900 shadow-lg">
             <div className="flex items-start gap-3 p-4">
               <div className="flex-1 text-sm leading-5">
-                <strong className="block mb-1">Report rejected</strong>
+                <strong className="block mb-1">{submitErrorTitle}</strong>
                 <span>{submitError}</span>
               </div>
 
               <button
                 onClick={() => {
                   setSubmitError(null);
-
                   if (popupTimerRef.current) {
                     clearTimeout(popupTimerRef.current);
                     popupTimerRef.current = null;
@@ -556,7 +556,7 @@ export function AddPicturePage() {
                 aria-label="Close notification"
                 className="shrink-0 rounded-md px-2 py-1 text-red-700 hover:bg-red-100"
               >
-                x
+                ✕
               </button>
             </div>
           </div>

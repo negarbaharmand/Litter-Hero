@@ -1,4 +1,5 @@
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import { useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import MarkerPopup from './MarkerPopup';
@@ -6,6 +7,16 @@ import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import type { Report } from '../../api';
 import { SWEDEN_BOUNDS, SWEDEN_MIN_ZOOM } from '../../utils/swedenMap';
+
+function MapFlyTo({ target }: { target: [number, number] | null }) {
+  const map = useMap();
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    if (target) map.flyTo(target, Math.max(map.getZoom(), 14));
+  }, [target, map]);
+  return null;
+}
 
 
 const DefaultIcon = L.icon({
@@ -34,11 +45,13 @@ export default function ReportMap({
   reports,
   center,
   currentLocation,
+  flyTo = null,
   theme = 'light',
 }: {
   reports?: Report[];
   center: [number, number];
   currentLocation: [number, number] | null;
+  flyTo?: [number, number] | null;
   theme?: 'light' | 'dark';
 }) {
   return (
@@ -49,8 +62,10 @@ export default function ReportMap({
         minZoom={SWEDEN_MIN_ZOOM}
         maxBounds={SWEDEN_BOUNDS}
         maxBoundsViscosity={1}
+        touchZoom={true}
         style={{ height: '100%', width: '100%' }}
       >
+        <MapFlyTo target={flyTo} />
         <TileLayer
           attribution={
             theme === 'dark'

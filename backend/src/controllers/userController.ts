@@ -146,6 +146,12 @@ export const getMe = async (req: Request, res: Response) => {
 
     const totalVerificationVotes = (cleanupVotesCount?.count ?? 0) + reportVerifyCount;
 
+    const [rankRow] = await db
+      .select({ rank: sql<number>`(SELECT COUNT(*)::int + 1 FROM users WHERE points > ${user.points})` })
+      .from(users)
+      .limit(1);
+    const rank = rankRow?.rank ?? 1;
+
     return res.json({
       ...userWithoutPassword,
       hasPassword,
@@ -158,6 +164,7 @@ export const getMe = async (req: Request, res: Response) => {
       cleanupsApproved: cleanupCount,
       reportVerificationVotes: reportVerifyCount,
       verificationVotes: totalVerificationVotes,
+      rank,
     });
   } catch (error) {
     console.error('Error fetching me:', error);
