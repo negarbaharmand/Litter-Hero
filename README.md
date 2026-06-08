@@ -59,9 +59,9 @@ Most environmental apps reward you for saying you did something. LitterHero only
 
 ## Demo video
 
-https://github.com/negarbaharmand/Litter-Hero/raw/main/demo/litter-hero-demo.mp4
+![Litter Hero demo](./demo/litter-hero-demo.gif)
 
-- File in repo: [`demo/litter-hero-demo.mp4`](./demo/litter-hero-demo.mp4)
+- Full video: [`demo/litter-hero-demo.mp4`](./demo/litter-hero-demo.mp4)
 
 ---
 
